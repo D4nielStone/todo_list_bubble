@@ -1,22 +1,32 @@
 #include <iostream>
 #include "tlb.hpp"
 
+void TLB::error(const std::string& msg) {
+    throw std::runtime_error(msg);
+}
+void TLB::info(const std::string& msg) {
+    std::cout << breset << "TLB::" << bgreen << msg << "\n";
+}
 void TLB::initGraphics() {
-    std::cout << breset << "TLB::" << bgreen << "Initializating graphics\n";
-    // step 1: create main window.
+    TLB::info("Creating new window...");
+    // step 1: init glfw
     if (!glfwInit()) {
-        throw std::runtime_error("Glfw initialization");
+        TLB::error("Glfw initialization");
     }
-    // step 2: create window
-    auto* window = glfwCreateWindow(500, 800, "TLB::TodoListBubble", NULL, NULL);
-    if (!window) {
-        throw std::runtime_error("Invalid Window");
+    // step 2: create window and init glad
+    m_window = glfwCreateWindow(500, 700, "TLB::TodoListBubble", NULL, NULL);
+    if (!m_window) {
+        TLB::error("Invalid window");
     };
 
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(m_window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        throw std::runtime_error("Glad initializtion");
+        TLB::error("Glad initialization");
     }
-
+    TLB::info("Window created");
+}
+void TLB::windowLoop() {
+    while(!glfwWindowShouldClose(m_window)) {
+    }
 }

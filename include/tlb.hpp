@@ -7,8 +7,15 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
 // \brief TLB is the main class. Todo List Bubble
 class TLB {
+private:
+    inline static GLFWwindow* m_window{ nullptr };
 public:
+    TLB();
     static void initGraphics();
+    static void windowLoop();
+    static void error(const std::string&);
+    static void info(const std::string&);
 };
