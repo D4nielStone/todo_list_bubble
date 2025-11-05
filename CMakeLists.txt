@@ -5,6 +5,7 @@ project(TodoListBubble)
 set(OUT_DIR ${CMAKE_SOURCE_DIR}/out)
 # include the default library header
 include_directories(
+    /usr/include/GLFW
     include
     libs
     )
@@ -14,3 +15,5 @@ add_executable(TodoListBubble
     source/main.cpp
     libs/glad/glad.c
     )
+find_package(glfw3 REQUIRED)
+target_link_libraries(TodoListBubble PRIVATE glfw)

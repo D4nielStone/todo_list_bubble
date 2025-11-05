@@ -6,7 +6,7 @@ int main() {
         std::cout << "Hello TodoListBubble! Trying to init the graphical library...\n";
         TLB::initGraphics();
     } catch (std::exception& e) {
-        std::cout << e.what();
+        std::cout << breset << "ERROR" << bred << e.what();
         return -1;
     }
     return 0;

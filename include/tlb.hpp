@@ -1,9 +1,12 @@
 #pragma once // precautionary measure
              // set the code of each color
-#define red         "\033[0;31m"
-#define green       "\033[0;32m"
-#define blue        "\033[0;34m"
-#define reset       "\033[0;0m"
+#define bred         "\033[0;31m"
+#define bgreen       "\033[0;32m"
+#define bblue        "\033[0;34m"
+#define breset       "\033[0;0m"
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 // \brief TLB is the main class. Todo List Bubble
 class TLB {
 public:
