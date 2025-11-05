@@ -27,6 +27,10 @@ void TLB::initGraphics() {
     TLB::info("Window created");
 }
 void TLB::windowLoop() {
+    TLB::info("Starting main loop");
     while(!glfwWindowShouldClose(m_window)) {
+        glfwPollEvents();
+        
+        glfwSwapBuffers(m_window);
     }
 }
