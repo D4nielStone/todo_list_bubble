@@ -21,6 +21,7 @@ add_library(glad STATIC
 
 target_include_directories(glad PUBLIC
     ${CMAKE_SOURCE_DIR}/libs/include
+    ${CMAKE_SOURCE_DIR}/libs/include/glad
 )
 
 # platform-specific include directories
