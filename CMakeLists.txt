@@ -75,6 +75,6 @@ else()
     
     target_link_libraries(TodoListBubble PUBLIC
         glad
-        glfw3
+        glfw
     )
 endif()
