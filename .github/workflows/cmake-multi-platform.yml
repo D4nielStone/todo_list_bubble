@@ -34,12 +34,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    # --- Linux Dependencies ---
     - name: Install GLFW on Ubuntu
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
         sudo apt-get install -y libglfw3-dev libglew-dev libglm-dev
 
+    # --- Windows: MinGW Toolchain ---
     - name: Install MinGW on Windows
       if: matrix.os == 'windows-latest'
       run: |
@@ -47,13 +49,30 @@ jobs:
         echo "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" >> $env:GITHUB_PATH
         g++ --version
 
+    # --- Windows: Build GLFW from source ---
+    - name: Build and install GLFW on Windows (MinGW)
+      if: matrix.os == 'windows-latest'
+      shell: bash
+      run: |
+        git clone https://github.com/glfw/glfw.git
+        cd glfw
+        cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_SHARED_LIBS=ON -S . -B build
+        cmake --build build --config ${{ matrix.build_type }}
+        cmake --install build --prefix "C:/glfw"
+
+        # Add to CMake search path
+        echo "C:/glfw/lib" >> $GITHUB_PATH
+        echo "C:/glfw/include" >> $GITHUB_PATH
+
+    # --- Common setup ---
     - name: Set reusable strings
       id: strings
       shell: bash
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: Configure CMake Windows
+    # --- Configure ---
+    - name: Configure CMake (Windows)
       if: matrix.os == 'windows-latest'
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
@@ -61,15 +80,10 @@ jobs:
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DGLFW_ROOT="C:/glfw"
         -S ${{ github.workspace }}
-      
-    - name: Download prebuilt GLFW
-      if: matrix.os == 'windows-latest'
-      run: |
-        curl -L -o /tmp/glfw-prebuilt.zip "https://example.com/your/glfw-mingw-prebuilt.zip"
-        unzip /tmp/glfw-prebuilt.zip -d third_party/glfw
 
-    - name: Configure CMake Ubuntu
+    - name: Configure CMake (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
@@ -78,10 +92,12 @@ jobs:
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -S ${{ github.workspace }}
 
+    # --- Build ---
     - name: Build
       run: |
         cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
+    # --- Tests ---
     - name: Run tests
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: ctest --build-config ${{ matrix.build_type }}
