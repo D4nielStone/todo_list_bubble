@@ -7,7 +7,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
+#include <string>
 // \brief TLB is the main class. Todo List Bubble
 class TLB {
 public:

@@ -1,6 +1,8 @@
 #include <iostream>
 #include "tlb.hpp"
 
+GLFWwindow* TLB::m_window = nullptr;
+
 void TLB::error(const std::string& msg) {
     throw std::runtime_error(msg);
 }
