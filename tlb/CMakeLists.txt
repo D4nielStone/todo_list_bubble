@@ -37,7 +37,7 @@ if(WIN32)
         ${CMAKE_SOURCE_DIR}/libs/include/GLFW
         ${CMAKE_SOURCE_DIR}/libs/include/glad
     )
-    target_link_options(TLB PRIVATE "-mwindows")
+    # target_link_options(TLB PRIVATE "-mwindows")
     # Link by full path and add required system libs
     target_link_libraries(TLB PRIVATE
         ${GLFW_LIB}

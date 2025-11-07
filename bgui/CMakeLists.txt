@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set the source of the project
 add_library(bgui STATIC
     source/bgui.cpp
+    source/element.cpp
     ) 
 
 include_directories(
