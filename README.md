@@ -6,7 +6,8 @@
 [![Issues](https://img.shields.io/github/issues/d4nielstone/todo_list_bubble?style=badge&)](https://github.com/D4nielStone/todo_list_bubble/issues)
 [![Discussions](https://img.shields.io/github/discussions/d4nielstone/todo_list_bubble?style=badge&)](https://github.com/D4nielStone/todo_list_bubble/discussions)
 
-A modern, fast and multi-plataform Todo application mada in C++. Made with the Bubble Graphic User Interface :).
+A modern, fast and multi-plataform Todo application made in C++. 
+> Note: Made with the Bubble Graphic User Interface :).
 
 ---
 
@@ -45,7 +46,7 @@ git clone https://github.com/glfw/glfw.git
 
 ---
 ## Linux
-You will just need to install `build-essential` and `libglfw3-dev` with your package manager.
+You just need to install `build-essential` and `libglfw3-dev` using your package manager.
 
 **cmake command**:
 ```bash 
