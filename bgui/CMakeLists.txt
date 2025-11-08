@@ -10,6 +10,7 @@ add_library(bgui STATIC
     source/bgui.cpp
     source/element.cpp
     source/os/os.cpp
+    source/gl/shader.cpp
     ) 
 
 include_directories(
