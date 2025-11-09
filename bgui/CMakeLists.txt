@@ -11,6 +11,7 @@ add_library(bgui STATIC
     source/element.cpp
     source/elements/absolute_layout.cpp
     source/os/os.cpp
+    source/os/font.cpp
     source/gl/shader.cpp
     source/utils/material.cpp
     ) 

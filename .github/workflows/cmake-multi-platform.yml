@@ -2,7 +2,7 @@ name: CMake (Linux + Windows MinGW)
 
 on:
   push:
-    branches: [ "main", "text_element" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
