@@ -34,7 +34,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
-        sudo apt-get install -y libglfw3-dev libglew-dev libglm-dev
+        sudo apt-get install -y libglfw3-dev
 
     - name: Install MinGW on Windows
       if: matrix.os == 'windows-latest'
@@ -67,7 +67,7 @@ jobs:
         cmake -S glfw -B glfw/build -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=OFF
         cmake --build glfw/build --config Release
         mkdir -p libs/lib
-        cp glfw/build/src/libglfw3.a libs/lib/
+        cp glfw/build/src/libglfw3.a libs/lib/libglfw3.a
 
 
       
