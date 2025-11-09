@@ -33,23 +33,19 @@
 #include "elements/absolute_layout.hpp"
 #include "utils/mat.hpp"
 #include "utils/vec.hpp"
+#include "utils/theme.hpp"
 #include <queue>
 #include <functional>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-enum class theme {
-    light,
-    dark
-};
 class bgui {
 private:
-    theme m_theme;
-    butil::color m_clear_color;
+    butil::theme m_theme;
     std::queue<std::function<void()>> m_gl_calls;
     std::unique_ptr<absolute_layout> m_main_layout;
 public:
-    bgui(theme gui_theme = theme::dark);
+    bgui(const butil::theme& theme = butil::light_theme);
     ~bgui();
 
     static bgui& instance() {
@@ -59,12 +55,12 @@ public:
 
     void init_lib();
     void add_gl_call(const std::function<void()>& f);
-    absolute_layout& get_main_layout();
+    absolute_layout* get_main_layout();
 
     // \{ 
     // style management
-    void set_theme(theme gui_theme);
-    theme get_theme() const;
+    void set_theme(const butil::theme& gui_theme);
+    butil::theme get_theme() const;
     // \}
     // \{
     // rendering

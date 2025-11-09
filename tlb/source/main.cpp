@@ -7,7 +7,7 @@ int main() {
         TLB::instance().init_graphics();
         TLB::instance().window_loop();
     } catch (std::exception& e) {
-        std::cout << breset << "ERROR" << bred << e.what();
+        std::cout << breset << "ERROR:: " << bred << e.what() << breset << "\n";
         return -1;
     }
     return 0;

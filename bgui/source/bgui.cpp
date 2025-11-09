@@ -5,7 +5,7 @@
 
 static bool init_trigger = false;
 
-bgui::bgui(theme gui_theme) : m_main_layout(nullptr), m_theme(gui_theme), m_clear_color({0.0f, 0.0f, 0.0f, 1.0f}) {
+bgui::bgui(const butil::theme& gui_theme) : m_main_layout(nullptr), m_theme(gui_theme) {
 }
 
 bgui::~bgui() {
@@ -15,6 +15,10 @@ void bgui::init_lib() {
     init_trigger = true;
     if(!m_main_layout)
         m_main_layout = std::make_unique<absolute_layout>();
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
     set_theme(m_theme);
 }
 
@@ -23,28 +27,18 @@ void bgui::add_gl_call(const std::function<void()> &f) {
     m_gl_calls.push(f);
 }
 
-absolute_layout &bgui::get_main_layout() {
+absolute_layout *bgui::get_main_layout() {
     if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
-    return *m_main_layout;
+    return m_main_layout.get();
 }
 
-void bgui::set_theme(theme gui_theme) {
+void bgui::set_theme(const butil::theme& gui_theme) {
     if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
     // set the theme and update clear color accordingly
     m_theme = gui_theme;
-    if (m_theme == theme::dark) {
-        m_clear_color = butil::color({0.1f, 0.1f, 0.1f, 0.95f});
-    } else  if (m_theme == theme::light) {
-        m_clear_color = butil::color({0.9f, 0.9f, 0.9f, 0.95f});
-    }
-
-    m_main_layout->get_material().m_visible = true;
-    m_main_layout->get_material().m_bg_color = m_clear_color;
-    m_main_layout->get_material().m_border_color = m_clear_color;
-
 }
 
-theme bgui::get_theme() const {
+butil::theme bgui::get_theme() const {
     if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
     return m_theme;
 }
@@ -84,7 +78,7 @@ GLuint bgui::get_quad_vao() const {
 
 void bgui::clear() const {
     if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
-    glClearColor(0.f, 0.f, 0.f, 0.f);
+    glClearColor(m_theme.m_clear_color[0], m_theme.m_clear_color[1], m_theme.m_clear_color[2], m_theme.m_clear_color[3]);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     butil::vec2i size = bos::get_window_size();
     glViewport(0, 0, size[0], size[1]);
