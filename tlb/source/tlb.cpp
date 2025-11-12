@@ -2,13 +2,18 @@
 #include "tlb.hpp"
 #include "bgui.hpp"
 #include "elem/text.hpp"
+#include "elem/linear_layout.hpp"
 
 GLFWwindow* TLB::m_window = nullptr;
 
 void TLB::config_layout() {
     bgui::instance().init_lib();
-    auto* lay = bgui::instance().get_main_layout();
-    lay->add_element<elements::text>("Todo List Bubble", 48);
+    
+    auto& lay = bgui::instance().set_layout<linear_layout>(orientation::vertical);
+    lay.add<elements::text>("Todo List Bubble", 0.8);
+    lay.add<elements::text>(";)ã!@#$%¨&*yyyywz", 0.5);   
+    lay.set_aligniment(alignment::start);
+    lay.set_cross_aligniment(alignment::center);
 }
 
 void TLB::error(const std::string &msg) {
@@ -24,10 +29,6 @@ void TLB::init_graphics() {
         TLB::error("Glfw initialization");
     }
     // step 2: create window and init glad
-    /*
-    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);    
-    glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
-    */
     
     m_window = glfwCreateWindow(400, 600, "Todo List Bubble Application", NULL, NULL);
     if (!m_window) {

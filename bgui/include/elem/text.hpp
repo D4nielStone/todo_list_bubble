@@ -7,14 +7,14 @@ namespace elements {
     class text : public element {
     private:
         std::string m_buffer;
-        std::string m_font_path;
-        unsigned int m_scale;
+        std::string m_font_name;
+        float m_scale;
         bos::font m_font;
     public:
-        text(const std::string& buffer, unsigned int scale);
+        text(const std::string& buffer, float scale);
         ~text();
-        // sets to this text the font with `path`.
-        void set_font(const std::string& path);
+        // sets to this text the font with `name`.
+        void set_font(const std::string& name);
         void update() override;
         void get_draw_calls(std::vector<draw_call>& calls) override;
         void set_theme(const butil::theme& t) override {

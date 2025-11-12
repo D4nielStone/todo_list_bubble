@@ -3,10 +3,36 @@
 #include <filesystem>
 #include <iostream>
 
+void bos::font_manager::search_system_fonts() {
+    #ifdef _WIN32
+        std::string folder = "C:\\Windows\\Fonts";
+    #else
+        std::string folder = "/usr/share/fonts";
+    #endif
+
+    for (const auto &entry : std::filesystem::recursive_directory_iterator(folder)) {
+        if (entry.is_regular_file()) {
+            auto path = entry.path().string();
+            if (!(path.ends_with(".ttf") || path.ends_with(".otf")))
+                continue;
+
+            FT_Face face;
+            if (!FT_New_Face(ft, path.c_str(), 0, &face)) {
+                std::string family_name  = face->family_name ? face->family_name : "(unknown)";
+                std::string style = face->style_name ? face->style_name : "(unknown)";
+                std::cout << "found font:" << family_name << " style:" << style << " path:" << path << "\n";
+                m_system_fonts[family_name + "-" + style] = path;
+                FT_Done_Face(face);
+            }
+        }
+    }
+}
+
 bos::font_manager::font_manager() {
     if (FT_Init_FreeType(&ft)) {
         throw std::runtime_error("Error initializing Freetype.");
     }
+    search_system_fonts();
 }
 
 bos::font_manager::~font_manager() {
@@ -18,6 +44,7 @@ bos::font &bos::font_manager::load_font(const std::string &font_name, const std:
     if (has_font(font_name) && m_fonts[font_name].path == font_path)
         return m_fonts[font_name];
 
+    std::cout << "loading font:" << font_name << "\n";
     FT_Face face{};
     if (FT_New_Face(ft, font_path.c_str(), 0, &face))
         throw std::runtime_error("Error loading font: " + font_name);
@@ -34,10 +61,11 @@ bos::font &bos::font_manager::load_font(const std::string &font_name, const std:
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     
     // First pass: compute total atlas size
-    for (unsigned int c = 32; c < 128; c++) {
-        if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+    for (unsigned int c = 32; c < 256; c++) {
+        if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
+            std::cout << "Missing glyph: " << c << "\n";
             continue;
-    
+        }
         width += face->glyph->bitmap.width + padding;
         max_height = std::max(max_height, (int)face->glyph->bitmap.rows);
     }
@@ -55,10 +83,11 @@ bos::font &bos::font_manager::load_font(const std::string &font_name, const std:
     
     // Fill atlas
     int xOffset = 0;
-    for (unsigned int c = 32; c < 128; c++) {
-        if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+    for (unsigned int c = 32; c < 256; c++) {
+        if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
+            std::cout << "Missing glyph: " << c << "\n";
             continue;
-    
+        }
         FT_Bitmap& bmp = face->glyph->bitmap;
     
         int yOffset = max_height - face->glyph->bitmap_top;
@@ -92,13 +121,16 @@ bos::font &bos::font_manager::load_font(const std::string &font_name, const std:
     return m_fonts[font_name];
 }
 
-
 bool bos::font_manager::has_font(const std::string &name) {
     return m_fonts.find(name) != m_fonts.end();
 }
 bos::font &bos::font_manager::get_font(const std::string& name) {
-    if (has_font(name)) return m_fonts[name];
-    else throw std::runtime_error("trying to get an invalid font.");
+    // default resolution will be 48
+    if(m_system_fonts.find(name) != m_system_fonts.end()) {
+        load_font(name, m_system_fonts[name], m_default_resolution);
+        return m_fonts[name];
+    }
+    else throw std::runtime_error("font not found.");
 }
 
 int bos::get_text_size(const std::string &font_name, const std::string &phrase) {

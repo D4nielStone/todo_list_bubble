@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 # set the name of the project
 project(TLB VERSION 1.0.0 LANGUAGES CXX C)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # set the source of the project
