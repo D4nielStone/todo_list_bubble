@@ -1,6 +1,13 @@
 #include "elem/text.hpp"
 #include <bgui.hpp>
 #include <iostream>
+#include <codecvt>
+#include <locale>
+
+std::u32string utf8_to_utf32(const std::string& str) {
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+    return conv.from_bytes(str);
+}
 
 elements::text::text(const std::string &buffer, float scale) : m_buffer(buffer),
  m_font_name("Noto Sans-Condensed"), m_scale(scale) {
@@ -29,7 +36,7 @@ void elements::text::get_draw_calls(std::vector<draw_call>& calls) {
     m_material.m_texture = m_font.atlas;
         
     int total_width = 0, total_height = 0;
-    for(const auto& ca : m_buffer) {
+    for(char32_t ca : utf8_to_utf32(m_buffer)) {
         if (chs.empty()) return;
         // break line
         if(ca == '\n') {line_y += line_size; line_x = 0; continue;}

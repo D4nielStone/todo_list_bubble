@@ -11,7 +11,6 @@ void TLB::config_layout() {
     
     auto& lay = bgui::instance().set_layout<linear_layout>(orientation::vertical);
     lay.add<elements::text>("Todo List Bubble", 0.8);
-    lay.add<elements::text>(";)ã!@#$%¨&*yyyywz", 0.5);   
     lay.set_aligniment(alignment::start);
     lay.set_cross_aligniment(alignment::center);
 }

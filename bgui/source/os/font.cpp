@@ -57,6 +57,7 @@ bos::font &bos::font_manager::load_font(const std::string &font_name, const std:
     int padding = 2;
     int width = 0;
     int max_height = 0;
+    int ascend=0, descend=0;
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     
@@ -66,8 +67,12 @@ bos::font &bos::font_manager::load_font(const std::string &font_name, const std:
             std::cout << "Missing glyph: " << c << "\n";
             continue;
         }
+
+        ascend = std::max(ascend, face->glyph->bitmap_top);
+        int desc = face->glyph->bitmap.rows - face->glyph->bitmap_top;
+        descend = std::max(descend, desc);
         width += face->glyph->bitmap.width + padding;
-        max_height = std::max(max_height, (int)face->glyph->bitmap.rows);
+        max_height = ascend + descend;
     }
     
     // Create atlas texture
@@ -90,7 +95,7 @@ bos::font &bos::font_manager::load_font(const std::string &font_name, const std:
         }
         FT_Bitmap& bmp = face->glyph->bitmap;
     
-        int yOffset = max_height - face->glyph->bitmap_top;
+        int yOffset = ascend - face->glyph->bitmap_top;
         glTexSubImage2D(GL_TEXTURE_2D, 0, xOffset, yOffset, bmp.width, bmp.rows, GL_RED, GL_UNSIGNED_BYTE, bmp.buffer);
 
     
