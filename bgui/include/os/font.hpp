@@ -26,15 +26,18 @@ namespace bos {
 
     class font_manager {
     private:
+        std::unordered_map<std::string, std::string> m_system_fonts;
         std::unordered_map<std::string, font> m_fonts;
         FT_Library ft;
     public:
+        static constexpr float m_default_resolution = 48.f;
         static font_manager& instance() {
             static font_manager f;
             return f;
         }
         font_manager();
         ~font_manager();
+        void search_system_fonts();
         font& load_font(const std::string& font_name, const std::string& font_path, FT_UInt resolution);
         font& get_font(const std::string& name);
         bool has_font(const std::string& name);

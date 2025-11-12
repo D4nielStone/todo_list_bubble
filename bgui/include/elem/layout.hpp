@@ -16,7 +16,7 @@ class layout : public element {
 protected:
     std::vector<std::unique_ptr<element>> m_elements;
     orientation m_orientation;
-    alignment m_alignment;
+    alignment m_alignment, m_cross_alignment;
     butil::vec<2, unsigned int> m_spacing;
 public:
     layout() : m_orientation(orientation::horizontal), m_alignment(alignment::start), m_spacing(1) {
@@ -44,6 +44,9 @@ public:
             return true;
         }
         return false;
+    }
+    void set_cross_aligniment(const alignment& al) {
+        m_cross_alignment = al;
     }
     void set_aligniment(const alignment& al) {
         m_alignment = al;

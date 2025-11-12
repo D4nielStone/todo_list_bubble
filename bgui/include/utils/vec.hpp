@@ -8,6 +8,12 @@ namespace butil {
     public:
         std::array<T, N> v{};
 
+        vec() {
+            for(auto& component : v) {
+                component = (T)0;
+            } 
+        }
+        
         vec(const T& scalar) {
             for(auto& component : v) {
                 component = scalar;
@@ -30,31 +36,39 @@ namespace butil {
             return v[index];
         }
 
-        vec operator+(const vec& other) const {
-            vec result;
+        vec<N, T> operator+(const vec<N, T>& other) const {
+            vec<N, T> result;
             for (size_t i = 0; i < N; ++i) {
                 result[i] = v[i] + other[i];
             }
             return result;
         }
 
-        vec operator-(const vec& other) const {
-            vec result;
+        vec<N, T> operator-(const vec<N, T>& other) const {
+            vec<N, T> result;
             for (size_t i = 0; i < N; ++i) {
                 result[i] = v[i] - other[i];
             }
             return result;
         }
 
-        vec operator*(T scalar) const {
-            vec result;
+        vec<N, T> operator*(const T& scalar) const {
+            vec<N, T> result;
             for (size_t i = 0; i < N; ++i) {
                 result[i] = v[i] * scalar;
             }
             return result;
         }
 
-        vec operator*(const vec& other) const {
+        vec<N, T> operator/(const T& scalar) const {
+            vec<N, T> result;
+            for (size_t i = 0; i < N; ++i) {
+                result[i] = v[i] / scalar;
+            }
+            return result;
+        }
+
+        vec<N, T> operator*(const vec<N, T>& other) const {
             vec result;
             for (size_t i = 0; i < N; ++i) {
                 result[i] = v[i] * other[i];
