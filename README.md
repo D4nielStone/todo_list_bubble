@@ -7,9 +7,7 @@
 [![Discussions](https://img.shields.io/github/discussions/d4nielstone/todo_list_bubble?style=badge&)](https://github.com/D4nielStone/todo_list_bubble/discussions)
 
 <p align="center">
-  <a href="https://d4nielstone.github.io/bubble_engine">
-    <img width="542" height="250" align="middle"  alt="todo_list_bubble_banner" src="https://github.com/user-attachments/assets/c34ee92c-df71-498c-b65b-ecf2ba8e9f9e" />
-  </a>
+  <img width="542" height="250" align="middle"  alt="todo_list_bubble_banner" src="https://github.com/user-attachments/assets/c34ee92c-df71-498c-b65b-ecf2ba8e9f9e" />
 </p>
 <hr>
 
