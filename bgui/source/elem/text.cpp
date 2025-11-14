@@ -15,7 +15,7 @@ elements::text::text(const std::string &buffer, float scale) : m_buffer(buffer),
     set_theme(bgui::instance().get_theme());
     m_material.m_use_tex = true;
     bgui::instance().add_gl_call([&](){
-        m_material.m_shader.compile("assets/quad.vs", "assets/text.fs");
+        m_material.m_shader.compile("quad.vs", "text.fs");
     });
 }
 elements::text::~text() {

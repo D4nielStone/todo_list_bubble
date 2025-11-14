@@ -7,7 +7,7 @@ hl::hl() {
     set_size(500, 5);
     set_theme(bgui::instance().get_theme());
     bgui::instance().add_gl_call([&](){
-        m_material.m_shader.compile("assets/quad.vs", "assets/quad.fs");
+        m_material.m_shader.compile("quad.vs", "quad.fs");
     });
 }
 

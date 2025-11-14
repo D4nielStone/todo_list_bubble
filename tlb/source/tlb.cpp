@@ -3,6 +3,7 @@
 #include "bgui.hpp"
 #include "elem/text.hpp"
 #include "elem/button.hpp"
+#include "elem/hl.hpp"
 #include "elem/linear_layout.hpp"
 
 GLFWwindow* TLB::m_window = nullptr;
@@ -12,9 +13,10 @@ void TLB::config_layout() {
     auto& lay = bgui::instance().set_layout<linear_layout>(orientation::vertical);
 
     lay.add<elements::text>("Todo", 0.8f);
-    auto& btn = lay.add<elements::button>("+", 0.8f, [&](){
+    lay.add<elements::hl>();
+    auto& btn = lay.add<elements::button>("new task +", 0.5f, [&](){
     });
-    btn.set_intern_spacing(20, 0);
+    btn.set_intern_spacing(16, 0);
     lay.set_cross_aligniment(alignment::center);
 }
 
@@ -36,7 +38,7 @@ void TLB::init_graphics() {
     }
     // step 2: create window and init glad
     
-    m_window = glfwCreateWindow(400, 600, "Todo List Bubble Application", NULL, NULL);
+    m_window = glfwCreateWindow(800, 600, "Todo List Bubble v1.0", NULL, NULL);
     if (!m_window) {
         TLB::error("Invalid window");
     };

@@ -7,6 +7,66 @@
 #include "gl/shader.hpp"
 
 static std::map<std::pair<std::string, std::string>, std::shared_ptr<GLuint>> shader_cache;
+static std::map<std::string, std::string> embedded_shaders = {
+    {"quad.vs", R"(#version 330 core
+layout(location = 0) in vec2 aPos;
+layout(location = 1) in vec2 aUv;
+
+out vec2 Uv;
+
+uniform vec4 u_rect;
+uniform mat4 u_projection;
+
+void main() {
+    vec2 pos = aPos * u_rect.zw + u_rect.xy;
+    Uv = aUv;
+    gl_Position =  u_projection * vec4(pos, 0, 1);
+    })"},
+    {"quad.fs", R"(#version 330 core
+
+in vec2 Uv; // UV coordinates from vertex shader (0..1)
+out vec4 FragColor;
+
+// Uniforms
+uniform vec4 u_bg_color;
+uniform vec4 u_border_color;
+uniform bool u_bordered;
+uniform float u_border_radius;
+uniform int u_border_size;
+uniform vec4 u_rect;
+
+void main() {
+    if(u_bordered) {
+        vec2 pos = u_rect.zw * Uv;
+        vec2 halfSize = u_rect.zw / 2;
+        vec2 d = abs(pos - halfSize)  - (halfSize - vec2(u_border_radius));
+        float dist = length(max(d, 0.0)) - u_border_radius;
+        if(dist > 0.0) discard;
+        if (dist > -u_border_size && u_bordered) {
+            FragColor = u_border_color;
+        } else {
+            FragColor = u_bg_color;
+        }
+    } else {
+        FragColor = u_bg_color;
+    }
+    })"}, {"text.fs", R"(#version 330 core
+
+in vec2 Uv;
+out vec4 FragColor;
+
+uniform sampler2D u_texture;
+uniform vec4 u_text_color;     // RGBA text color
+uniform vec2 u_uv_min;
+uniform vec2 u_uv_max;
+
+void main() {
+    vec2 uv = mix(u_uv_min, u_uv_max, vec2(Uv.x, 1-Uv.y));
+
+    float dist = texture(u_texture, uv).r;
+    FragColor = vec4(u_text_color.rgb, u_text_color.a * dist);
+})"}
+};
 
 using namespace bgl;
 
@@ -23,8 +83,10 @@ void shader::compile(const char* vertex_path, const char* fragment_path) {
         return;
     }
 
-    GLuint vert = compile(GL_VERTEX_SHADER, bos::read_file(vertex_path));
-    GLuint frag = compile(GL_FRAGMENT_SHADER, bos::read_file(fragment_path));
+    auto source_v = embedded_shaders.find(vertex_path) != embedded_shaders.end() ? embedded_shaders[vertex_path] : bos::read_file(vertex_path);
+    auto source_f = embedded_shaders.find(fragment_path) != embedded_shaders.end() ? embedded_shaders[fragment_path] : bos::read_file(fragment_path);
+    GLuint vert = compile(GL_VERTEX_SHADER, source_v);
+    GLuint frag = compile(GL_FRAGMENT_SHADER, source_f);
 
     GLuint program = link(vert, frag);
     m_program = std::shared_ptr<GLuint>(new GLuint(program), [](GLuint* p) {

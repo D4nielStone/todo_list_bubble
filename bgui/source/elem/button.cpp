@@ -5,7 +5,7 @@ elements::button::button(const std::string &name, const float scale, const std::
     m_label(name, scale), m_function(f) {
     set_theme(bgui::instance().get_theme());
     bgui::instance().add_gl_call([&](){
-        m_material.m_shader.compile("assets/quad.vs", "assets/quad.fs");
+        m_material.m_shader.compile("quad.vs", "quad.fs");
     });
 }
 
