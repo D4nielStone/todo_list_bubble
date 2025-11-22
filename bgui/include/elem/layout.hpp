@@ -1,6 +1,7 @@
 #pragma once
 #include "element.hpp"
 #include <algorithm>
+#include <queue>
 
 enum class orientation {
     vertical,
@@ -14,6 +15,7 @@ enum class alignment {
 };
 class layout : public element {
 protected:
+    std::queue<std::unique_ptr<layout>> m_modals;
     std::vector<std::unique_ptr<element>> m_elements;
     orientation m_orientation;
     alignment m_alignment = alignment::start, m_cross_alignment = alignment::start;
@@ -35,6 +37,14 @@ public:
         auto elem = std::make_unique<T>(std::forward<Args>(args)...);
         T& ref = *elem;
         m_elements.push_back(std::move(elem));
+        return ref;
+    }
+
+    template<typename T, typename... Args>
+    T& new_modal(Args&&... args) {
+        auto m = std::make_unique<T>(std::forward<Args>(args)...);
+        T& ref = *m;
+        m_modals.push(std::move(m));
         return ref;
     }
 
@@ -66,4 +76,6 @@ public:
         m_spacing_elements = {a, b};
     }
     void update() override;
+    void get_draw_calls(std::vector<draw_call>& calls);
+    virtual void fit_to_content();
 };

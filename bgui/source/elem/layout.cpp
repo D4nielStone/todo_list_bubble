@@ -3,11 +3,7 @@
 
 layout::layout() : m_orientation(orientation::horizontal), m_alignment(alignment::start), m_spacing_elements(1) {
         m_material.m_visible = false;
-        
         set_theme(bgui::instance().get_theme());
-        bgui::instance().add_gl_call([&](){
-            m_material.m_shader.compile("quad.vs", "quad.fs");
-        });
     };
 
 void layout::update() {
@@ -17,6 +13,9 @@ void layout::update() {
 
     for (size_t i = m_elements.size(); i-- > 0; ) {
         auto elem = m_elements[i].get();
+        if (m_modals.empty()) {
+            elem->update();
+        }
 
         float x = elem->get_x();
         float y = elem->get_y();
@@ -52,4 +51,21 @@ void layout::update() {
 }
 
 void layout::fit_to_content() {
+    set_size(50, 50);
 }
+
+void layout::get_draw_calls(std::vector<draw_call>& calls) {
+    static bool shader_compiled = false;
+    if(!shader_compiled) {
+        m_material.m_shader.compile("quad.vs", "quad.fs");
+        shader_compiled = true;
+    }
+    element::get_draw_calls(calls);
+    // linear layouts get the draw call in addition order
+    for (auto& elem : m_elements) {
+        elem->set_position(elem->get_x()+get_x(), elem->get_y()+get_y());
+        elem->get_draw_calls(calls);
+    }
+    if(!m_modals.empty())
+        m_modals.front()->get_draw_calls(calls);
+};

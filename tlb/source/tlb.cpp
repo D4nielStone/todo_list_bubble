@@ -27,9 +27,13 @@ void TLB::config_layout() {
     lp.set_cross_aligniment(alignment::center);
 
     // add elements:
+    
     lp.add<elements::text>("TLB", 0.3f).set_font("Noto Sans-Medium");
-    lp.add<elements::button>("+ Add a new Group", 0.3f, [](){
-        //auto& m = lp.new_modal();
+    lp.add<elements::button>("+ Add a new Group", 0.3f, [&](){
+        auto& m = lay.new_modal<linear_layout>(orientation::vertical);
+        m.set_padding(5, 5);
+        m.add<elements::text>("Name This Group", 0.3f);
+        m.get_material().m_visible = true;
     }).set_intern_spacing(5, 5);
 }
 

@@ -10,6 +10,11 @@ void element::set_extern_spacing(int x, int y) {
     m_extern_spacing[0] = x;
     m_extern_spacing[1] = y;
 }
+
+void element::set_padding(int x, int y) {
+    m_padding[0] = x;
+    m_padding[1] = y;
+}
 void element::set_intern_spacing(int x, int y) {
     m_intern_spacing[0] = x;
     m_intern_spacing[1] = y;
@@ -24,7 +29,16 @@ void element::set_size(int width, int height) {
     m_bounds[3] = height;
 }
 
-void element::set_x(int x) {    
+void element::set_height(int h)
+{
+    m_bounds[3] = h;
+}
+void element::set_width(int w)
+{
+    m_bounds[2] = w;
+}
+void element::set_x(int x)
+{
     m_bounds[0] = x;
 }
 
@@ -73,6 +87,11 @@ int element::get_width() const {
 
 
 void element::get_draw_calls(std::vector<draw_call>& calls) {
+    static bool shader_compiled = false;
+    if(!shader_compiled) {
+        m_material.m_shader.compile("quad.vs", "quad.fs");
+        shader_compiled = true;
+    }
     // by default draw just the background
     calls.push_back({m_material, bgui::instance().get_quad_vao(), GL_TRIANGLES, 6,
          m_bounds});

@@ -7,5 +7,4 @@ public:
     ~absolute_layout() = default;
 
     void update() override;
-    void get_draw_calls(std::vector<draw_call>& calls) override;
 };

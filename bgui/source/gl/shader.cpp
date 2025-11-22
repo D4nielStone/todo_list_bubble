@@ -79,7 +79,7 @@ void shader::compile(const char* vertex_path, const char* fragment_path) {
 
     auto it = shader_cache.find(key);
     if (it != shader_cache.end()) {
-        m_program = it->second; // shared_ptr
+        m_program = shader_cache.at(key);
         return;
     }
 
@@ -203,6 +203,10 @@ void shader::set_float(const char* name, const float v) {
 }
 
 void shader::bind() {
+    if(!m_program || *m_program == 0) {
+        throw std::runtime_error("ERROR: shader program is null\n");
+        return;
+    }
     glUseProgram(*m_program);
 }
 

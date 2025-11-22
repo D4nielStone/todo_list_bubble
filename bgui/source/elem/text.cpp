@@ -10,13 +10,11 @@ std::u32string utf8_to_utf32(const std::string& str) {
 }
 
 elements::text::text(const std::string &buffer, float scale) : m_buffer(buffer),
- m_font_name("Noto Sans-Medium"), m_scale(scale) {
+    m_font_name("Noto Sans-Medium"), m_scale(scale) {
     set_font(m_font_name);
     set_theme(bgui::instance().get_theme());
     m_material.m_use_tex = true;
-    bgui::instance().add_gl_call([&](){
-        m_material.m_shader.compile("quad.vs", "text.fs");
-    });
+    m_material.m_shader.compile("quad.vs", "text.fs");
 }
 elements::text::~text() {
 }

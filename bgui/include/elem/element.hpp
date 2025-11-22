@@ -28,16 +28,19 @@ class element {
 protected:
     butil::material m_material;
     // absolute position and size
-    butil::vec4 m_bounds;
+    butil::vec4 m_bounds{0, 0, 50, 50};
 public:
-    butil::vec<2, unsigned int> m_intern_spacing {0, 0}, m_extern_spacing{0, 0};
+    butil::vec<2, unsigned int> m_intern_spacing {0, 0}, m_extern_spacing{0, 0}, m_padding{0, 0};
     element();
     virtual ~element() = default;
     // \brief setters
     void set_intern_spacing(int x, int y);
     void set_extern_spacing(int x, int y);
+    void set_padding(int x, int y);
     void set_position(int x, int y);
     void set_size(int width, int height);
+    void set_height(int h);
+    void set_width(int h);
     void set_x(int x);
     void set_y(int y);
     void set_rect(int x, int y, int width, int height);

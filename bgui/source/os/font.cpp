@@ -20,7 +20,6 @@ void bos::font_manager::search_system_fonts() {
             if (!FT_New_Face(ft, path.c_str(), 0, &face)) {
                 std::string family_name  = face->family_name ? face->family_name : "(unknown)";
                 std::string style = face->style_name ? face->style_name : "(unknown)";
-                std::cout << "found font:" << family_name << " style:" << style << " path:" << path << "\n";
                 m_system_fonts[family_name + "-" + style] = path;
                 FT_Done_Face(face);
             }
@@ -44,7 +43,6 @@ bos::font &bos::font_manager::load_font(const std::string &font_name, const std:
     if (has_font(font_name) && m_fonts[font_name].path == font_path)
         return m_fonts[font_name];
 
-    std::cout << "loading font:" << font_name << "\n";
     FT_Face face{};
     if (FT_New_Face(ft, font_path.c_str(), 0, &face))
         throw std::runtime_error("Error loading font: " + font_name);
