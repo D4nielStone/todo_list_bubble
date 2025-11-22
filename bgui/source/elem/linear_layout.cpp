@@ -92,4 +92,6 @@ void linear_layout::get_draw_calls(std::vector<draw_call>& calls) {
     for (auto& elem : m_elements) {
         elem->get_draw_calls(calls);
     }
+    if(!m_modals.empty())
+    m_modals.front()->get_draw_calls(calls);
 };

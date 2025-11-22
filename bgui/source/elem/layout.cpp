@@ -29,13 +29,27 @@ void layout::update() {
             my >= y &&
             my <= y + h;
 
-        if (inside) {
-            elem->on_mouse_hover();
-            // calculate click
-            if(bos::get_pressed(bos::input_key::mouse_left)) {
-                elem->on_pressed();
+        // calculate inputs only if don't have modals
+        if (m_modals.empty()) {
+            if (inside) {
+                elem->on_mouse_hover();
+                // calculate click
+                if(bos::get_pressed(bos::input_key::mouse_left)) {
+                    elem->on_pressed();
+                }
+                break;
             }
-            break;
         }
     }
+    if(!m_modals.empty()) {
+        m_modals.front()->update();
+        m_modals.front()->fit_to_content();
+        m_modals.front()->set_position(
+            get_x() + get_width()/2 - m_modals.front()->get_width()/2,
+            get_y() + get_height()/2 - m_modals.front()->get_height()/2
+        );
+    }
+}
+
+void layout::fit_to_content() {
 }
