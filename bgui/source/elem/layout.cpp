@@ -54,7 +54,11 @@ void layout::fit_to_content() {
     set_size(50, 50);
 }
 
-void layout::get_draw_calls(std::vector<draw_call>& calls) {
+void layout::pop_modal() {
+    m_modals.pop();
+}
+void layout::get_draw_calls(std::vector<draw_call> &calls)
+{
     static bool shader_compiled = false;
     if(!shader_compiled) {
         m_material.m_shader.compile("quad.vs", "quad.fs");

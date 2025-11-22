@@ -78,4 +78,5 @@ public:
     void update() override;
     void get_draw_calls(std::vector<draw_call>& calls);
     virtual void fit_to_content();
+    void pop_modal();
 };

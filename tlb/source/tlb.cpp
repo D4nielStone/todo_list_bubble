@@ -31,8 +31,13 @@ void TLB::config_layout() {
     lp.add<elements::text>("TLB", 0.3f).set_font("Noto Sans-Medium");
     lp.add<elements::button>("+ Add a new Group", 0.3f, [&](){
         auto& m = lay.new_modal<linear_layout>(orientation::vertical);
+        m.set_cross_aligniment(alignment::center);
         m.set_padding(5, 5);
-        m.add<elements::text>("Name This Group", 0.3f);
+        m.get_material().set("u_bg_color", butil::color({0, 0, 0, 0.35}));
+        m.add<elements::text>("Exemple of a modal element:", 0.3f);
+        m.add<elements::button>("Close", 0.3f, [&](){
+            lay.pop_modal();
+        });
         m.get_material().m_visible = true;
     }).set_intern_spacing(5, 5);
 }
