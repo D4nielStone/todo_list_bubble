@@ -1,2 +1,0 @@
-/usr/bin/ar qc libbgui.a CMakeFiles/bgui.dir/core/source/bgui.cpp.o CMakeFiles/bgui.dir/core/source/elem/button.cpp.o CMakeFiles/bgui.dir/core/source/elem/element.cpp.o CMakeFiles/bgui.dir/core/source/elem/layout.cpp.o CMakeFiles/bgui.dir/core/source/elem/linear_layout.cpp.o CMakeFiles/bgui.dir/core/source/elem/text.cpp.o CMakeFiles/bgui.dir/core/source/elem/text_input.cpp.o CMakeFiles/bgui.dir/core/source/os/os.cpp.o CMakeFiles/bgui.dir/core/source/utils/material.cpp.o CMakeFiles/bgui.dir/backend/source/opengl3/backend.cpp.o
-/usr/bin/ranlib libbgui.a

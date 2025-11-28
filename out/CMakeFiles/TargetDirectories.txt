@@ -1,3 +1,0 @@
-/workspaces/cpp-bgui/out/CMakeFiles/bgui.dir
-/workspaces/cpp-bgui/out/CMakeFiles/edit_cache.dir
-/workspaces/cpp-bgui/out/CMakeFiles/rebuild_cache.dir
