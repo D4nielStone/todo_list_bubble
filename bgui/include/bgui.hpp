@@ -47,7 +47,7 @@ private:
     // input
     bool m_last_mouse_left = false;
 public:
-    bgui(const butil::theme& theme = butil::dark_theme);
+    bgui(const butil::theme& theme = butil::light_theme);
     ~bgui();
 
     static bgui& instance() {

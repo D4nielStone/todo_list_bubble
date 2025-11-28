@@ -16,28 +16,35 @@ void TLB::config_layout() {
     auto& center = lay.add<linear_layout>(butil::orientation::vertical);
 
     // sets panel visible
-    lp.get_material().m_visible = true;
+    lp.set_visible(true);
     lp.set_padding(5, 5);
 
     // set rect manually
     lp.set_rect(0, 0, 200, 1000);
     center.set_rect(200, 0, 1000, 1000);
+    auto& top = center.add<linear_layout>(butil::orientation::horizontal);
+    top.set_height(50);
+    top.get_material().set("u_bg_color", butil::color{0.96f, 0.96f, 0.96f, 1.f});
+    center.set_cross_alignment(butil::alignment::stretch);
+    top.set_alignment(butil::alignment::center);
+    top.add<elements::text>("Home", 0.8f);
+    top.set_visible(true);
 
     // cross alignment (horizontal)
-    lp.set_cross_aligniment(butil::alignment::stretch);
+    lp.set_cross_alignment(butil::alignment::stretch);
 
     // add elements:
     lp.add<elements::text>("Groups", 0.5f);
 
     lp.add<elements::button>("+ Add a new Group", 0.5f, [&](){
         auto& m = lay.new_modal<linear_layout>(butil::orientation::vertical);
-        m.set_cross_aligniment(butil::alignment::end);
+        m.set_cross_alignment(butil::alignment::end);
         m.set_padding(5, 5);
         m.add<elements::text>("Exemple of a modal element:", 0.5f);
         m.add<elements::button>("Close", 0.5f, [&](){
             lay.pop_modal();
         }).set_intern_spacing(5, 5);
-        m.get_material().m_visible = true;
+        m.set_visible(true);
     }).set_intern_spacing(5, 5);
 }
 

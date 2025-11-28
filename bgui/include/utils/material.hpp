@@ -8,7 +8,6 @@ namespace butil {
         bgl::shader m_shader;
         std::unordered_map<std::string, bgl::uniform> m_uniforms;
         GLuint m_texture;
-        bool m_visible;
         bool m_use_tex;
 
         material();

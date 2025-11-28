@@ -6,73 +6,101 @@ using namespace butil;
     
 linear_layout::linear_layout(const orientation& ori) {
     m_orientation = ori;
-    m_material.m_visible = false;
+    m_visible = false;
     m_material.m_shader.compile("quad.vs", "quad.fs");
 }
 
 void linear_layout::update() {
-    // no children -> nothing to do
     if (m_elements.empty()) return;
 
-    const bool vertical = (m_orientation == orientation::vertical);
     layout::update();
 
-    // compute total main-axis size (sum of widths or heights) + spacing between items
-    int spacing = vertical ? m_spacing_elements[1] : m_spacing_elements[0]; 
+    const bool vertical = (m_orientation == orientation::vertical);
+    const int main_index = vertical ? 1 : 0;
+    const int cross_index = vertical ? 0 : 1;
+
+    const int spacing = m_spacing_elements[main_index];
+
+    // Available size on main axis (respect padding)
+    const int available_main =
+        get_size()[main_index] - m_padding[main_index] * 2;
+
     int elem_total_main = 0;
 
-    // avaliable size subtracting my padding
-    int available_main = get_size()[vertical ? 1 : 0] - m_padding[vertical ? 1 : 0] * 2;
-
+    // Sum child sizes + spacing
     for (auto& elem : m_elements) {
-    if (vertical)
-        elem_total_main += elem->get_height() + elem->get_extern_spacing()[1];
-    else
-        elem_total_main += elem->get_width() + elem->get_extern_spacing()[0];
+        elem_total_main += elem->get_size()[main_index];
     }
 
-    if (m_elements.size() > 1) elem_total_main += spacing * (int(m_elements.size()) - 1);
+    if (m_elements.size() > 1)
+        elem_total_main += spacing * int(m_elements.size() - 1);
 
-    // compute starting cursor on the main axis depending on alignment (start/center/end)
-    int cursor_main;
-    if (m_alignment == alignment::start)
-        cursor_main = m_padding[vertical ? 1 : 0]; // in start just add my padding
-    else if (m_alignment == alignment::center)
-        cursor_main = (available_main - elem_total_main) / 2 + m_padding[vertical ? 1 : 0];
-    else // > end
-        cursor_main = available_main - elem_total_main - m_padding[vertical ? 1 : 0];
+    // Starting cursor depending on alignment
+    int cursor_main = 0;
 
-    // Place each child using cursor_main and cross-axis alignment
+    switch (m_alignment) {
+        case alignment::start:
+            cursor_main = m_padding[main_index];
+            break;
+
+        case alignment::center:
+            cursor_main =
+                (available_main - elem_total_main) / 2 +
+                m_padding[main_index];
+            break;
+
+        case alignment::end:
+            cursor_main =
+                available_main - elem_total_main +
+                m_padding[main_index];
+            break;
+    }
+
+    // Place elements
     for (auto& elem : m_elements) {
-        // child already updated above
-        int ex = 0;
-        int ey = 0;
 
-        // cross-axis (horizontal) alignment for this child
-        if (m_cross_alignment == alignment::start ||
-            m_cross_alignment == alignment::stretch)
-            ex = m_padding[vertical ? 0 : 1];
-        else if (m_cross_alignment == alignment::center)
-            ex = (get_size()[vertical ? 0 : 1]- elem->get_size()[vertical ? 0 : 1]) / 2;
-        else // end
-            ex = get_size()[vertical ? 0 : 1] - elem->get_size()[vertical ? 0 : 1] - m_padding[vertical ? 0 : 1];
+        int cross_pos = 0;
 
-        // main-axis position = cursor_main (y)
-        ey = cursor_main;
+        const int cross_size = elem->get_size()[cross_index];
+        const int container_cross = get_size()[cross_index];
 
-        // commit positions
-        elem->set_x(ex);
-        elem->set_y(ey);
+        // Cross-axis alignment
+        switch (m_cross_alignment) {
+            case alignment::start:
+                cross_pos = m_padding[cross_index];
+                break;
 
-        // cross stretch
-        if (m_cross_alignment == alignment::stretch)
-            if(vertical) elem->set_width(get_width() - m_padding[vertical ? 1 : 0]*2);
-            else elem->set_height(get_height() - m_padding[vertical ? 1 : 0]*2);
+            case alignment::center:
+                cross_pos = (container_cross - cross_size) / 2;
+                break;
 
-        // advance cursor
-        cursor_main += elem->get_size()[vertical ? 1 : 0] + elem->get_extern_spacing()[vertical ? 1 : 0];
+            case alignment::end:
+                cross_pos = container_cross - cross_size - m_padding[cross_index];
+                break;
+
+            case alignment::stretch:
+                cross_pos = m_padding[cross_index];
+                if (vertical)
+                    elem->set_width(container_cross - m_padding[cross_index] * 2);
+                else
+                    elem->set_height(container_cross - m_padding[cross_index] * 2);
+                break;
+        }
+
+        // Set position
+        if (vertical) {
+            elem->set_x(cross_pos);
+            elem->set_y(cursor_main);
+        } else {
+            elem->set_x(cursor_main);
+            elem->set_y(cross_pos);
+        }
+
+        // Advance in main axis
+        cursor_main += elem->get_size()[main_index] + spacing;
     }
 }
+
 void linear_layout::fit_to_content() {
     const bool vertical = (m_orientation == orientation::vertical);
     int max_cross = 0;

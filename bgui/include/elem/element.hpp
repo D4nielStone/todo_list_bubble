@@ -10,8 +10,9 @@ class element {
 protected:
     butil::orientation m_orientation = butil::orientation::horizontal;
     butil::alignment m_alignment = butil::alignment::start, m_cross_alignment = butil::alignment::start;
-    butil::vec<2, unsigned int> m_spacing_elements;
+    butil::vec<2, unsigned int> m_spacing_elements{0, 0};
     butil::material m_material;
+    bool m_visible {true};
 
     // absolute position and size
     butil::vec<2, unsigned int> m_intern_spacing {0, 0}, m_extern_spacing{0, 0}, m_padding{0, 0};
@@ -32,10 +33,11 @@ public:
     void set_rect(int x, int y, int width, int height);
     void set_shader(const bgl::shader& shd);
     void set_material(const butil::material& mhd);
-    void set_cross_aligniment(const butil::alignment& al);
-    void set_aligniment(const butil::alignment& al);
+    void set_cross_alignment(const butil::alignment& al);
+    void set_alignment(const butil::alignment& al);
     void set_orientation(const butil::orientation& o);
     void set_spacing_elements(const unsigned int a, const unsigned int b);
+    void set_visible(bool);
     // \brief getters
     int get_x() const;
     int get_y() const;
@@ -51,8 +53,8 @@ public:
     virtual layout* as_layout() { return nullptr; }
     virtual void update();
     virtual void apply_theme(const butil::theme& theme){};
-    virtual void on_pressed() {};
+    virtual void on_clicked() {};
     virtual void on_released() {};
     virtual void on_mouse_hover() {};
-    virtual void get_draw_calls(std::vector<butil::draw_call>& calls);
+    virtual void get_draw_requests(std::vector<butil::draw_request>& calls);
 };

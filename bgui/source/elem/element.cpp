@@ -5,7 +5,7 @@ using namespace butil;
 
 element::element() : m_orientation(orientation::horizontal), m_alignment(alignment::start), m_spacing_elements(1) {
     apply_theme(bgui::instance().get_theme());
-    m_material.m_visible = false;
+    m_visible = false;
 }
 
 void element::set_extern_spacing(int x, int y) {
@@ -63,10 +63,10 @@ void element::set_material(const butil::material &mhd) {
     m_material = mhd;
 }
 
-void element::set_cross_aligniment(const butil::alignment &al) {
+void element::set_cross_alignment(const butil::alignment &al) {
     m_cross_alignment = al;
 }
-void element::set_aligniment(const butil::alignment &al)
+void element::set_alignment(const butil::alignment &al)
 {
     m_alignment = al;
 }
@@ -75,6 +75,10 @@ void element::set_orientation(const butil::orientation &o) {
 }
 void element::set_spacing_elements(const unsigned int a, const unsigned int b) {
     m_spacing_elements = {a, b};
+}
+void element::set_visible(bool visible)
+{
+    m_visible = visible;
 }
 int element::get_x() const {
 
@@ -112,7 +116,8 @@ int element::get_width() const
     return m_bounds[2];
 }
 
-void element::get_draw_calls(std::vector<butil::draw_call>& calls) {
+void element::get_draw_requests(std::vector<butil::draw_request>& calls) {
+    if(!m_visible) return;
     static bool shader_compiled = false;
     if(!shader_compiled) {
         m_material.m_shader.compile("quad.vs", "quad.fs");

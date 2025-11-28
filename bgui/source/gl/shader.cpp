@@ -32,15 +32,19 @@ uniform vec4 u_bg_color;
 uniform vec4 u_border_color;
 uniform bool u_bordered;
 uniform float u_border_radius;
-uniform int u_border_size;
+uniform float u_border_size;
 uniform vec4 u_rect;
 
 void main() {
     if(u_bordered) {
         vec2 pos = u_rect.zw * Uv;
         vec2 halfSize = u_rect.zw / 2;
-        vec2 d = abs(pos - halfSize)  - (halfSize - vec2(u_border_radius));
-        float dist = length(max(d, 0.0)) - u_border_radius;
+        vec2 center = u_rect.zw * 0.5;
+    vec2 p = pos - center;
+
+    vec2 q = abs(p) - (center - vec2(u_border_radius));
+    float dist = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - u_border_radius;
+
         if(dist > 0.0) discard;
         if (dist > -u_border_size && u_bordered) {
             FragColor = u_border_color;
