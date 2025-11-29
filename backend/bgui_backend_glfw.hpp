@@ -1,5 +1,8 @@
 #pragma once
+#include <GLFW/glfw3.h>
 
-void bgui_set_opengl3();
-void bgui_set_glfw(void* window);
-void bgui_glfw_update_inputs();
+namespace bkend {
+    GLFWwindow* set_up_glfw(int width, int height, const char* title, int flags = 0, GLFWmonitor* monitor = nullptr, GLFWwindow* share = nullptr);
+    void glfw_update();
+    void glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+} // namespace bkend

@@ -5,8 +5,28 @@
 #include <locale>
 
 std::u32string utf8_to_utf32(const std::string& str) {
-    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
-    return conv.from_bytes(str);
+    std::u32string result;
+    size_t i = 0;
+    while (i < str.length()) {
+        unsigned char c = str[i];
+        char32_t ch = 0;
+        
+        if ((c & 0x80) == 0) {
+            ch = c;
+            i += 1;
+        } else if ((c & 0xE0) == 0xC0) {
+            ch = ((c & 0x1F) << 6) | (str[i + 1] & 0x3F);
+            i += 2;
+        } else if ((c & 0xF0) == 0xE0) {
+            ch = ((c & 0x0F) << 12) | ((str[i + 1] & 0x3F) << 6) | (str[i + 2] & 0x3F);
+            i += 3;
+        } else if ((c & 0xF8) == 0xF0) {
+            ch = ((c & 0x07) << 18) | ((str[i + 1] & 0x3F) << 12) | ((str[i + 2] & 0x3F) << 6) | (str[i + 3] & 0x3F);
+            i += 4;
+        }
+        result.push_back(ch);
+    }
+    return result;
 }
 
 belem::text::text(const std::string &buffer, float scale) : m_buffer(buffer),

@@ -41,6 +41,16 @@
 #include <queue>
 #include <functional>
 
+#ifdef BGUI_USE_GLFW
+    #include "backend/bgui_backend_glfw.hpp"
+#endif
+#ifdef BGUI_USE_OPENGL
+    #include "backend/bgui_backend_opengl3.hpp"
+#endif
+#ifdef BGUI_USE_FREETYPE
+    #include "backend/bgui_backend_freetype.hpp"
+#endif
+
 class bgui {
 private:
     butil::theme m_theme;
@@ -79,7 +89,7 @@ public:
     GLuint get_quad_vao() const;*/
 
     static butil::draw_data* get_draw_data();
-    static void init_lib();
+    static void initialize_interface();
     static bool shutdown_lib();
     static void update();
     bool update_inputs(blay::layout & lay);

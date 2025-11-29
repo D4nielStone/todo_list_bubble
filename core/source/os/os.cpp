@@ -63,11 +63,3 @@ bool bos::get_pressed(const bos::input_key& k) {
     if(bos::s_input_map[k] == bos::input_action::press) return true;
     return false;
 }
-/*
-void bos::glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-    bos::input_key internal_key = bos::s_glfw_key_reverse_map.at(button);
-
-    bos::input_action internal_action = static_cast<bos::input_action>(bos::s_glfw_action_reverse_map.at(action)); 
-
-    bos::s_input_map[internal_key] = internal_action;
-}*/// TODO: move to backend

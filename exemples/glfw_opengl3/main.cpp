@@ -1,36 +1,13 @@
-#include <bgui_backend_glfw.hpp>
-#include <bgui_backend_opengl3.hpp>
 #include <bgui.hpp>
-#include <GLFW/glfw3.h>
-
 #include <iostream>
 
 int main() {
+    bgui::initialize_interface();
 
-    if (!glfwInit()) {
-        std::cerr << "Failed to init GLFW\n";
-        return -1;
-    }
+    GLFWwindow* window = bkend::set_up_glfw(1280, 720, "BGUI Exemple");
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "BGUI Example", nullptr, nullptr);
-    if (!window) {
-        std::cerr << "Failed to create window\n";
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
-
-    // config layout
-    bgui::init_lib();
-
-    bgui_set_opengl3();
-    bgui_set_glfw(window);
+    bkend::set_up_freetype();
+    bkend::set_up_opengl3();
 
     auto& root = bgui::set_layout<blay::relative>(butil::orientation::horizontal); 
     // Supported layouts: linear, absolute (base), relative, and more.
@@ -47,12 +24,9 @@ int main() {
     panel.add<belem::text>("Hello World!", 0.5f);
 
     while (!glfwWindowShouldClose(window)) {
-
-        glfwPollEvents();
-        bgui_glfw_update_inputs();
-
+        bkend::glfw_update();
         bgui::update();
-        bgui_opengl3_render(
+        bkend::opengl3_render(
             bgui::get_draw_data()
         );
 
@@ -63,6 +37,7 @@ int main() {
     // CLEANUP
     // ============================
     bgui::shutdown_lib();
+    bkend::shutdown_freetype();
     glfwDestroyWindow(window);
     glfwTerminate();
 

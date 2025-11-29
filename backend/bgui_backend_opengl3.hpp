@@ -1,4 +1,7 @@
 #pragma once
 #include "utils/draw.hpp"
 
-void bgui_opengl3_render(butil::draw_data*);
+namespace bkend {
+    void opengl3_render(butil::draw_data*);
+    void set_up_opengl3();
+} // namespace bkend

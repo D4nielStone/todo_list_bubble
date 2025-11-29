@@ -4,11 +4,11 @@
 #include <stdexcept>
 #include <iostream>
 #include <memory>
-#include "gl/shader.hpp"
+#include <opengl3/opengl3_shader.hpp>
 
 static std::map<std::pair<std::string, std::string>, std::shared_ptr<GLuint>> shader_cache;
 static std::map<std::string, std::string> embedded_shaders = {
-    {"quad.vs", R"(#version 330 core
+    {"ui::default-vs", R"(#version 330 core
 layout(location = 0) in vec2 aPos;
 layout(location = 1) in vec2 aUv;
 
@@ -22,7 +22,7 @@ void main() {
     Uv = aUv;
     gl_Position =  u_projection * vec4(pos, 0, 1);
     })"},
-    {"quad.fs", R"(#version 330 core
+    {"ui::default-fs", R"(#version 330 core
 
 in vec2 Uv; // UV coordinates from vertex shader (0..1)
 out vec4 FragColor;
@@ -54,7 +54,7 @@ void main() {
     } else {
         FragColor = u_bg_color;
     }
-    })"}, {"text.fs", R"(#version 330 core
+    })"}, {"ui::text-fs", R"(#version 330 core
 
 in vec2 Uv;
 out vec4 FragColor;
@@ -79,7 +79,7 @@ shader::shader(const char * vertex_path, const char * fragment_path) {
 }
 
 void shader::compile(const char* vertex_path, const char* fragment_path) {
-    auto key = std::make_pair(std::string(vertex_path), std::string(fragment_path));
+    auto key = std::make_pair(std::string(vertex_path) + "- vs", std::string(fragment_path) + "- fs");
 
     auto it = shader_cache.find(key);
     if (it != shader_cache.end()) {
@@ -87,8 +87,9 @@ void shader::compile(const char* vertex_path, const char* fragment_path) {
         return;
     }
 
-    auto source_v = embedded_shaders.find(vertex_path) != embedded_shaders.end() ? embedded_shaders[vertex_path] : bos::read_file(vertex_path);
-    auto source_f = embedded_shaders.find(fragment_path) != embedded_shaders.end() ? embedded_shaders[fragment_path] : bos::read_file(fragment_path);
+    // Uses default shader if don't found in embedded shaders
+    auto source_v = embedded_shaders.find(key.first) != embedded_shaders.end() ? embedded_shaders[key.first] : embedded_shaders["ui::default-vs"];
+    auto source_f = embedded_shaders.find(key.second) != embedded_shaders.end() ? embedded_shaders[key.second] : embedded_shaders["ui::default-fs"];
     GLuint vert = compile(GL_VERTEX_SHADER, source_v);
     GLuint frag = compile(GL_FRAGMENT_SHADER, source_f);
 
@@ -146,7 +147,7 @@ GLuint shader::compile(GLenum type, const std::string &source) {
     return m_id;
 }
 
-void bgl::shader::set(const std::string& name, const bgl::propertie u) {
+void bgl::shader::set(const std::string& name, const butil::propertie u) {
     switch (u.m_type) {
     case 0x0: // vec2
         set_vec2(name.c_str(), u.m_value.m_vec2);
@@ -172,43 +173,43 @@ void bgl::shader::set(const std::string& name, const bgl::propertie u) {
     }
 }
 void shader::set_mat4(const char *name, const butil::mat4 matrix) {
-    GLint loc = glGetpropertieLocation(*m_program, name);
-    glpropertieMatrix4fv(loc, 1, GL_FALSE, matrix.data());
+    GLint loc = glGetUniformLocation(*m_program, name);
+    glUniformMatrix4fv(loc, 1, GL_FALSE, matrix.data());
 }
 
 void shader::set_vec4(const char *name, const butil::vec4 vector) {
-    GLint loc = glGetpropertieLocation(*m_program, name);
-    glpropertie4f(loc, vector[0], vector[1], vector[2], vector[3]);
+    GLint loc = glGetUniformLocation(*m_program, name);
+    glUniform4f(loc, vector[0], vector[1], vector[2], vector[3]);
 }
 
 void shader::set_vec3(const char *name, const butil::vec3 vector) {
-    GLint loc = glGetpropertieLocation(*m_program, name);
-    glpropertie3f(loc, vector[0], vector[1], vector[2]);
+    GLint loc = glGetUniformLocation(*m_program, name);
+    glUniform3f(loc, vector[0], vector[1], vector[2]);
 }
 
 void shader::set_vec2(const char *name, const butil::vec2 vector) {
-    GLint loc = glGetpropertieLocation(*m_program, name);
-    glpropertie2f(loc, vector[0], vector[1]);
+    GLint loc = glGetUniformLocation(*m_program, name);
+    glUniform2f(loc, vector[0], vector[1]);
 }
     
 void shader::set_bool(const char* name, const bool v) {
-    GLint loc = glGetpropertieLocation(*m_program, name);
-    glpropertie1i(loc, v);
+    GLint loc = glGetUniformLocation(*m_program, name);
+    glUniform1i(loc, v);
 }
         
 void shader::set_int(const char* name, const int v) {
-    GLint loc = glGetpropertieLocation(*m_program, name);
-    glpropertie1i(loc, v);
+    GLint loc = glGetUniformLocation(*m_program, name);
+    glUniform1i(loc, v);
 }        
 
 void shader::set_float(const char* name, const float v) {
-    GLint loc = glGetpropertieLocation(*m_program, name);
-    glpropertie1f(loc, v);
+    GLint loc = glGetUniformLocation(*m_program, name);
+    glUniform1f(loc, v);
 }
 
 void shader::bind() {
     if(!m_program || *m_program == 0) {
-        throw std::runtime_error("ERROR: shader program is null\n");
+        throw std::runtime_error("shader program is null! Have you compiled before binding?\n");
         return;
     }
     glUseProgram(*m_program);

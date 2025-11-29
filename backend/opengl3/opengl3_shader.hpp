@@ -1,9 +1,10 @@
 #pragma once
 #include <GL/glew.h>
 #include <os/os.hpp>
-#include "memory"
-#include "utils/mat.hpp"
-#include "utils/vec.hpp"
+#include <memory>
+#include <utils/mat.hpp>
+#include <utils/vec.hpp>
+#include <utils/propertie.hpp>
 
 namespace bgl {
     class shader {
@@ -28,7 +29,7 @@ namespace bgl {
         static GLuint compile(GLenum type, const std::string& source);
         static GLuint link(GLuint vert, GLuint frag);
 
-        void set(const std::string& name, const propertie u);
+        void set(const std::string& name, const butil::propertie u);
 
         bool operator==(const shader& other) const {
             return *m_program == *other.m_program;

@@ -11,14 +11,10 @@ bgui::bgui(const butil::theme& gui_theme) : m_main_layout(nullptr), m_theme(gui_
 bgui::~bgui() {
 }
 
-void bgui::init_lib() {
+void bgui::initialize_interface() {
     init_trigger = true;
     if(!instance().m_main_layout)
         instance().set_layout<blay::layout>();
-    /*
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    */
     instance().apply_theme(instance().m_theme);
 }
 

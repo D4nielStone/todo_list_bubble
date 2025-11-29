@@ -80,7 +80,7 @@ if (!glfwInit()) {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
-    bgui::init_lib();
+    bgui::initialize_interface();
 
     bgui_set_opengl3();
     bgui_set_glfw(window);
