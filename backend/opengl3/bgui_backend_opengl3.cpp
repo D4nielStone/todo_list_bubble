@@ -1,4 +1,4 @@
-#include <GL/glew.h>
+#include <glad/glad.h>
 #include "bgui_backend_opengl3.hpp"
 #include "opengl3_shader.hpp"
 #include <bgui.hpp>
@@ -105,10 +105,10 @@ void bkend::opengl3_clear_texture_cache() {
 
 // Setup inicial do OpenGL3
 void bkend::set_up_opengl3() {
-    glewExperimental = GL_TRUE;
-    GLenum err = glewInit();
-    if (err != GLEW_OK) {
-    }
+    if(gladLoadGL())
+        std::cout << "OpenGL loaded successfully!" << std::endl;
+    else
+        std::cout << "Failed to initialize OpenGL context" << std::endl;    
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glEnable(GL_BLEND);

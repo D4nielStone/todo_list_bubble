@@ -47,7 +47,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
-        sudo apt-get install -y libglfw3-dev libfreetype6-dev libglew-dev
+        sudo apt-get install -y libglfw3-dev libfreetype6-dev
 
     - name: Install Dependencies on Windows (MinGW/Msys2)
       if: matrix.os == 'windows-latest'
@@ -59,7 +59,6 @@ jobs:
         install: >
           mingw-w64-x86_64-glfw
           mingw-w64-x86_64-freetype
-          mingw-w64-x86_64-glew
         # Use the standard cmd shell for the following steps
         shell: cmd
 

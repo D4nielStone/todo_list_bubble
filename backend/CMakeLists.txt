@@ -1,4 +1,5 @@
 add_library(bgui_backend INTERFACE)
+enable_language(C)
 
 target_link_libraries(bgui_backend INTERFACE bgui_core)
 # FREETYPE backend

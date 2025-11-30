@@ -14,7 +14,6 @@ namespace bkend {
     static vulkan_backend_data vk;
     void vulkan_render(butil::draw_data*);
     void create_vk_instance();
-    void create_vk_debug_messenger();
     VKAPI_ATTR VkBool32 VKAPI_CALL bgui_vk_debug_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
     VkDebugUtilsMessageTypeFlagsEXT messageTypes,
