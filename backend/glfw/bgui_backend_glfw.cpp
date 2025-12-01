@@ -35,26 +35,27 @@ GLFWwindow* bkend::set_up_glfw(int width, int height, const char* title, int fla
         glfwTerminate();
     }
 
-    bos::s_window_io.m_title = title;
-    bos::s_window_io.m_size = butil::vec2i{width, height};
+    bos::get_window().m_title = title;
+    bos::get_window().m_size = butil::vec2i{width, height};
     glfwSetMouseButtonCallback(window, bkend::glfw_mouse_button_callback);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
     return window;
 }
-void bkend::glfw_update() {
+void bkend::glfw_update(bos::windowio &window_io) {
     glfwPollEvents();
 
     // Gests the window size
     int width, height;
     glfwGetWindowSize(glfwGetCurrentContext(), &width, &height);
-    bos::s_window_io.m_size = butil::vec2i{width, height};
+    window_io.m_size[0] = width;
+    window_io.m_size[1] = height;
 
     // Gests the mouse position
     double x, y;
     glfwGetCursorPos(glfwGetCurrentContext(), &x, &y);
-    bos::s_window_io.m_mouse_position = butil::vec2i{(int)x, (int)y};
+    window_io.m_mouse_position = butil::vec2i{(int)x, (int)y};
 }
 
 void bkend::glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
@@ -62,7 +63,7 @@ void bkend::glfw_mouse_button_callback(GLFWwindow* window, int button, int actio
 
     bos::input_action internal_action = static_cast<bos::input_action>(s_glfw_action_reverse_map.at(action)); 
 
-    bos::s_window_io.m_input_map[internal_key] = internal_action;
+    bos::get_window().m_input_map[internal_key] = internal_action;
 }
 void bkend::shutdown_glfw() {
     glfwDestroyWindow(glfwGetCurrentContext());

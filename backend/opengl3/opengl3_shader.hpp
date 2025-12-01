@@ -7,7 +7,7 @@
 #include <utils/propertie.hpp>
 
 namespace bgl {
-    class shader {
+    class opengl3_shader {
     private:
         std::shared_ptr<GLuint> m_program{nullptr};
         
@@ -19,9 +19,9 @@ namespace bgl {
         void set_int(const char* name, const int v);
         void set_float(const char* name, const float v);
     public:
-        shader() = default;
-        shader(const char* vertex_path, const char* fragment_path);
-        ~shader();
+        opengl3_shader() = default;
+        opengl3_shader(const char* vertex_path, const char* fragment_path);
+        ~opengl3_shader();
         void bind();
         void unbind();
 
@@ -31,11 +31,11 @@ namespace bgl {
 
         void set(const std::string& name, const butil::propertie u);
 
-        bool operator==(const shader& other) const {
+        bool operator==(const opengl3_shader& other) const {
             return *m_program == *other.m_program;
         }
     };
-    shader* get_default_shader();
-    shader* get_text_shader();
-    shader* get_shader_from_tag(const std::string&);
+    opengl3_shader* get_default_opengl3_shader();
+    opengl3_shader* get_text_opengl3_shader();
+    opengl3_shader* get_opengl3_shader_from_tag(const std::string&);
 } // namespace bgl

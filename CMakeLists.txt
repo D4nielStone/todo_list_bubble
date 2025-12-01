@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.15)
 project(BGUI)
 
 # --- Backend options ---
-option(BGUI_USE_OPENGL   "Enable OpenGL backend"   OFF)
+option(BGUI_USE_OPENGL   "Enable OpenGL backend"   ON)
 option(BGUI_USE_VULKAN   "Enable Vulkan backend"   OFF)
 option(BGUI_USE_GLFW     "Enable GLFW backend"     ON)
 option(BGUI_USE_FREETYPE "Enable FreeType support" ON)
@@ -37,6 +37,6 @@ target_include_directories(bgui
         ${PROJECT_SOURCE_DIR}/core/include
 )
 
-if(BGUI_BUILD_EXEMPLES)
+if(BGUI_BUILD_EXAMPLES)
     add_subdirectory(exemples)
 endif()

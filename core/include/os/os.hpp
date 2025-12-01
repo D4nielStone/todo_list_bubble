@@ -23,8 +23,7 @@ namespace bos {
         std::unordered_map<input_key, input_action> m_input_map;
         std::string m_title{""};
     };
-    static windowio s_window_io;
-
+    windowio& get_window();
     butil::vec2i get_window_size();
     butil::vec2i get_mouse_position();
     std::string read_file(const std::string& path);

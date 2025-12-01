@@ -6,8 +6,8 @@
 #include <memory>
 #include <opengl3/opengl3_shader.hpp>
 
-static std::map<std::pair<std::string, std::string>, std::shared_ptr<GLuint>> shader_cache;
-static std::map<std::string, std::string> embedded_shaders = {
+static std::map<std::pair<std::string, std::string>, std::shared_ptr<GLuint>> opengl3_shader_cache;
+static std::map<std::string, std::string> embedded_opengl3_shaders = {
     {"ui::default_vs", R"(#version 330 core
 layout(location = 0) in vec2 aPos;
 layout(location = 1) in vec2 aUv;
@@ -24,7 +24,7 @@ void main() {
     })"},
     {"ui::default_fs", R"(#version 330 core
 
-in vec2 Uv; // UV coordinates from vertex shader (0..1)
+in vec2 Uv; // UV coordinates from vertex opengl3_shader (0..1)
 out vec4 FragColor;
 
 // uniforms
@@ -74,22 +74,22 @@ void main() {
 
 using namespace bgl;
 
-shader::shader(const char * vertex_path, const char * fragment_path) {
+opengl3_shader::opengl3_shader(const char * vertex_path, const char * fragment_path) {
     compile(vertex_path, fragment_path);
 }
 
-void shader::compile(const char* vertex_path, const char* fragment_path) {
+void opengl3_shader::compile(const char* vertex_path, const char* fragment_path) {
     auto key = std::make_pair(std::string(vertex_path) + "_vs", std::string(fragment_path) + "_fs");
 
-    auto it = shader_cache.find(key);
-    if (it != shader_cache.end()) {
-        m_program = shader_cache.at(key);
+    auto it = opengl3_shader_cache.find(key);
+    if (it != opengl3_shader_cache.end()) {
+        m_program = opengl3_shader_cache.at(key);
         return;
     }
 
-    // Uses default shader if don't found in embedded shaders
-    auto source_v = embedded_shaders.find(key.first) != embedded_shaders.end() ? embedded_shaders[key.first] : embedded_shaders["ui::default_vs"];
-    auto source_f = embedded_shaders.find(key.second) != embedded_shaders.end() ? embedded_shaders[key.second] : embedded_shaders["ui::default_fs"];
+    // Uses default opengl3_shader if don't found in embedded opengl3_shaders
+    auto source_v = embedded_opengl3_shaders.find(key.first) != embedded_opengl3_shaders.end() ? embedded_opengl3_shaders[key.first] : embedded_opengl3_shaders["ui::default_vs"];
+    auto source_f = embedded_opengl3_shaders.find(key.second) != embedded_opengl3_shaders.end() ? embedded_opengl3_shaders[key.second] : embedded_opengl3_shaders["ui::default_fs"];
     GLuint vert = compile(GL_VERTEX_SHADER, source_v);
     GLuint frag = compile(GL_FRAGMENT_SHADER, source_f);
 
@@ -99,35 +99,35 @@ void shader::compile(const char* vertex_path, const char* fragment_path) {
         delete p;
     });
 
-    shader_cache[key] = m_program;
+    opengl3_shader_cache[key] = m_program;
 }
 
-shader::~shader() {
+opengl3_shader::~opengl3_shader() {
 }
 
-GLuint shader::compile(GLenum type, const std::string &source) {
-    GLuint shader = glCreateShader(type);
+GLuint opengl3_shader::compile(GLenum type, const std::string &source) {
+    GLuint opengl3_shader = glCreateShader(type);
     const char* src = source.c_str();
-    glShaderSource(shader, 1, &src, nullptr);
-    glCompileShader(shader);
+    glShaderSource(opengl3_shader, 1, &src, nullptr);
+    glCompileShader(opengl3_shader);
 
     GLint success;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(opengl3_shader, GL_COMPILE_STATUS, &success);
     if (!success) {
         char infoLog[512];
-        glGetShaderInfoLog(shader, 512, nullptr, infoLog);
+        glGetShaderInfoLog(opengl3_shader, 512, nullptr, infoLog);
         throw std::runtime_error(
-            std::string("Shader compilation failed (") + 
+            std::string("opengl3_shader compilation failed (") + 
             (type == GL_VERTEX_SHADER ? "vertex" : "fragment") +
             "): " + infoLog
         );
 
     }
 
-    return shader;
+    return opengl3_shader;
  }
 
- GLuint shader::link(GLuint vert, GLuint frag) {
+ GLuint opengl3_shader::link(GLuint vert, GLuint frag) {
     GLuint m_id = glCreateProgram();
     glAttachShader(m_id, vert);
     glAttachShader(m_id, frag);
@@ -138,7 +138,7 @@ GLuint shader::compile(GLenum type, const std::string &source) {
     if (!success) {
         char infoLog[512];
         glGetProgramInfoLog(m_id, 512, nullptr, infoLog);
-        throw std::runtime_error("Shader link failed:\n" + std::string(infoLog));
+        throw std::runtime_error("opengl3_shader link failed:\n" + std::string(infoLog));
     }
 
     glDeleteShader(vert);
@@ -147,7 +147,7 @@ GLuint shader::compile(GLenum type, const std::string &source) {
     return m_id;
 }
 
-void bgl::shader::set(const std::string& name, const butil::propertie u) {
+void bgl::opengl3_shader::set(const std::string& name, const butil::propertie u) {
     switch (u.m_type) {
     case 0x0: // vec2
         set_vec2(name.c_str(), u.m_value.m_vec2);
@@ -172,69 +172,69 @@ void bgl::shader::set(const std::string& name, const butil::propertie u) {
         break;
     }
 }
-void shader::set_mat4(const char *name, const butil::mat4 matrix) {
+void opengl3_shader::set_mat4(const char *name, const butil::mat4 matrix) {
     GLint loc = glGetUniformLocation(*m_program, name);
     glUniformMatrix4fv(loc, 1, GL_FALSE, matrix.data());
 }
 
-void shader::set_vec4(const char *name, const butil::vec4 vector) {
+void opengl3_shader::set_vec4(const char *name, const butil::vec4 vector) {
     GLint loc = glGetUniformLocation(*m_program, name);
     glUniform4f(loc, vector[0], vector[1], vector[2], vector[3]);
 }
 
-void shader::set_vec3(const char *name, const butil::vec3 vector) {
+void opengl3_shader::set_vec3(const char *name, const butil::vec3 vector) {
     GLint loc = glGetUniformLocation(*m_program, name);
     glUniform3f(loc, vector[0], vector[1], vector[2]);
 }
 
-void shader::set_vec2(const char *name, const butil::vec2 vector) {
+void opengl3_shader::set_vec2(const char *name, const butil::vec2 vector) {
     GLint loc = glGetUniformLocation(*m_program, name);
     glUniform2f(loc, vector[0], vector[1]);
 }
     
-void shader::set_bool(const char* name, const bool v) {
+void opengl3_shader::set_bool(const char* name, const bool v) {
     GLint loc = glGetUniformLocation(*m_program, name);
     glUniform1i(loc, v);
 }
         
-void shader::set_int(const char* name, const int v) {
+void opengl3_shader::set_int(const char* name, const int v) {
     GLint loc = glGetUniformLocation(*m_program, name);
     glUniform1i(loc, v);
 }        
 
-void shader::set_float(const char* name, const float v) {
+void opengl3_shader::set_float(const char* name, const float v) {
     GLint loc = glGetUniformLocation(*m_program, name);
     glUniform1f(loc, v);
 }
 
-void shader::bind() {
+void opengl3_shader::bind() {
     if(!m_program || *m_program == 0) {
-        throw std::runtime_error("shader program is null! Have you compiled before binding?\n");
+        throw std::runtime_error("opengl3_shader program is null! Have you compiled before binding?\n");
         return;
     }
     glUseProgram(*m_program);
 }
 
-void shader::unbind() {
+void opengl3_shader::unbind() {
     glUseProgram(0);
 }
 
-shader* bgl::get_default_shader() {
-    static shader default_shader("ui::default", "ui::default");
-    return &default_shader;
+opengl3_shader* bgl::get_default_opengl3_shader() {
+    static opengl3_shader default_opengl3_shader("ui::default", "ui::default");
+    return &default_opengl3_shader;
 }
 
-shader* bgl::get_text_shader() {
-    static shader text_shader("ui::default", "ui::text");
-    return &text_shader;
+opengl3_shader* bgl::get_text_opengl3_shader() {
+    static opengl3_shader text_opengl3_shader("ui::default", "ui::text");
+    return &text_opengl3_shader;
 }
 
-shader* bgl::get_shader_from_tag(const std::string& name) {
+opengl3_shader* bgl::get_opengl3_shader_from_tag(const std::string& name) {
     if(name == "ui::default") {
-        return bgl::get_default_shader();
+        return bgl::get_default_opengl3_shader();
     } else if(name == "ui::text") {
-        return bgl::get_text_shader();
+        return bgl::get_text_opengl3_shader();
     } else {
-        return bgl::get_default_shader();
+        return bgl::get_default_opengl3_shader();
     }
 }

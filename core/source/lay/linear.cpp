@@ -1,6 +1,7 @@
 
 #include "lay/linear.hpp"
 #include "bgui.hpp"
+#include <iostream>
 using namespace blay;
 
 using namespace butil;
@@ -100,6 +101,7 @@ void linear::update() {
         // Advance in main axis
         cursor_main += elem->get_size()[main_index] + spacing;
     }
+
 }
 
 void linear::fit_to_content() {

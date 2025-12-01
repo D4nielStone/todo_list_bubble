@@ -9,13 +9,13 @@ int main() {
 
     bgui::set_up();
 
-    auto* root = bgui::instance().get_layout();
+    blay::linear& root = bgui::instance().set_layout<blay::linear>(butil::orientation::vertical);
 
     // Adding elements
-    root->add<belem::text>("Hello World!", 2.f);
+    root.add<belem::text>("Hello World!", 1.f);
 
     while (!glfwWindowShouldClose(window)) {
-        bkend::glfw_update();           // update events
+        bkend::glfw_update(bos::get_window());           // update events
         bgui::update();                 // update layout
         bkend::opengl3_render(
             bgui::get_draw_data()       // render the layout data

@@ -2,6 +2,7 @@
 #include "os/os.hpp"
 #include <utils/vec.hpp>
 #include <stdexcept>
+#include <iostream>
 
 static bool init_trigger = false;
 
@@ -51,6 +52,7 @@ bool bgui::shutdown_lib() {
 void bgui::update() {
     if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
     // the main layout must to be resized based on the window size.
+
     butil::vec2i w_size = bos::get_window_size();
     instance().m_main_layout->set_rect(0.f, 0.f, static_cast<float>(w_size[0]), static_cast<float>(w_size[1]));
     instance().update(*instance().m_main_layout);
