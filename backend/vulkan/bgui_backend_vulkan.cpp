@@ -23,7 +23,7 @@ VkResult CreateDebugUtilsMessengerEXT(
 }
 
 // Debug callback function
-VKAPI_ATTR VkBool32 VKAPI_CALL bkend::bgui_vk_debug_callback(
+VKAPI_ATTR VkBool32 VKAPI_CALL bgui::bgui_vk_debug_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
     VkDebugUtilsMessageTypeFlagsEXT messageTypes,
     const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
@@ -40,7 +40,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL bkend::bgui_vk_debug_callback(
 }
 
 // Creates Vulkan instance + debug messenger
-void bkend::create_vk_instance() {
+void bgui::create_vk_instance() {
     const char* validationLayers[] = { "VK_LAYER_KHRONOS_validation" };
 
     VkApplicationInfo appInfo{};
@@ -55,14 +55,14 @@ void bkend::create_vk_instance() {
     VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
     debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
     debugCreateInfo.messageSeverity =
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERbguiE_BIT_EXT |
         VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
         VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
     debugCreateInfo.messageType =
         VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
         VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
         VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-    debugCreateInfo.pfnUserCallback = bkend::bgui_vk_debug_callback;
+    debugCreateInfo.pfnUserCallback = bgui::bgui_vk_debug_callback;
     debugCreateInfo.pUserData = nullptr;
 
     VkInstanceCreateInfo createInfo{};
@@ -93,7 +93,7 @@ void bkend::create_vk_instance() {
 #endif
 
     if (vkCreateInstance(&createInfo, nullptr, &vk.instance) != VK_SUCCESS) {
-        throw std::runtime_error("VK Bkend::failed to create instance!");
+        throw std::runtime_error("VK bgui::failed to create instance!");
     }
 
     // Creates the actual messenger
@@ -101,7 +101,7 @@ void bkend::create_vk_instance() {
     CreateDebugUtilsMessengerEXT(vk.instance, &debugCreateInfo, nullptr, &vk.debugMessenger);
 }
 
-void bkend::shutdown_vulkan() {
+void bgui::shutdown_vulkan() {
     if (vk.debugMessenger != VK_NULL_HANDLE) {
         auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)
             vkGetInstanceProcAddr(vk.instance, "vkDestroyDebugUtilsMessengerEXT");
@@ -115,10 +115,10 @@ void bkend::shutdown_vulkan() {
         vkDestroyInstance(vk.instance, nullptr);
 }
 
-void bkend::set_up_vulkan() {
-    bkend::create_vk_instance();
+void bgui::set_up_vulkan() {
+    bgui::create_vk_instance();
 }
 
-void bkend::vulkan_render(butil::draw_data* draw_data) {
+void bgui::vulkan_render(bgui::draw_data* draw_data) {
     // Placeholder
 }

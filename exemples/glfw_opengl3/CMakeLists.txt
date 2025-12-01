@@ -13,4 +13,4 @@ target_include_directories(exemple_glfw_opengl3
     PRIVATE ${PROJECT_SOURCE_DIR}/../../backend
             ${PROJECT_SOURCE_DIR}/../../core/include
 )
-target_link_libraries(exemple_glfw_opengl3 PRIVATE bgui)
+target_link_libraries(exemple_glfw_opengl3 PRIVATE bgui bgui_core bgui_backend)

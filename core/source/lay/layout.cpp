@@ -1,11 +1,11 @@
 #include "lay/layout.hpp"
 #include "bgui.hpp"
 
-using namespace blay;
+using namespace bgui;
 
 layout::layout() : element() {
     m_visible = false;
-    apply_theme(bgui::instance().get_theme());
+    apply_theme(bgui::get_theme());
 };
 
 void layout::update() {
@@ -43,7 +43,7 @@ void layout::pop_modal()
     m_modals.pop();
 }
 
-void layout::get_requests(butil::draw_data &data) {
+void layout::get_requests(bgui::draw_data* data) {
     element::get_requests(data);
     // linear layouts get the draw call in addition order
     for (auto& elem : m_elements) {

@@ -4,19 +4,19 @@
 #include <iostream>
 
 // Maps to input conversion
-static std::unordered_map<int, bos::input_key> s_glfw_key_reverse_map = {
-    {GLFW_MOUSE_BUTTON_LEFT, bos::input_key::mouse_left},
-    {GLFW_MOUSE_BUTTON_RIGHT, bos::input_key::mouse_right},
-    {GLFW_MOUSE_BUTTON_MIDDLE, bos::input_key::mouse_middle}
+static std::unordered_map<int, bgui::input_key> s_glfw_key_reverse_map = {
+    {GLFW_MOUSE_BUTTON_LEFT, bgui::input_key::mouse_left},
+    {GLFW_MOUSE_BUTTON_RIGHT, bgui::input_key::mouse_right},
+    {GLFW_MOUSE_BUTTON_MIDDLE, bgui::input_key::mouse_middle}
 };
-static std::unordered_map<int, bos::input_action> s_glfw_action_reverse_map = {
-    {GLFW_PRESS, bos::input_action::press},
-    {GLFW_RELEASE, bos::input_action::release},
-    {GLFW_REPEAT, bos::input_action::repeat}
+static std::unordered_map<int, bgui::input_action> s_glfw_action_reverse_map = {
+    {GLFW_PRESS, bgui::input_action::press},
+    {GLFW_RELEASE, bgui::input_action::release},
+    {GLFW_REPEAT, bgui::input_action::repeat}
 };
 
 // GLFW Backend functions
-GLFWwindow* bkend::set_up_glfw(int width, int height, const char* title, int flags, GLFWmonitor* monitor, GLFWwindow* share) {
+GLFWwindow* bgui::set_up_glfw(int width, int height, const char* title, int flags, GLFWmonitor* monitor, GLFWwindow* share) {
     if (!glfwInit()) {
         throw std::runtime_error("Failed to init GLFW\n");
     }
@@ -35,15 +35,15 @@ GLFWwindow* bkend::set_up_glfw(int width, int height, const char* title, int fla
         glfwTerminate();
     }
 
-    bos::get_window().m_title = title;
-    bos::get_window().m_size = butil::vec2i{width, height};
-    glfwSetMouseButtonCallback(window, bkend::glfw_mouse_button_callback);
+    bgui::get_window().m_title = title;
+    bgui::get_window().m_size = bgui::vec2i{width, height};
+    glfwSetMouseButtonCallback(window, bgui::glfw_mouse_button_callback);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
     return window;
 }
-void bkend::glfw_update(bos::windowio &window_io) {
+void bgui::glfw_update(bgui::windowio &window_io) {
     glfwPollEvents();
 
     // Gests the window size
@@ -55,17 +55,17 @@ void bkend::glfw_update(bos::windowio &window_io) {
     // Gests the mouse position
     double x, y;
     glfwGetCursorPos(glfwGetCurrentContext(), &x, &y);
-    window_io.m_mouse_position = butil::vec2i{(int)x, (int)y};
+    window_io.m_mouse_position = bgui::vec2i{(int)x, (int)y};
 }
 
-void bkend::glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-    bos::input_key internal_key = s_glfw_key_reverse_map.at(button);
+void bgui::glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    bgui::input_key internal_key = s_glfw_key_reverse_map.at(button);
 
-    bos::input_action internal_action = static_cast<bos::input_action>(s_glfw_action_reverse_map.at(action)); 
+    bgui::input_action internal_action = static_cast<bgui::input_action>(s_glfw_action_reverse_map.at(action)); 
 
-    bos::get_window().m_input_map[internal_key] = internal_action;
+    bgui::get_window().m_input_map[internal_key] = internal_action;
 }
-void bkend::shutdown_glfw() {
+void bgui::shutdown_glfw() {
     glfwDestroyWindow(glfwGetCurrentContext());
     glfwTerminate();
 }

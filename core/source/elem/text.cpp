@@ -29,23 +29,22 @@ std::u32string utf8_to_utf32(const std::string& str) {
     return result;
 }
 
-belem::text::text(const std::string &buffer, float scale) : m_buffer(buffer),
-    m_font_name("Noto Sans-Condensed"), m_scale(scale) {
+bgui::text::text(const std::string &buffer, float scale) : m_buffer(buffer),
+    m_font_name("Noto Sans-Condensed#40"), m_scale(scale) {
     set_font(m_font_name);
-    apply_theme(bgui::instance().get_theme());
     m_material.m_use_tex = true;
     m_material.m_shader_tag = "ui::text";
 }
-belem::text::~text() {
+bgui::text::~text() {
 }
-void belem::text::update() {
+void bgui::text::update() {
 }
-void belem::text::set_font(const std::string &path) {
-    auto& i = bos::font_manager::instance();
+void bgui::text::set_font(const std::string &path) {
+    auto& i = bgui::font_manager::get_font_manager();
     m_font = i.get_font(path);
 }
 
-void belem::text::get_requests(butil::draw_data& data) {
+void bgui::text::get_requests(bgui::draw_data* data) {
     const auto& chs = m_font.chs;
     if (chs.empty()) return;
     float ascent = m_font.ascent * m_scale;
@@ -80,7 +79,7 @@ void belem::text::get_requests(butil::draw_data& data) {
         float w = m_scale * ch.size[0];
         float h = m_scale * ch.size[1];
 
-        data.m_quad_requests.push({
+        data->m_quad_requests.push({
             m_material, 6,
             { xpos, ypos, w, -h },
             ch.uv_min, ch.uv_max

@@ -2,12 +2,12 @@
 #include "vec.hpp"
 #include "mat.hpp"
 
-namespace butil {
+namespace bgui {
     union any_t {
-        butil::vec2 m_vec2;
-        butil::vec3 m_vec3;
-        butil::vec4 m_vec4;
-        butil::mat4 m_mat4;
+        bgui::vec2 m_vec2;
+        bgui::vec3 m_vec3;
+        bgui::vec4 m_vec4;
+        bgui::mat4 m_mat4;
         float m_float;
         int m_int;
         any_t() {};
@@ -19,10 +19,10 @@ namespace butil {
         any_t m_value;
         // constructors:
         propertie() : m_type(0x5) {m_value.m_int = 0;};
-        propertie(const butil::vec2& v) : m_type(0x0){m_value.m_vec2 = v;};
-        propertie(const butil::vec3& v) : m_type(0x1){m_value.m_vec3 = v;};
-        propertie(const butil::vec4& v) : m_type(0x2){m_value.m_vec4 = v;};
-        propertie(const butil::mat4& v) : m_type(0x3){m_value.m_mat4 = v;};
+        propertie(const bgui::vec2& v) : m_type(0x0){m_value.m_vec2 = v;};
+        propertie(const bgui::vec3& v) : m_type(0x1){m_value.m_vec3 = v;};
+        propertie(const bgui::vec4& v) : m_type(0x2){m_value.m_vec4 = v;};
+        propertie(const bgui::mat4& v) : m_type(0x3){m_value.m_mat4 = v;};
         propertie(const float& v) :  m_type(0x4){m_value.m_float = v;};
         propertie(const int& v) : m_type(0x5){m_value.m_int = v;};
         propertie& operator=(const propertie& other) {

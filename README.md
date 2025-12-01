@@ -63,10 +63,10 @@ After initializing the library, you can set the main layout and add UI elements 
 int main() {
     bgui::set_up();
 
-    GLFWwindow* window = bkend::set_up_glfw(1280, 720, "BGUI Exemple");
+    GLFWwindow* window = bgui::set_up_glfw(1280, 720, "BGUI Exemple");
 
-    bkend::set_up_freetype();
-    bkend::set_up_opengl3();
+    bgui::set_up_freetype();
+    bgui::set_up_opengl3();
     [...]
 ```
 
@@ -74,19 +74,19 @@ int main() {
 
 ```cpp
 
-    auto& root = bgui::set_layout<blay::relative>(butil::orientation::horizontal); 
+    auto& root = bgui::set_layout<bgui::relative>(bgui::orientation::horizontal); 
     // Supported layouts: linear, absolute (base), relative, and more.
 
     // Lateral panel: vertical linear layout
-    auto& panel = root.add<blay::linear>(butil::orientation::vertical);
+    auto& panel = root.add<bgui::linear>(bgui::orientation::vertical);
 
     // Cross alignment (horizontal)
-    panel.set_cross_alignment(butil::alignment::stretch);
-    panel.set_width(300/*, butil::pixel*/); // Pixel is default
-    panel.set_height(1.f, butil::mode::relative);
+    panel.set_cross_alignment(bgui::alignment::stretch);
+    panel.set_width(300/*, bgui::pixel*/); // Pixel is default
+    panel.set_height(1.f, bgui::mode::relative);
 
     // Adding elements
-    panel.add<belem::text>("Hello World!", 0.5f);
+    panel.add<bgui::text>("Hello World!", 0.5f);
 ```
 
 #### Main Loop
@@ -94,9 +94,9 @@ int main() {
 ```cpp
     [...]
     while (!glfwWindowShouldClose(window)) {
-        bkend::glfw_update(); // update events
+        bgui::glfw_update(); // update events
         bgui::update();       // update layout
-        bkend::opengl3_render(
+        bgui::opengl3_render(
             bgui::get_draw_data() // render the layout data
         );
         glfwSwapBuffers(window);
@@ -104,9 +104,9 @@ int main() {
 
     // don't forget to clean-up the trash!
     bgui::shutdown_lib();
-    bkend::shutdown_opengl3();
-    bkend::shutdown_freetype();
-    bkend::shutdown_glfw();
+    bgui::shutdown_opengl3();
+    bgui::shutdown_freetype();
+    bgui::shutdown_glfw();
     return 0;
 }
 ```

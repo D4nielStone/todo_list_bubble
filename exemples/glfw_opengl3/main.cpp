@@ -2,31 +2,34 @@
 #include <iostream>
 
 int main() {
-    GLFWwindow* window = bkend::set_up_glfw(1280, 720, "BGUI GLFW & Opengl3 Exemple");
+    GLFWwindow* window = bgui::set_up_glfw(1280, 720, "BGUI GLFW & Opengl3 Exemple");
     
-    bkend::set_up_opengl3();
-    bkend::set_up_freetype();
+    bgui::set_up_opengl3();
+    bgui::set_up_freetype();
 
     bgui::set_up();
-
-    blay::linear& root = bgui::instance().set_layout<blay::linear>(butil::orientation::vertical);
+    bgui::linear& root = bgui::set_layout<bgui::linear>(bgui::orientation::vertical);
+    root.set_cross_alignment(bgui::alignment::center);
 
     // Adding elements
-    root.add<belem::text>("Hello World!", 1.f);
+    root.add<bgui::text>("Hello World!", 0.5f);
+    root.add<bgui::text>("Hello World!", 0.5f);
+    root.add<bgui::text>("Hello World!", 0.5f);
+    bgui::apply_theme(bgui::light_theme);
 
     while (!glfwWindowShouldClose(window)) {
-        bkend::glfw_update(bos::get_window());           // update events
+        bgui::glfw_update(bgui::get_window());           // update events
         bgui::update();                 // update layout
-        bkend::opengl3_render(
+        bgui::opengl3_render(
             bgui::get_draw_data()       // render the layout data
         );
         glfwSwapBuffers(window);
     }
 
     bgui::shutdown_lib();
-    bkend::shutdown_opengl3();
-    bkend::shutdown_freetype();
-    bkend::shutdown_glfw();
+    bgui::shutdown_opengl3();
+    bgui::shutdown_freetype();
+    bgui::shutdown_glfw();
     return 0;
 
     return 0;

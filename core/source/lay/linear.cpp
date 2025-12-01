@@ -2,9 +2,9 @@
 #include "lay/linear.hpp"
 #include "bgui.hpp"
 #include <iostream>
-using namespace blay;
+using namespace bgui;
 
-using namespace butil;
+using namespace bgui;
     
 linear::linear(const orientation& ori) {
     m_orientation = ori;

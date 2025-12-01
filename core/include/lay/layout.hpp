@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <queue>
 
-namespace blay {
+namespace bgui {
     class layout : public element {
     protected:
         std::queue<std::unique_ptr<layout>> m_modals;
@@ -12,7 +12,7 @@ namespace blay {
         layout();
         ~layout() = default;
     
-        virtual void apply_theme(const butil::theme& theme) {
+        virtual void apply_theme(const bgui::theme& theme) {
             m_material.set("bg_color", theme.m_box_color);
             m_material.set("bordered", true);
             m_material.set("border_radius", 4.f);
@@ -47,11 +47,11 @@ namespace blay {
             return false;
         }
         void update() override;
-        void get_requests(butil::draw_data& calls);
+        void get_requests(bgui::draw_data* calls);
         virtual void fit_to_content();
         std::queue<std::unique_ptr<layout>> &get_modals();
         std::vector<std::unique_ptr<element>>& get_elements();
         void pop_modal();
-        blay::layout* as_layout() override { return this; }
+        bgui::layout* as_layout() override { return this; }
     };
-} // namespace blay
+} // namespace bgui

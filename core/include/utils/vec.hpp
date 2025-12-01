@@ -2,7 +2,7 @@
 #include <cmath>
 #include <array>
 
-namespace butil {
+namespace bgui {
     template<size_t N, typename T = float>
     class vec {
     public:
@@ -91,4 +91,4 @@ namespace butil {
     using vec2i = vec<2, int>;
 
     using color = vec4;
-} // namespace butil
+} // namespace bgui

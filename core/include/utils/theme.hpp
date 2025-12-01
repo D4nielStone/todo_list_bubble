@@ -2,7 +2,7 @@
 #include "material.hpp"
 #include "vec.hpp"
 
-namespace butil {
+namespace bgui {
     enum class mode {
         relative,
         pixel
@@ -18,16 +18,16 @@ namespace butil {
         stretch
     };
     struct theme{
-        butil::color m_clear_color;
-        butil::color m_text_color;
-        butil::color m_box_color;
-        butil::color m_button_color;
-        butil::color m_button_border_color;
-        butil::color m_button_clicked_color;
-        butil::color m_button_hovered_color;
+        bgui::color m_clear_color = bgui::color(1.f);
+        bgui::color m_text_color = bgui::color(1.f);
+        bgui::color m_box_color = bgui::color(1.f);
+        bgui::color m_button_color = bgui::color(1.f);
+        bgui::color m_button_border_color = bgui::color(1.f);
+        bgui::color m_button_clicked_color = bgui::color(1.f);
+        bgui::color m_button_hovered_color = bgui::color(1.f);
     };
     
-    static const theme light_theme = {
+    inline const theme light_theme = {
         {0.94,0.94,0.94,1.0},
         {0.0,0.0,0.0,1.0},
         {0.92,0.92,0.92,1.0}, 
@@ -36,7 +36,7 @@ namespace butil {
         {0.88,0.88,0.88,1.0}, 
         {0.88,0.88,0.88,1.0}
     };
-    static const theme dark_theme = {
+    inline const theme dark_theme = {
         {0.06f, 0.06f, 0.06f, 1.f},
         {1.f, 1.f, 1.f, 1.f},
         {0.08f, 0.08f, 0.08f, 1.f},
@@ -45,4 +45,4 @@ namespace butil {
         {0.12f, 0.12f, 0.12f, 1.f},   // pressed
         {0.12f, 0.12f, 0.12f, 1.f} // hovered
     };
-}; // namespace butil
+}; // namespace bgui

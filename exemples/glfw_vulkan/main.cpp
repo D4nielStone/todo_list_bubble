@@ -2,31 +2,31 @@
 #include <iostream>
 
 int main() {
-    GLFWwindow* window = bkend::set_up_glfw(800, 400, "BGUI GLFW & Vulkan Exemple");
+    GLFWwindow* window = bgui::set_up_glfw(800, 400, "BGUI GLFW & Vulkan Exemple");
     
-    bkend::set_up_vulkan();
-    bkend::set_up_freetype();
+    bgui::set_up_vulkan();
+    bgui::set_up_freetype();
 
     bgui::set_up();
 
-    auto* root = bgui::instance().get_layout();
+    auto* root = bgui::get_layout();
 
     // Adding elements
-    root->add<belem::text>("Hello World!", 2.f);
+    root->add<bgui::text>("Hello World!", 2.f);
 
     while (!glfwWindowShouldClose(window)) {
-        bkend::glfw_update();           // update events
+        bgui::glfw_update();           // update events
         bgui::update();                 // update layout
-        bkend::vulkan_render(
+        bgui::vulkan_render(
             bgui::get_draw_data()       // render the layout data
         );
         glfwSwapBuffers(window);
     }
 
     bgui::shutdown_lib();
-    bkend::shutdown_vulkan();
-    bkend::shutdown_freetype();
-    bkend::shutdown_glfw();
+    bgui::shutdown_vulkan();
+    bgui::shutdown_freetype();
+    bgui::shutdown_glfw();
     return 0;
 
     return 0;

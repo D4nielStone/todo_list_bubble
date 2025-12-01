@@ -2,7 +2,7 @@
 #include <array>
 #include <cstddef>
 
-namespace butil {
+namespace bgui {
 
 template<size_t R, size_t C, typename T>
 class mat {
@@ -83,4 +83,4 @@ inline void scale(mat4& m, float sx, float sy, float sz) {
     m(2, 2) *= sz;
 }
 
-} // namespace butil
+} // namespace bgui

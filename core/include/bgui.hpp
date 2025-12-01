@@ -53,38 +53,22 @@
     #include "backend/bgui_backend_freetype.hpp"
 #endif
 
-class bgui {
-private:
-    butil::draw_data m_draw_data;
-    butil::theme m_theme;
-
-    std::queue<std::function<void()>> m_calls;
-    std::unique_ptr<blay::layout> m_main_layout;
-    bool m_last_mouse_left = false;
-public:
-    bgui(const butil::theme& theme = butil::light_theme);
-    ~bgui();
-    static bgui& instance() {
-        static bgui instance;
-        return instance;
-    }
-
-    void add_call(const std::function<void()>& f);
-    blay::layout* get_layout();
+namespace bgui {
+    extern std::unique_ptr<layout> m_main_layout;
 
     template<typename T, typename... Args>
-    static T& set_layout(Args&&... args) {
-        instance().m_main_layout = std::make_unique<T>(std::forward<Args>(args)...);
-        T* ref = dynamic_cast<T*>(instance().m_main_layout.get());
-        return *ref;
+    T& set_layout(Args&&... args) {
+        m_main_layout = std::make_unique<T>(std::forward<Args>(args)...);
+        static_assert(std::is_base_of<layout, T>::value, "BGUI::the class T must be a layout type.");
+        return static_cast<T&>(*m_main_layout);
     }
 
-    void apply_theme(const butil::theme& gui_theme);
-    butil::theme get_theme() const;
-    static butil::draw_data* get_draw_data();
-    static void set_up();
-    static bool shutdown_lib();
-    static void update();
-    bool update_inputs(blay::layout & lay);
-    void update(blay::layout &lay);
+    void add_function(const std::function<void()>& f);
+    layout& get_layout();
+    void apply_theme(const bgui::theme& gui_theme);
+    bgui::theme& get_theme();
+    bgui::draw_data* get_draw_data();
+    void set_up();
+    bool shutdown_lib();
+    void update();
 };

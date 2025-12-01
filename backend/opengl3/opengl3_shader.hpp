@@ -11,10 +11,10 @@ namespace bgl {
     private:
         std::shared_ptr<GLuint> m_program{nullptr};
         
-        void set_mat4(const char* name, const butil::mat4 matrix);
-        void set_vec4(const char* name, const butil::vec4 vector);
-        void set_vec3(const char* name, const butil::vec3 vector);
-        void set_vec2(const char* name, const butil::vec2 vector);
+        void set_mat4(const char* name, const bgui::mat4 matrix);
+        void set_vec4(const char* name, const bgui::vec4 vector);
+        void set_vec3(const char* name, const bgui::vec3 vector);
+        void set_vec2(const char* name, const bgui::vec2 vector);
         void set_bool(const char* name, const bool v);
         void set_int(const char* name, const int v);
         void set_float(const char* name, const float v);
@@ -29,7 +29,7 @@ namespace bgl {
         static GLuint compile(GLenum type, const std::string& source);
         static GLuint link(GLuint vert, GLuint frag);
 
-        void set(const std::string& name, const butil::propertie u);
+        void set(const std::string& name, const bgui::propertie u);
 
         bool operator==(const opengl3_shader& other) const {
             return *m_program == *other.m_program;

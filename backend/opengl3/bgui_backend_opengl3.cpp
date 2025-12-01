@@ -9,6 +9,13 @@
 #include <memory>
 #include <string>
 #include <sstream>
+#include <algorithm> // Necessário para std::find_if
+
+// Define uma cor de debug distinta (Magenta)
+#define DEBUG_COLOR_R 255
+#define DEBUG_COLOR_G 0
+#define DEBUG_COLOR_B 255
+#define DEBUG_COLOR_A 255
 
 // RAII wrapper for VAO/VBO
 struct quad_vao {
@@ -65,7 +72,7 @@ static std::unordered_map<std::string, GLuint> m_texture_cache;
 static std::unique_ptr<quad_vao> s_quad_vao;
 
 // Helper: build a cache key robust to same path but different buffer/flags
-static std::string build_texture_cache_key(const butil::texture& tex) {
+static std::string build_texture_cache_key(const bgui::texture& tex) {
     // Combine path, buffer size, alpha flag, red-channel flag
     std::ostringstream ss;
     ss << tex.m_path << "|" << tex.m_buffer.size()
@@ -75,15 +82,31 @@ static std::string build_texture_cache_key(const butil::texture& tex) {
     return ss.str();
 }
 
-GLuint bkend::get_quad_vao() {
+/**
+ * @brief Verifica se um buffer contém apenas zeros.
+ * @param buffer O vetor de bytes a ser verificado.
+ * @return true se todos os bytes forem 0, false caso contrário.
+ */
+static bool is_buffer_all_zeros(const std::vector<unsigned char>& buffer) {
+    if (buffer.empty()) return true;
+    
+    // Otimização: procura pelo primeiro byte que NÃO é zero.
+    // Se nenhum for encontrado, o buffer é todo zero.
+    return std::find_if(buffer.begin(), buffer.end(), [](unsigned char c) {
+        return c != 0;
+    }) == buffer.end();
+}
+
+GLuint bgui::get_quad_vao() {
     if (!s_quad_vao) {
         s_quad_vao = std::make_unique<quad_vao>();
     }
     return s_quad_vao->vao;
 }
 
-// Safe function to obtain/generate texture (fixed)
-GLuint bkend::opengl3_get_texture(const butil::texture& tex) {
+// Safe function to obtain/generate texture (fixed with DEBUG logic)
+GLuint bgui::opengl3_get_texture(const bgui::texture& tex) {
+
     const std::string key = build_texture_cache_key(tex);
     auto it = m_texture_cache.find(key);
     if (it != m_texture_cache.end()) return it->second;
@@ -93,52 +116,69 @@ GLuint bkend::opengl3_get_texture(const butil::texture& tex) {
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
     // basic wrap / filter for UI; caller can change if needed
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, tex.m_generate_mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     if (!tex.m_buffer.empty()) {
-        // Choose internalFormat and format correctly
-        GLenum internalFormat;
-        GLenum format;
-        if (tex.m_use_red_channel) {
-            internalFormat = GL_R8;
-            format = GL_RED;
-        } else if (tex.m_has_alpha) {
-            internalFormat = GL_RGBA8;
-            format = GL_RGBA;
-        } else {
-            internalFormat = GL_RGB8;
-            format = GL_RGB;
+        
+        bool debug_upload = false;
+        
+        // Debug check: if the texture is a font atlas and the buffer is all zeros, use debug texture
+        if (tex.m_use_red_channel && is_buffer_all_zeros(tex.m_buffer)) {
+            std::cerr << "[GL3 DEBUG] WARNING: Font atlas buffer (" << tex.m_path << ") is all zeros! Displaying debug texture.\n";
+            debug_upload = true;
         }
 
         GLsizei width  = static_cast<GLsizei>(tex.m_size[0]);
         GLsizei height = static_cast<GLsizei>(tex.m_size[1]);
 
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // ensure no alignment padding issues for arbitrary widths
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, nullptr);
-
-        // Upload the provided subimage at the given offset (this assumes offset + size fits inside the allocated texture)
-        if (tex.m_offset[0] != 0 || tex.m_offset[1] != 0) {
-        }
-
-        glTexSubImage2D(GL_TEXTURE_2D, 0,
-                        static_cast<GLint>(tex.m_offset[0]),
-                        static_cast<GLint>(tex.m_offset[1]),
-                        width, height,
-                        format, GL_UNSIGNED_BYTE, tex.m_buffer.data());
-
-        if (tex.m_generate_mipmap) {
-            glGenerateMipmap(GL_TEXTURE_2D);
+        if (debug_upload) {
+            GLenum internalFormat = GL_RGBA8;
+            GLenum format = GL_RGBA;
+            
+            unsigned char debug_pattern[16] = {
+                DEBUG_COLOR_R, DEBUG_COLOR_G, DEBUG_COLOR_B, DEBUG_COLOR_A,
+                0, 0, 0, 255,                                              
+                0, 0, 0, 255,                                              
+                DEBUG_COLOR_R, DEBUG_COLOR_G, DEBUG_COLOR_B, DEBUG_COLOR_A 
+            };
+            
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, 2, 2, 0, format, GL_UNSIGNED_BYTE, debug_pattern);
+            
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            
+        } else {
+            
+            GLenum internalFormat;
+            GLenum format;
+            
+            if (tex.m_use_red_channel) {
+                internalFormat = GL_R8;
+                format = GL_RED;
+            } else if (tex.m_has_alpha) {
+                internalFormat = GL_RGBA8;
+                format = GL_RGBA;
+            } else {
+                internalFormat = GL_RGB8;
+                format = GL_RGB;
+            }
+            
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+            
+            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, tex.m_buffer.data());
+            
+            if (tex.m_generate_mipmap) {
+                glGenerateMipmap(GL_TEXTURE_2D);
+            }
         }
     } else {
-        // fallback: single white pixel (RGBA)
         unsigned char white_pixel[4] = {255, 255, 255, 255};
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, white_pixel);
     }
-
-    // store in cache using the robust key
     m_texture_cache[key] = texture_id;
 
     // unbind texture for hygiene
@@ -148,7 +188,7 @@ GLuint bkend::opengl3_get_texture(const butil::texture& tex) {
 }
 
 // Clear texture cache (delete GL textures)
-void bkend::opengl3_clear_texture_cache() {
+void bgui::opengl3_clear_texture_cache() {
     for (auto& kv : m_texture_cache) {
         GLuint id = kv.second;
         if (id) glDeleteTextures(1, &id);
@@ -157,7 +197,7 @@ void bkend::opengl3_clear_texture_cache() {
 }
 
 // OpenGL3 initial setup
-void bkend::set_up_opengl3() {
+void bgui::set_up_opengl3() {
     // gladLoadGL returns non-zero on success (depending on your glad configuration).
     // If you use gladLoadGLLoader you need to call gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) earlier.
     if (gladLoadGL())
@@ -178,7 +218,7 @@ void bkend::set_up_opengl3() {
 }
 
 // Shutdown safely - must be called while OpenGL context is valid
-void bkend::shutdown_opengl3() {
+void bgui::shutdown_opengl3() {
     // delete textures
     opengl3_clear_texture_cache();
 
@@ -187,15 +227,15 @@ void bkend::shutdown_opengl3() {
 }
 
 // Render main
-void bkend::opengl3_render(butil::draw_data* data) {
+void bgui::opengl3_render(bgui::draw_data* data) {
     // basic clear
-    const auto& theme = bgui::instance().get_theme();
+    const auto& theme = bgui::get_theme();
     glClearColor(theme.m_clear_color[0],
                  theme.m_clear_color[1],
                  theme.m_clear_color[2],
                  theme.m_clear_color[3]);
 
-    const auto window_size = bos::get_window_size();
+    const auto window_size = bgui::get_window_size();
     glViewport(0, 0, window_size[0], window_size[1]);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -203,7 +243,7 @@ void bkend::opengl3_render(butil::draw_data* data) {
     // Ensure VAO exists (recreate if needed)
     glBindVertexArray(get_quad_vao());
 
-    const butil::mat4 proj = bos::get_projection();
+    const bgui::mat4 proj = bgui::get_projection();
 
     // We'll avoid binding/unbinding shader for each quad:
     // track last shader to reduce state changes
@@ -224,6 +264,16 @@ void bkend::opengl3_render(butil::draw_data* data) {
             last_shader = shader;
         }
 
+        if (call.m_material.m_use_tex) {
+            glActiveTexture(GL_TEXTURE0);
+            GLuint texid = opengl3_get_texture(call.m_material.m_texture);
+            glBindTexture(GL_TEXTURE_2D, texid);
+            shader->set("tex", 0); // sampler unit 0
+        } else {
+            // make sure no texture bound if material doesn't want texture (avoid sampling mistakes)
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
+
         // bind properties (uniforms)
         for (auto& prop : call.m_material.m_properties) {
             // shader->set should be implemented to set various uniform types
@@ -235,16 +285,6 @@ void bkend::opengl3_render(butil::draw_data* data) {
         shader->set("uv_min", call.m_uv_min);
         shader->set("uv_max", call.m_uv_max);
         shader->set("projection", proj);
-
-        if (call.m_material.m_use_tex) {
-            glActiveTexture(GL_TEXTURE0);
-            GLuint texid = opengl3_get_texture(call.m_material.m_texture);
-            glBindTexture(GL_TEXTURE_2D, texid);
-            shader->set("tex", 0); // sampler unit 0
-        } else {
-            // make sure no texture bound if material doesn't want texture (avoid sampling mistakes)
-            glBindTexture(GL_TEXTURE_2D, 0);
-        }
 
         // draw: call.m_count should be number of vertices (6 for quad)
         glDrawArrays(GL_TRIANGLES, 0, call.m_count);

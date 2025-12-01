@@ -65,11 +65,13 @@ uniform vec2 uv_min;
 uniform vec2 uv_max;
 
 void main() {
-    vec2 uv = mix(uv_min, uv_max, vec2(Uv.x, 1.0-Uv.y));
+    vec2 uv = mix(uv_min, uv_max, vec2(Uv.x, Uv.y));
 
-    vec4 dist = texture(tex, uv);
-    FragColor = dist;
-})"}
+    float r = texture(tex, uv).r;
+
+    FragColor = vec4(text_color.rgb, r * text_color.w);
+}
+)"}
 };
 
 using namespace bgl;
@@ -106,48 +108,62 @@ opengl3_shader::~opengl3_shader() {
 }
 
 GLuint opengl3_shader::compile(GLenum type, const std::string &source) {
-    GLuint opengl3_shader = glCreateShader(type);
+    GLuint sh = glCreateShader(type);
     const char* src = source.c_str();
-    glShaderSource(opengl3_shader, 1, &src, nullptr);
-    glCompileShader(opengl3_shader);
+    glShaderSource(sh, 1, &src, nullptr);
+    glCompileShader(sh);
 
-    GLint success;
-    glGetShaderiv(opengl3_shader, GL_COMPILE_STATUS, &success);
+    GLint success = 0;
+    glGetShaderiv(sh, GL_COMPILE_STATUS, &success);
     if (!success) {
-        char infoLog[512];
-        glGetShaderInfoLog(opengl3_shader, 512, nullptr, infoLog);
+        GLint logLen = 0;
+        glGetShaderiv(sh, GL_INFO_LOG_LENGTH, &logLen);
+        std::string infoLog(logLen > 0 ? logLen : 1, '\0');
+        glGetShaderInfoLog(sh, logLen, nullptr, &infoLog[0]);
+
+        // cleanup shader object to avoid leak
+        glDeleteShader(sh);
+
         throw std::runtime_error(
-            std::string("opengl3_shader compilation failed (") + 
+            std::string("opengl3_shader compilation failed (") +
             (type == GL_VERTEX_SHADER ? "vertex" : "fragment") +
             "): " + infoLog
         );
-
     }
 
-    return opengl3_shader;
- }
+    return sh;
+}
 
- GLuint opengl3_shader::link(GLuint vert, GLuint frag) {
-    GLuint m_id = glCreateProgram();
-    glAttachShader(m_id, vert);
-    glAttachShader(m_id, frag);
-    glLinkProgram(m_id);
+GLuint opengl3_shader::link(GLuint vert, GLuint frag) {
+    GLuint prog = glCreateProgram();
+    glAttachShader(prog, vert);
+    glAttachShader(prog, frag);
+    glLinkProgram(prog);
 
-    GLint success;
-    glGetProgramiv(m_id, GL_LINK_STATUS, &success);
+    GLint success = 0;
+    glGetProgramiv(prog, GL_LINK_STATUS, &success);
     if (!success) {
-        char infoLog[512];
-        glGetProgramInfoLog(m_id, 512, nullptr, infoLog);
-        throw std::runtime_error("opengl3_shader link failed:\n" + std::string(infoLog));
+        GLint logLen = 0;
+        glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &logLen);
+        std::string infoLog(logLen > 0 ? logLen : 1, '\0');
+        glGetProgramInfoLog(prog, logLen, nullptr, &infoLog[0]);
+
+        // cleanup both shaders and program
+        glDeleteProgram(prog);
+        glDeleteShader(vert);
+        glDeleteShader(frag);
+
+        throw std::runtime_error("opengl3_shader link failed:\n" + infoLog);
     }
 
+    // shaders can be deleted after successful link
     glDeleteShader(vert);
     glDeleteShader(frag);
 
-    return m_id;
+    return prog;
 }
 
-void bgl::opengl3_shader::set(const std::string& name, const butil::propertie u) {
+void bgl::opengl3_shader::set(const std::string& name, const bgui::propertie u) {
     switch (u.m_type) {
     case 0x0: // vec2
         set_vec2(name.c_str(), u.m_value.m_vec2);
@@ -172,38 +188,45 @@ void bgl::opengl3_shader::set(const std::string& name, const butil::propertie u)
         break;
     }
 }
-void opengl3_shader::set_mat4(const char *name, const butil::mat4 matrix) {
+void opengl3_shader::set_mat4(const char *name, const bgui::mat4 matrix) {
     GLint loc = glGetUniformLocation(*m_program, name);
+    if (loc >= 0)
     glUniformMatrix4fv(loc, 1, GL_FALSE, matrix.data());
 }
 
-void opengl3_shader::set_vec4(const char *name, const butil::vec4 vector) {
+void opengl3_shader::set_vec4(const char *name, const bgui::vec4 vector) {
     GLint loc = glGetUniformLocation(*m_program, name);
+    if (loc >= 0)
     glUniform4f(loc, vector[0], vector[1], vector[2], vector[3]);
 }
 
-void opengl3_shader::set_vec3(const char *name, const butil::vec3 vector) {
+void opengl3_shader::set_vec3(const char *name, const bgui::vec3 vector) {
     GLint loc = glGetUniformLocation(*m_program, name);
+    if (loc >= 0)
     glUniform3f(loc, vector[0], vector[1], vector[2]);
 }
 
-void opengl3_shader::set_vec2(const char *name, const butil::vec2 vector) {
+void opengl3_shader::set_vec2(const char *name, const bgui::vec2 vector) {
     GLint loc = glGetUniformLocation(*m_program, name);
+    if (loc >= 0)
     glUniform2f(loc, vector[0], vector[1]);
 }
     
 void opengl3_shader::set_bool(const char* name, const bool v) {
     GLint loc = glGetUniformLocation(*m_program, name);
+    if (loc >= 0)
     glUniform1i(loc, v);
 }
         
 void opengl3_shader::set_int(const char* name, const int v) {
     GLint loc = glGetUniformLocation(*m_program, name);
+    if (loc >= 0)
     glUniform1i(loc, v);
 }        
 
 void opengl3_shader::set_float(const char* name, const float v) {
     GLint loc = glGetUniformLocation(*m_program, name);
+    if (loc >= 0)
     glUniform1f(loc, v);
 }
 

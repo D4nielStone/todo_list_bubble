@@ -3,7 +3,7 @@
 #include "utils/draw.hpp"
 #include <functional>
 
-namespace belem {
+namespace bgui {
     class button : public element {
     private:
         std::function<void()> m_function;
@@ -16,7 +16,7 @@ namespace belem {
         void on_released() override;
         void on_mouse_hover() override;
         void update() override;
-        void get_requests(butil::draw_data& calls) override;
-        void apply_theme(const butil::theme& t) override;
+        void get_requests(bgui::draw_data* calls) override;
+        void apply_theme(const bgui::theme& t) override;
     };
-} // namespace belem
+} // namespace bgui

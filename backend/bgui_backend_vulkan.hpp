@@ -2,7 +2,7 @@
 #include <vulkan/vulkan.h>
 #include "utils/draw.hpp"
 
-namespace bkend {
+namespace bgui {
     struct vulkan_backend_data {
         VkInstance instance = VK_NULL_HANDLE;
         VkSurfaceKHR surface = VK_NULL_HANDLE;
@@ -12,7 +12,7 @@ namespace bkend {
     };
 
     static vulkan_backend_data vk;
-    void vulkan_render(butil::draw_data*);
+    void vulkan_render(bgui::draw_data*);
     void create_vk_instance();
     VKAPI_ATTR VkBool32 VKAPI_CALL bgui_vk_debug_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -24,5 +24,5 @@ namespace bkend {
     void set_up_vulkan();
     void shutdown_vulkan();
     //GLuint get_quad_vao();
-    //GLuint vulkan_get_texture(const butil::texture& tex);
-} // namespace bkend
+    //GLuint vulkan_get_texture(const bgui::texture& tex);
+} // namespace bgui

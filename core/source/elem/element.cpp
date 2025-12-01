@@ -1,10 +1,10 @@
 #include "elem/element.hpp"
 #include "bgui.hpp"
 
-using namespace butil;
+using namespace bgui;
 
 element::element() : m_orientation(orientation::horizontal), m_alignment(alignment::start), m_spacing_elements(1) {
-    apply_theme(bgui::instance().get_theme());
+    apply_theme(bgui::get_theme());
     m_visible = false;
 }
 
@@ -31,12 +31,12 @@ void element::set_size(int width, int height) {
     m_bounds[3] = height;
 }
 
-void element::set_height(float h, butil::mode m)
+void element::set_height(float h, bgui::mode m)
 {
     m_size_mode[1] = m;
     m_bounds[3] = h;
 }
-void element::set_width(float w, butil::mode m)
+void element::set_width(float w, bgui::mode m)
 {
     m_size_mode[0] = m;
     m_bounds[2] = w;
@@ -61,18 +61,18 @@ void element::set_shader_tag(const std::string &shd) {
     m_material.m_shader_tag = shd;
 }
 
-void element::set_material(const butil::material &mhd) {
+void element::set_material(const bgui::material &mhd) {
     m_material = mhd;
 }
 
-void element::set_cross_alignment(const butil::alignment &al) {
+void element::set_cross_alignment(const bgui::alignment &al) {
     m_cross_alignment = al;
 }
-void element::set_alignment(const butil::alignment &al)
+void element::set_alignment(const bgui::alignment &al)
 {
     m_alignment = al;
 }
-void element::set_orientation(const butil::orientation &o) {
+void element::set_orientation(const bgui::orientation &o) {
     m_orientation = o;
 }
 void element::set_spacing_elements(const unsigned int a, const unsigned int b) {
@@ -95,7 +95,7 @@ std::string element::get_shader_tag() const {
     return m_material.m_shader_tag;
 }
  
-butil::material & element::get_material() {
+bgui::material & element::get_material() {
     return m_material;
 }
 
@@ -103,13 +103,13 @@ int element::get_height() const {
    return m_bounds[3];
 }
 
-butil::vec2i element::get_size() const {
+bgui::vec2i element::get_size() const {
     return vec2i{(int)m_bounds[2], (int)m_bounds[3]};
 }
-butil::vec2i element::get_position() const {
+bgui::vec2i element::get_position() const {
     return vec2i{(int)m_bounds[0], (int)m_bounds[1]};
 }
-butil::vec<2, unsigned int> element::get_extern_spacing() const
+bgui::vec<2, unsigned int> element::get_extern_spacing() const
 {
     return m_extern_spacing;
 }
@@ -118,10 +118,10 @@ int element::get_width() const
     return m_bounds[2];
 }
 
-void element::get_requests(butil::draw_data& data) {
+void element::get_requests(bgui::draw_data* data) {
     if(!m_visible) return;
     // by default draw just the background
-    data.m_quad_requests.push({m_material, 6, m_bounds});
+    data->m_quad_requests.push({m_material, 6, m_bounds});
 };
     
 void element::update() {

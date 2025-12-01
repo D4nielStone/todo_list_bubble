@@ -21,21 +21,21 @@
  * linear layout(orientation::vertical);
  * layout.set_spacing(8);
  * layout.set_alignment(alignment::center);
- * layout.add<belem::text>("My Text", 0.5);
+ * layout.add<bgui::text>("My Text", 0.5);
  * @endcode
  */
 
 #pragma once
 #include "layout.hpp"
 
-namespace blay {
+namespace bgui {
     class linear : public layout {
     public:
-        linear(const butil::orientation& ori = butil::orientation::horizontal);
+        linear(const bgui::orientation& ori = bgui::orientation::horizontal);
         ~linear() = default;
     
         void update() override;
         void fit_to_content() override;
-        blay::layout* as_layout() override { return this; }
+        bgui::layout* as_layout() override { return this; }
     };
 }// namespace lay

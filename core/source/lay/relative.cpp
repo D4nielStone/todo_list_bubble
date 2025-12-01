@@ -1,9 +1,9 @@
 
 #include "lay/relative.hpp"
 #include "bgui.hpp"
-using namespace blay;
+using namespace bgui;
 
-using namespace butil;
+using namespace bgui;
     
 relative::relative(const orientation& ori) {
     m_orientation = ori;

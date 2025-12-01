@@ -1,12 +1,12 @@
 #include "utils/material.hpp"
 #include "bgui.hpp"
 
-butil::material::material() : m_use_tex(false) {
+bgui::material::material() : m_use_tex(false) {
 }
-butil::material::~material() {
+bgui::material::~material() {
 }
 /*
-void butil::material::bind_properties() {
+void bgui::material::bind_properties() {
     m_shader.bind();
 
     for(const auto& [name, u] : m_properties) {
@@ -19,6 +19,6 @@ void butil::material::bind_properties() {
         m_shader.set("texture", 0);
     }
 }*/
-void butil::material::set(const std::string &name, const butil::propertie u) {
+void bgui::material::set(const std::string &name, const bgui::propertie u) {
     m_properties[name] = u;
 }
