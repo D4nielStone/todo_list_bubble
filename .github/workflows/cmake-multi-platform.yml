@@ -1,55 +1,21 @@
-name: build
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
+name: build without backend
+on: [push, pull_request]
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-
     strategy:
-      fail-fast: false
       matrix:
-         os: [ubuntu-latest]
-         build_type: [Release, Debug]
-         include:
-           - os: windows-latest
-             c_compiler: gcc
-             cpp_compiler: g++
-           - os: ubuntu-latest
-             c_compiler: gcc
-             cpp_compiler: g++
-           - os: ubuntu-latest
-             c_compiler: clang
-             cpp_compiler: clang++
-
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-    - name: Set up build environment variables
-      id: strings
-      shell: bash
-      run: |
-        echo "build-output-dir=build-${{ runner.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}" >> $GITHUB_OUTPUT
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: ${{ matrix.cmake-version }}
 
-    - name: Install Dependencies on Ubuntu
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libglfw3-dev libfreetype6-dev
+      - name: Configure CMake
+        run: cmake -S . -B out -DBGUI_USE_OPENGL=OFF -DBGUI_USE_GLFW=OFF -DBGUI_BUILD_EXAMPLES=OFF -DBGUI_USE_FREETYPE=OFF
 
-    - name: Configure CMake Ubuntu
-      if: matrix.os == 'ubuntu-latest'
-      run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -S ${{ github.workspace }}
-
-    - name: Build
-      run: |
-        cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+      - name: Build
+        run: cmake --build out --config Release
