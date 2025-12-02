@@ -30,8 +30,7 @@ Bubble GUI works with a **retained** logic model:
 | Rendering     | Render the drawdata queue |
 | Final State   | Store position to compare in future updates |
 
-> The final visual state is calculated only when generating draw commands and is **not stored**.
-
+> The final visual state is calculated only when generating draw requests.
 ---
 
 ## Releases & Changelogs
