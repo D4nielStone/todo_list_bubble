@@ -79,15 +79,22 @@ bool update_inputs(bgui::layout &lay){
             mx <= x + w &&
             my >= y &&
             my <= y + h;
+        if(inside) {
+            elem->on_mouse_hover();
+            if(mouse_now) elem->on_pressed();
+            if(mouse_click) elem->on_clicked();
+            else if(mouse_released) elem->on_released();
+        }
     }
     return false;
 }
 // Updates the main layout
 void bgui::update() {
     if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
-    // the main layout must to be resized based on the window size.
     bgui::vec2i w_size = bgui::get_window_size();
-    bgui::m_main_layout->set_final_rect(0, 0, w_size[0], w_size[1]);
+    // the main layout must to be resized based on the window size by default.
+    bgui::m_main_layout->request_height(bgui::mode::match_parent);
+    bgui::m_main_layout->request_width(bgui::mode::match_parent);
     
     while(!s_functions.empty()) {
         auto& f = s_functions.front();
@@ -96,7 +103,9 @@ void bgui::update() {
     }
 
     // update main layout and inputs
+    bgui::m_main_layout->update_size(w_size);
     bgui::m_main_layout->update();
+
     update_inputs(*bgui::m_main_layout);
     bgui::get_window().m_last_mouse_left = bgui::get_pressed(bgui::input_key::mouse_left);
 
