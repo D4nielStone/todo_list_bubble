@@ -69,25 +69,32 @@ bool update_inputs(bgui::layout &lay){
                 return true;
             }
         
-        float x = elem->get_x();
-        float y = elem->get_y();
-        float w = elem->get_width();
-        float h = elem->get_height();
+        float x = elem->processed_x();
+        float y = elem->processed_y();
+        float w = elem->processed_width();
+        float h = elem->processed_height();
 
         bool inside =
             mx >= x &&
             mx <= x + w &&
             my >= y &&
             my <= y + h;
+        if(inside) {
+            elem->on_mouse_hover();
+            if(mouse_now) elem->on_pressed();
+            if(mouse_click) elem->on_clicked();
+            else if(mouse_released) elem->on_released();
+        }
     }
     return false;
 }
 // Updates the main layout
 void bgui::update() {
     if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
-    // the main layout must to be resized based on the window size.
     bgui::vec2i w_size = bgui::get_window_size();
-    bgui::m_main_layout->set_rect(0.f, 0.f, static_cast<float>(w_size[0]), static_cast<float>(w_size[1]));
+    // the main layout must to be resized based on the window size by default.
+    bgui::m_main_layout->request_height(bgui::mode::match_parent);
+    bgui::m_main_layout->request_width(bgui::mode::match_parent);
     
     while(!s_functions.empty()) {
         auto& f = s_functions.front();
@@ -96,11 +103,13 @@ void bgui::update() {
     }
 
     // update main layout and inputs
+    bgui::m_main_layout->update_size(w_size);
     bgui::m_main_layout->update();
+
     update_inputs(*bgui::m_main_layout);
     bgui::get_window().m_last_mouse_left = bgui::get_pressed(bgui::input_key::mouse_left);
 
-    // clean draw data and get new requests
+    // get new requests
     if(!get_draw_data()->m_quad_requests.empty()) std::cout << "[BGUI] Warning: draw data not empty at beginning of frame.\nMake sure you are resetting draw data each frame.\n";
     bgui::m_main_layout->get_requests(get_draw_data());
 }

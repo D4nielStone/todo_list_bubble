@@ -281,7 +281,7 @@ void bgui::gl3_render(bgui::draw_data* data) {
         }
 
         // set quad uniforms
-        shader->set("rect", call.m_bounds);
+        shader->set("rect", call.m_rect);
         shader->set("uv_min", call.m_uv_min);
         shader->set("uv_max", call.m_uv_max);
         shader->set("projection", proj);

@@ -8,17 +8,24 @@ int main() {
     bgui::set_up_freetype();
 
     bgui::set_up();
-    bgui::linear& root = bgui::set_layout<bgui::linear>(bgui::orientation::vertical);
-    root.set_cross_alignment(bgui::alignment::stretch);
-    root.set_padding(10, 2);
+    bgui::layout& root = bgui::get_layout();
 
     // Adding elements
-    root.add<bgui::text>("Linear Layout Stretched Exemple\nIndividual Alignments:", 1.f).set_cross_alignment(bgui::alignment::center);
-    
-    // individual alignments
-    root.add<bgui::text>("Start", 0.5f).set_cross_alignment(bgui::alignment::start);
-    root.add<bgui::text>("End", 0.5f).set_cross_alignment(bgui::alignment::end);
-    root.add<bgui::text>("Center", 0.5f).set_cross_alignment(bgui::alignment::center);
+    auto& panel = root.add<bgui::linear>(bgui::orientation::vertical);
+    panel.set_padding(10, 2);
+    panel.request_width(bgui::mode::pixel, 300.f);
+    panel.request_height(bgui::mode::match_parent);
+
+    // layout are invisible by default
+    panel.set_visible(true);
+
+    auto& txt = panel.add<bgui::text>("Linear Layout Exemple", 0.4f);
+    txt.request_width(bgui::mode::match_parent);
+    txt.set_alignment(bgui::alignment::center);
+    auto& button = panel.add<bgui::button>("Button Exemple", 0.4f, [](){});
+    button.request_width(bgui::mode::match_parent);
+
+    // Theme must be applyed in the end
     bgui::apply_theme(bgui::dark_theme);
 
     while (!glfwWindowShouldClose(window)) {

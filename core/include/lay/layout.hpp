@@ -16,12 +16,8 @@ namespace bgui {
         layout();
         ~layout() = default;
     
-        virtual void apply_theme(const bgui::theme& theme) {
-            m_material.set("bg_color", theme.m_box_color);
-            m_material.set("bordered", true);
-            m_material.set("border_radius", 4.f);
-            m_material.set("border_size", 1.f);
-            m_material.set("border_color", theme.m_button_border_color);
+        void apply_theme(const bgui::theme& theme) override {
+            element::apply_theme(theme);
             for(auto& e: m_elements) e->apply_theme(theme);
         };
     
@@ -29,6 +25,7 @@ namespace bgui {
         T& add(Args&&... args) {
             auto elem = std::make_unique<T>(std::forward<Args>(args)...);
             T& ref = *elem;
+            ref.set_parent(this);
             m_elements.push_back(std::move(elem));
             return ref;
         }
@@ -44,7 +41,6 @@ namespace bgui {
         }
         void update() override;
         void get_requests(bgui::draw_data* calls);
-        virtual void fit_to_content();
         std::vector<std::unique_ptr<element>>& get_elements();
         bgui::layout* as_layout() override { return this; }
     };

@@ -9,19 +9,22 @@ namespace bgui {
     private:
         std::string m_buffer;
         std::string m_font_name;
+        alignment m_self_alignment;
         float m_scale;
         bgui::font m_font;
     public:
         text(const std::string& buffer, float scale);
         ~text();
         // sets to this text the font with `name`.
+        void set_alignment(const alignment& align) { m_self_alignment = align; };
         void set_font(const std::string& name);
         void update() override;
         float get_text_width();
         void get_requests(bgui::draw_data *calls) override;
         void apply_theme(const bgui::theme& t) override {
-            m_material.set("text_color", t.m_text_color);
-            m_visible = true;
+            element::apply_theme(t);
+            // TODO: adds pointer to set material props
+            m_material.set("text_color", m_theme.m_text_color);
         };
     };
 } // namespace bgui

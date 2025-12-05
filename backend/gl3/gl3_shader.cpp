@@ -172,13 +172,16 @@ void bgl::gl3_shader::set(const std::string& name, const bgui::propertie u) {
     case 0x2: // vec4
         set_vec4(name.c_str(), u.m_value.m_vec4);
         break;
-    case 0x3: // mat4
+    case 0x3: // vec4i
+        set_vec4(name.c_str(), u.m_value.m_vec4i);
+        break;
+    case 0x4: // mat4
         set_mat4(name.c_str(), u.m_value.m_mat4);
         break;
-    case 0x4: // float
+    case 0x5: // float
         set_float(name.c_str(), u.m_value.m_float);
         break;
-    case 0x5: // int
+    case 0x6: // int
         set_int(name.c_str(), u.m_value.m_int);
         break;
     
@@ -196,6 +199,12 @@ void gl3_shader::set_vec4(const char *name, const bgui::vec4 vector) {
     GLint loc = glGetUniformLocation(m_id, name);
     if (loc >= 0)
     glUniform4f(loc, vector[0], vector[1], vector[2], vector[3]);
+}
+
+void gl3_shader::set_vec4(const char *name, const bgui::vec4i vector) {
+    GLint loc = glGetUniformLocation(m_id, name);
+    if (loc >= 0)
+    glUniform4i(loc, vector[0], vector[1], vector[2], vector[3]);
 }
 
 void gl3_shader::set_vec3(const char *name, const bgui::vec3 vector) {

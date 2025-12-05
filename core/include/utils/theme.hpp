@@ -4,8 +4,10 @@
 
 namespace bgui {
     enum class mode {
-        modular,
-        pixel
+        percent,
+        pixel,
+        match_parent,
+        wrap_content
     };
     enum class orientation {
         vertical,
@@ -14,8 +16,7 @@ namespace bgui {
     enum class alignment {
         start,
         center,
-        end,
-        stretch
+        end
     };
     struct theme{
         bgui::color m_clear_color = bgui::color(1.f);

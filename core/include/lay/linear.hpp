@@ -8,12 +8,19 @@
 
 namespace bgui {
     class linear : public layout {
+    private:
+        orientation m_orientation;
+        alignment m_cross_alignment {alignment::start},
+        m_alignment                 {alignment::start};
     public:
         linear(const bgui::orientation& ori = bgui::orientation::horizontal);
         ~linear() = default;
     
         void update() override;
-        void fit_to_content() override;
+        void set_orientation(const orientation& ori) { m_orientation = ori; };
+        void set_alignment(const alignment& align) { m_alignment = align; };
+        void set_cross_alignment(const alignment& align) { m_cross_alignment = align; };
+        
         bgui::layout* as_layout() override { return this; }
     };
 }// namespace bgui
