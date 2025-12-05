@@ -72,20 +72,25 @@ int main() {
 - Configure the layout as you want
 
 ```cpp
-
-    auto& root = bgui::set_layout<bgui::modular>(bgui::orientation::horizontal); 
-    // Supported layouts: linear, absolute (base), modular, and more.
-
-    // Lateral panel: vertical linear layout
-    auto& panel = root.add<bgui::linear>(bgui::orientation::vertical);
-
-    // Cross alignment (horizontal)
-    panel.set_cross_alignment(bgui::alignment::stretch);
-    panel.request_width(300/*, bgui::pixel*/); // Pixel is default
-    panel.request_height(1.f, bgui::mode::modular);
+    bgui::layout& root = bgui::get_layout();
 
     // Adding elements
-    panel.add<bgui::text>("Hello World!", 0.5f);
+    auto& panel = root.add<bgui::linear>(bgui::orientation::vertical);
+    panel.set_padding(10, 2);
+    panel.request_width(bgui::mode::pixel, 300.f);
+    panel.request_height(bgui::mode::match_parent);
+
+    // layout are invisible by default
+    panel.set_visible(true);
+
+    auto& txt = panel.add<bgui::text>("Linear Layout Exemple", 0.4f);
+    txt.request_width(bgui::mode::match_parent);
+    txt.set_alignment(bgui::alignment::center);
+    auto& button = panel.add<bgui::button>("Button Exemple", 0.4f, [](){});
+    button.request_width(bgui::mode::match_parent);
+
+    // Theme must be applyed in the end
+    bgui::apply_theme(bgui::dark_theme);
 ```
 
 #### Main Loop
