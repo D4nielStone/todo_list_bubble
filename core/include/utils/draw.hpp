@@ -8,9 +8,9 @@ namespace bgui{
     struct draw_request {
         bgui::material& m_material;
         int m_count{6};
-        bgui::vec4 m_bounds{0.0f, 0.0f, 100.0f, 100.0f};
+        bgui::vec4 m_rect{0.f, 0.f, 100.f, 100.f};
         bgui::vec2 m_uv_min{0, 0};
-        bgui::vec2 m_uv_max{0, 0};
+        bgui::vec2 m_uv_max{1, 1};
 
         bool operator==(const draw_request& other) const {
             return m_material == other.m_material &&

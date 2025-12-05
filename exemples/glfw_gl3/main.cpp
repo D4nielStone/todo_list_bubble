@@ -9,16 +9,21 @@ int main() {
 
     bgui::set_up();
     bgui::linear& root = bgui::set_layout<bgui::linear>(bgui::orientation::vertical);
-    root.set_cross_alignment(bgui::alignment::stretch);
-    root.set_padding(10, 2);
 
     // Adding elements
-    root.add<bgui::text>("Linear Layout Stretched Exemple\nIndividual Alignments:", 1.f).set_cross_alignment(bgui::alignment::center);
-    
+    auto& panel = root.add<bgui::linear>(bgui::orientation::vertical);
+    panel.set_padding(10, 2);
+    panel.set_width(bgui::mode::pixel, 300.f);
+    panel.set_height(bgui::mode::match_parent);
+    panel.set_visible(true);
+
+    auto& txt = panel.add<bgui::text>("Linear Layout Exemple", 0.4f);
+    txt.set_width(bgui::mode::match_parent);
+    txt.set_alignment(bgui::alignment::center);
+    auto& button = panel.add<bgui::button>("Button Exemple", 0.4f, [](){});
+    button.set_width(bgui::mode::match_parent);
+
     // individual alignments
-    root.add<bgui::text>("Start", 0.5f).set_cross_alignment(bgui::alignment::start);
-    root.add<bgui::text>("End", 0.5f).set_cross_alignment(bgui::alignment::end);
-    root.add<bgui::text>("Center", 0.5f).set_cross_alignment(bgui::alignment::center);
     bgui::apply_theme(bgui::dark_theme);
 
     while (!glfwWindowShouldClose(window)) {

@@ -69,10 +69,10 @@ bool update_inputs(bgui::layout &lay){
                 return true;
             }
         
-        float x = elem->get_x();
-        float y = elem->get_y();
-        float w = elem->get_width();
-        float h = elem->get_height();
+        float x = elem->get_final_x();
+        float y = elem->get_final_y();
+        float w = elem->get_final_width();
+        float h = elem->get_final_height();
 
         bool inside =
             mx >= x &&
@@ -87,7 +87,7 @@ void bgui::update() {
     if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
     // the main layout must to be resized based on the window size.
     bgui::vec2i w_size = bgui::get_window_size();
-    bgui::m_main_layout->set_rect(0.f, 0.f, static_cast<float>(w_size[0]), static_cast<float>(w_size[1]));
+    bgui::m_main_layout->set_final_rect(0, 0, w_size[0], w_size[1]);
     
     while(!s_functions.empty()) {
         auto& f = s_functions.front();
@@ -100,7 +100,7 @@ void bgui::update() {
     update_inputs(*bgui::m_main_layout);
     bgui::get_window().m_last_mouse_left = bgui::get_pressed(bgui::input_key::mouse_left);
 
-    // clean draw data and get new requests
+    // get new requests
     if(!get_draw_data()->m_quad_requests.empty()) std::cout << "[BGUI] Warning: draw data not empty at beginning of frame.\nMake sure you are resetting draw data each frame.\n";
     bgui::m_main_layout->get_requests(get_draw_data());
 }

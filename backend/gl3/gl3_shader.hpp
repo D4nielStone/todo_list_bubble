@@ -13,6 +13,7 @@ namespace bgl {
         
         void set_mat4(const char* name, const bgui::mat4 matrix);
         void set_vec4(const char* name, const bgui::vec4 vector);
+        void set_vec4(const char* name, const bgui::vec4i vector);
         void set_vec3(const char* name, const bgui::vec3 vector);
         void set_vec2(const char* name, const bgui::vec2 vector);
         void set_bool(const char* name, const bool v);

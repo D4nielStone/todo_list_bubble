@@ -3,37 +3,40 @@
 #include <iostream>
 
 bgui::button::button(const std::string &name, const float scale, const std::function<void()> &f) : 
-    m_label(name, scale), m_function(f) {
-    m_alignment = bgui::alignment::center;
-    apply_theme(bgui::get_theme());
-    m_material.m_shader_tag = "ui::default";
+    m_label(name, scale), m_function(f), m_label_alignment(bgui::alignment::center) {
+        set_padding(5, 2);
+        set_width(mode::wrap_content);
+        set_height(mode::wrap_content);
 }
 
 bgui::button::~button() {
 }
 
 void bgui::button::update() {
-    m_material.set("bg_color", bgui::get_theme().m_button_color);
-    set_size(m_label.get_width() + m_intern_spacing[0]*2, m_label.get_height() + m_intern_spacing[1]*2);
+    m_material.set("bg_color", m_theme.m_button_color);
 }
 
 void bgui::button::get_requests(bgui::draw_data* data) {
     // TODO: optimize: avoid re-updateing label position if not changed
     element::get_requests(data);
-    switch(m_alignment) {
+    switch(m_label_alignment) {
         case bgui::alignment::start:
-            m_label.set_position(get_x() + m_intern_spacing[0], get_y() + m_intern_spacing[1]);
+            m_label.set_final_rect(get_final_x() + m_padding[0], get_final_y() + m_padding[1], m_label.get_final_width(), m_label.get_final_height());
             break;
         case bgui::alignment::center:
-            m_label.set_position(
-                get_x() + (get_width() - m_label.get_width()) / 2,
-                get_y() + (get_height() - m_label.get_height()) / 2
+            m_label.set_final_rect(
+                get_final_x() + (get_final_width() - m_label.get_final_width()) / 2,
+                get_final_y() + (get_final_height() - m_label.get_final_height()) / 2,
+                m_label.get_final_width(),
+                m_label.get_final_height()
             );
             break;
         case bgui::alignment::end:
-            m_label.set_position(
-                get_x() + get_width() - m_label.get_width() - m_intern_spacing[0],
-                get_y() + get_height() - m_label.get_height() - m_intern_spacing[1]
+            m_label.set_final_rect(
+                get_final_x() + get_final_width() - m_label.get_final_width() - m_padding[0],
+                get_final_y() + get_final_height() - m_label.get_final_height() - m_padding[1],
+                m_label.get_final_width(),
+                m_label.get_final_height()
             );
             break;
         default:
@@ -42,12 +45,17 @@ void bgui::button::get_requests(bgui::draw_data* data) {
     m_label.get_requests(data);
 }
 
+
+float bgui::button::content_height() {
+    return m_label.get_final_height();
+}
+
+float bgui::button::content_width() {
+    return m_label.get_final_width();
+}
+
 void bgui::button::apply_theme(const bgui::theme &t) {
-    m_material.set("bg_color", t.m_button_color);
-    m_material.set("bordered", true);
-    m_material.set("border_radius", 4.f);
-    m_material.set("border_size", 1.f);
-    m_material.set("border_color", t.m_button_border_color);
+    element::apply_theme(t);
     m_visible = true;
     m_label.apply_theme(t);
 }
