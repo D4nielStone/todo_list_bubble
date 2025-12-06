@@ -18,7 +18,7 @@ struct border {
 
 class element {
 protected:
-    element* m_parent {nullptr};
+    layout* m_parent {nullptr};
     material m_material;
     bool m_visible {true};
 
@@ -66,7 +66,7 @@ public:
     void set_material(const material& m);
     void set_visible(bool v);
 
-    void set_parent(element* p) { m_parent = p; }
+    void set_parent(layout* p) { m_parent = p; }
 
     vec2i get_min_size() const { return m_min_size; }
     vec2i get_max_size() const { return m_max_size; }
@@ -78,7 +78,7 @@ public:
     int processed_height()const { return m_rect[3]; }
 
     void set_final_rect(int x, int y, int w, int h) {m_rect = vec4i({x, y, w, h}); }
-    void set_final_position(int x, int y) {m_rect[0] = x; m_rect[1] = y;}
+    void set_position(int x, int y) {m_rect[0] = x; m_rect[1] = y;}
     void set_final_size(int x, int y) {m_rect[2] = x; m_rect[3] = y;}
 
     vec2i processed_position() const { return vec2i({m_rect[0], m_rect[1]}); }
@@ -98,7 +98,7 @@ public:
     std::string get_shader_tag() const;
     material& get_material() { return m_material; }
 
-    element* get_parent() const { return m_parent; }
+    layout* get_parent() const { return m_parent; }
 
     virtual layout* as_layout() { return nullptr; }
     void update_size(const vec2i& available_size);
@@ -114,6 +114,7 @@ public:
     virtual float content_width(){return 0.f;};
     virtual float content_height(){return 0.f;};
     virtual void on_pressed() {};
+    virtual void on_dragged(const vec2i& mouse_delta) {};
     virtual void on_clicked() {};
     virtual void on_released() {};
     virtual void on_mouse_hover() {};

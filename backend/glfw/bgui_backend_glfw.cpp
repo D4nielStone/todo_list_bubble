@@ -35,15 +35,15 @@ GLFWwindow* bgui::set_up_glfw(int width, int height, const char* title, int flag
         glfwTerminate();
     }
 
-    bgui::get_window().m_title = title;
-    bgui::get_window().m_size = bgui::vec2i{width, height};
+    bgui::get_context().m_title = title;
+    bgui::get_context().m_size = bgui::vec2i{width, height};
     glfwSetMouseButtonCallback(window, bgui::glfw_mouse_button_callback);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
     return window;
 }
-void bgui::glfw_update(bgui::windowio &window_io) {
+void bgui::glfw_update(bgui::context &window_io) {
     glfwPollEvents();
 
     // Gests the window size
@@ -63,7 +63,7 @@ void bgui::glfw_mouse_button_callback(GLFWwindow* window, int button, int action
 
     bgui::input_action internal_action = static_cast<bgui::input_action>(s_glfw_action_reverse_map.at(action)); 
 
-    bgui::get_window().m_input_map[internal_key] = internal_action;
+    bgui::get_context().m_input_map[internal_key] = internal_action;
 }
 void bgui::shutdown_glfw() {
     glfwDestroyWindow(glfwGetCurrentContext());

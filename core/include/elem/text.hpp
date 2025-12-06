@@ -20,6 +20,8 @@ namespace bgui {
         void set_font(const std::string& name);
         void update() override;
         float get_text_width();
+        void set_buffer(const std::string& buffer) { m_buffer = buffer; };
+        const std::string& get_buffer() const { return m_buffer; };
         void get_requests(bgui::draw_data *calls) override;
         void apply_theme(const bgui::theme& t) override {
             element::apply_theme(t);

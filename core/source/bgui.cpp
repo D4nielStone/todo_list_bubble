@@ -56,8 +56,8 @@ bool update_inputs(bgui::layout &lay){
     float my = m[1];
 
     bool mouse_now = bgui::get_pressed(bgui::input_key::mouse_left);
-    bool mouse_click = (mouse_now && !bgui::get_window().m_last_mouse_left);
-    bool mouse_released = (!mouse_now && bgui::get_window().m_last_mouse_left);
+    bool mouse_click = (mouse_now && !bgui::get_context().m_last_mouse_left);
+    bool mouse_released = (!mouse_now && bgui::get_context().m_last_mouse_left);
     
     const auto& elements = lay.get_elements();   
 
@@ -81,9 +81,17 @@ bool update_inputs(bgui::layout &lay){
             my <= y + h;
         if(inside) {
             elem->on_mouse_hover();
-            if(mouse_now) elem->on_pressed();
-            if(mouse_click) elem->on_clicked();
-            else if(mouse_released) elem->on_released();
+            if(mouse_now) {
+                elem->on_pressed();
+                elem->on_dragged(m - bgui::get_context().m_last_mouse_pos);
+            }
+            if(mouse_click) {
+                elem->on_clicked();
+            }
+            else if(mouse_released) {
+                elem->on_released();
+            }
+            return true;
         }
     }
     return false;
@@ -91,7 +99,7 @@ bool update_inputs(bgui::layout &lay){
 // Updates the main layout
 void bgui::update() {
     if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
-    bgui::vec2i w_size = bgui::get_window_size();
+    bgui::vec2i w_size = bgui::get_context_size();
     // the main layout must to be resized based on the window size by default.
     bgui::m_main_layout->request_height(bgui::mode::match_parent);
     bgui::m_main_layout->request_width(bgui::mode::match_parent);
@@ -107,7 +115,9 @@ void bgui::update() {
     bgui::m_main_layout->update();
 
     update_inputs(*bgui::m_main_layout);
-    bgui::get_window().m_last_mouse_left = bgui::get_pressed(bgui::input_key::mouse_left);
+
+    bgui::get_context().m_last_mouse_left = bgui::get_pressed(bgui::input_key::mouse_left);
+    bgui::get_context().m_last_mouse_pos = bgui::get_mouse_position();
 
     // get new requests
     if(!get_draw_data()->m_quad_requests.empty()) std::cout << "[BGUI] Warning: draw data not empty at beginning of frame.\nMake sure you are resetting draw data each frame.\n";

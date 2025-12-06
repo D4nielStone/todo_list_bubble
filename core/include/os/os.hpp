@@ -17,15 +17,16 @@ namespace bgui {
         release,
         repeat
     };
-    struct windowio {
+    struct context {
         bgui::vec2i m_size{800, 600};
         bgui::vec2i m_mouse_position{0, 0};
+        bgui::vec2i m_last_mouse_pos{0, 0};
         std::unordered_map<input_key, input_action> m_input_map;
         std::string m_title{""};
         bool m_last_mouse_left = false;
     };
-    windowio& get_window();
-    bgui::vec2i get_window_size();
+    context& get_context();
+    bgui::vec2i get_context_size();
     bgui::vec2i get_mouse_position();
     std::string read_file(const std::string& path);
     bgui::mat4 get_projection();

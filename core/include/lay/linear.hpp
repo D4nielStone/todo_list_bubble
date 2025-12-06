@@ -8,7 +8,7 @@
 
 namespace bgui {
     class linear : public layout {
-    private:
+    protected:
         orientation m_orientation;
         alignment m_cross_alignment {alignment::start},
         m_alignment                 {alignment::start};

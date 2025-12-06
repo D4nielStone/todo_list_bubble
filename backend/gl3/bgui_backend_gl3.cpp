@@ -235,7 +235,7 @@ void bgui::gl3_render(bgui::draw_data* data) {
                  theme.m_clear_color[2],
                  theme.m_clear_color[3]);
 
-    const auto window_size = bgui::get_window_size();
+    const auto window_size = bgui::get_context_size();
     glViewport(0, 0, window_size[0], window_size[1]);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
