@@ -1,13 +1,11 @@
 #include "elem/window.hpp"
-#include <button.hpp>
+#include "elem/button.hpp"
 
-using namespace bgui;
-bgui::window::window(const std::string& title)
-    : linear(bgui::orientation::vertical), m_title(nullptr), m_header(nullptr) {
+bgui::window::window(const char* title) : linear(bgui::orientation::vertical), m_title(nullptr), m_header(nullptr) {
     // window widget experiment
     //TODO:: add parse init config for window
     set_position(20, 20);
-    request_size(0, 0);
+    request_size(300, 300);
     set_visible(true);
 
     // testing the header:
@@ -24,4 +22,7 @@ bgui::window::window(const std::string& title)
         m_parent->remove(this);
     });
     m_header->set_visible(true);
+}
+void bgui::window::update() {
+    linear::update();
 }

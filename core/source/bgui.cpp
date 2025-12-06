@@ -85,8 +85,13 @@ bool update_inputs(bgui::layout &lay){
                 elem->on_pressed();
                 elem->on_dragged(m - bgui::get_context().m_last_mouse_pos);
             }
-            if(mouse_click) elem->on_clicked();
-            else if(mouse_released) elem->on_released();
+            if(mouse_click) {
+                elem->on_clicked();
+            }
+            else if(mouse_released) {
+                elem->on_released();
+            }
+            return true;
         }
     }
     return false;

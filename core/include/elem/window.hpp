@@ -1,5 +1,6 @@
 #pragma once
 #include "lay/linear.hpp"
+#include "elem/text.hpp"
 #include <string>
 
 namespace bgui {
@@ -8,7 +9,10 @@ namespace bgui {
         text* m_title;
         linear* m_header;
     public:
-        window(const std::string& title = "");
+        window() = default;
+        window(const char* title);
+        ~window()=default;
+        void update() override;
         void set_title(const std::string& title) { m_title->set_buffer(title); }
         text& get_title() { return *m_title; }
     };
