@@ -59,6 +59,4 @@ int main() {
     bgui::shutdown_freetype();
     bgui::shutdown_glfw();
     return 0;
-
-    return 0;
 }

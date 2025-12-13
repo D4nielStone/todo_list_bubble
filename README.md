@@ -83,11 +83,28 @@ int main() {
     // layout are invisible by default
     panel.set_visible(true);
 
-    auto& txt = panel.add<bgui::text>("Linear Layout Exemple", 0.4f);
+    auto& txt = panel.add<bgui::text>("Linear Layout Exemple", 0.35f);
     txt.request_width(bgui::mode::match_parent);
     txt.set_alignment(bgui::alignment::center);
-    auto& button = panel.add<bgui::button>("Button Exemple", 0.4f, [](){});
+    auto& button = panel.add<bgui::button>("Button Exemple", 0.35f, [](){});
     button.request_width(bgui::mode::match_parent);
+
+    // window widget
+    auto& win = root.add<bgui::window>("Hello Bubble!");
+    root.add<bgui::window>("win2");
+    root.add<bgui::window>("win3");
+    root.add<bgui::window>("win4");
+    auto& context = win.add<bgui::linear>(bgui::orientation::vertical);
+    context.request_height(bgui::mode::stretch);
+    context.request_width(bgui::mode::match_parent);
+    context.set_padding(10, 10);
+
+    context.add<bgui::text>("This is a window widget exemple.", 0.35f);
+    auto& txt2 = context.add<bgui::text>("Centered text", 0.35f);
+    txt2.set_alignment(bgui::alignment::center);
+    txt2.request_width(bgui::mode::stretch);
+    auto& button2 = context.add<bgui::button>("Button inside window", 0.35f, [](){});
+    button2.request_width(bgui::mode::match_parent);
 
     // Theme must be applyed in the end
     bgui::apply_theme(bgui::dark_theme);
@@ -98,15 +115,14 @@ int main() {
 ```cpp
     [...]
     while (!glfwWindowShouldClose(window)) {
-        bgui::glfw_update(); // update events
-        bgui::update();       // update layout
+        bgui::glfw_update(bgui::get_context());           // update events
+        bgui::update();                 // update layout
         bgui::gl3_render(
-            bgui::get_draw_data() // render the layout data
+            bgui::get_draw_data()       // render the layout data
         );
         glfwSwapBuffers(window);
     }
 
-    // don't forget to clean-up the trash!
     bgui::shutdown_lib();
     bgui::shutdown_gl3();
     bgui::shutdown_freetype();
