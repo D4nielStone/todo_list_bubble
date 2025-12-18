@@ -8,7 +8,7 @@ using namespace bgui;
 element::element() : m_has_tag(false) {
     std::cout << "[DEBUG] New element id:" + std::to_string(m_uid.m_uint) + "\n";
 }
-element::element(const char* tag) : m_has_tag(true) {
+element::element(const char* tag) : m_has_tag(true), m_uid(tag) {
     std::cout << "[DEBUG] New element id:" << m_uid.m_str << "\n";
 }
 
