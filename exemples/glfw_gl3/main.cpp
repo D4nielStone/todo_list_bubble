@@ -36,6 +36,7 @@ int main() {
     context.set_padding(10, 10);
 
     context.add<bgui::text>("This is a window widget exemple.", 0.35f);
+    context.add<bgui::checkbox>("my_id");
     auto& txt2 = context.add<bgui::text>("Centered text", 0.35f);
     txt2.set_alignment(bgui::alignment::center);
     txt2.request_width(bgui::mode::stretch);

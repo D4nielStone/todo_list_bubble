@@ -1,6 +1,7 @@
 #pragma once
 #include "elem/element.hpp"
 #include "elem/button.hpp"
+#include "elem/checkbox.hpp"
 #include "elem/text.hpp"
 #include "elem/window.hpp"
 #include "lay/layout.hpp"

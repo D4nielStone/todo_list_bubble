@@ -57,7 +57,6 @@ float bgui::button::content_width() {
 
 void bgui::button::apply_theme(const bgui::theme &t) {
     element::apply_theme(t);
-    m_visible = true;
     m_label.apply_theme(t);
 }
 
