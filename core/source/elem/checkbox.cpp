@@ -25,6 +25,6 @@ bgui::checkbox::checkbox(bool* ref, bool actv, const std::string& title, const f
 
 void bgui::checkbox::on_clicked() {
     m_active = m_active ? false : true;
-    get_elements()[0]->get_material().set("bg_color", color{0.1f, 0.2f, 0.1f, (float)m_active});
+    get_elements()[0]->get_material().set("bg_color", color{0.4f, 0.4f, 0.4f, (float)m_active});
     if(m_ref != nullptr) *m_ref = m_active;
 }
