@@ -7,4 +7,6 @@ namespace bgui {
     void glfw_update(bgui::context &window_io);
     void glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
     void shutdown_glfw();
+    bool should_close_glfw();
+    void swap_glfw();
 } // namespace bgui

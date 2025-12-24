@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <iostream>
 
+static GLFWwindow* s_window{nullptr};
+
 // Maps to input conversion
 static std::unordered_map<int, bgui::input_key> s_glfw_key_reverse_map = {
     {GLFW_MOUSE_BUTTON_LEFT, bgui::input_key::mouse_left},
@@ -17,6 +19,8 @@ static std::unordered_map<int, bgui::input_action> s_glfw_action_reverse_map = {
 
 // GLFW Backend functions
 GLFWwindow* bgui::set_up_glfw(int width, int height, const char* title, int flags, GLFWmonitor* monitor, GLFWwindow* share) {
+    if(s_window) 
+    throw std::runtime_error("GLFW wind already exists.");
     if (!glfwInit()) {
         throw std::runtime_error("Failed to init GLFW\n");
     }
@@ -29,6 +33,7 @@ GLFWwindow* bgui::set_up_glfw(int width, int height, const char* title, int flag
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     #endif
     GLFWwindow* window = glfwCreateWindow(width, height, title, monitor, share);
+    s_window = window;
 
     if (!window) {
         throw std::runtime_error("Failed to create window\n");
@@ -48,13 +53,13 @@ void bgui::glfw_update(bgui::context &window_io) {
 
     // Gests the window size
     int width, height;
-    glfwGetWindowSize(glfwGetCurrentContext(), &width, &height);
+    glfwGetWindowSize(s_window, &width, &height);
     window_io.m_size[0] = width;
     window_io.m_size[1] = height;
 
     // Gests the mouse position
     double x, y;
-    glfwGetCursorPos(glfwGetCurrentContext(), &x, &y);
+    glfwGetCursorPos(s_window, &x, &y);
     window_io.m_mouse_position = bgui::vec2i{(int)x, (int)y};
 }
 
@@ -66,6 +71,17 @@ void bgui::glfw_mouse_button_callback(GLFWwindow* window, int button, int action
     bgui::get_context().m_input_map[internal_key] = internal_action;
 }
 void bgui::shutdown_glfw() {
-    glfwDestroyWindow(glfwGetCurrentContext());
+    glfwDestroyWindow(s_window);
+    s_window = nullptr;
     glfwTerminate();
+}
+
+bool bgui::should_close_glfw() {
+    if(!s_window)
+        throw std::runtime_error("BGUI::GLFW::Please Setup GLFW First!");
+    return glfwWindowShouldClose(s_window);
+}
+
+void bgui::swap_glfw() {
+    glfwSwapBuffers(s_window);
 }
