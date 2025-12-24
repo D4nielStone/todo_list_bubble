@@ -12,7 +12,7 @@ add_library(bgui_backend_gl3 STATIC
 target_compile_definitions(bgui_backend_gl3 PUBLIC BGUI_USE_OPENGL)
 
 target_link_libraries(bgui_backend_gl3
-    PUBLIC glad
+    PUBLIC glad bgui_core
 )
 
 target_include_directories(bgui_backend_gl3

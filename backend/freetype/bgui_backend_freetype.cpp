@@ -20,7 +20,7 @@ void bgui::set_up_freetype() {
 
     std::cout << "[FREETYPE] Initialized.\n";
 
-    ft_search_system_fonts("noto");
+    ft_search_system_fonts("NotoSans");
 
 
     std::cout << "[FREETYPE] Total system fonts found: " << s_system_fonts.size() << "\n";
@@ -69,7 +69,7 @@ void bgui::ft_search_system_fonts(const std::string& filter) {
             s_system_fonts[family + "-" + style] = path;
 
             // debug: TODO: add debug manager
-            std::cout << "[FONT] Loaded: " << (family + "-" + style) << "\n";
+            // std::cout << "[FONT] Loaded: " << (family + "-" + style) << "\n";
             FT_Done_Face(face);
         }
     }

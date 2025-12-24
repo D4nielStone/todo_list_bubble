@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 cmake_minimum_required(VERSION 3.15)
-project(BGUI)
 
 # --- Backend options ---
 option(BGUI_USE_OPENGL   "Enable OpenGL backend"   ON)
@@ -21,6 +20,7 @@ message(STATUS "Vulkan backend:   ${BGUI_USE_VULKAN}")
 message(STATUS "GLFW backend:     ${BGUI_USE_GLFW}")
 message(STATUS "FreeType support: ${BGUI_USE_FREETYPE}")
 message(STATUS "Build examples:   ${BGUI_BUILD_EXAMPLES}")
+message(STATUS "Build tests:   ${BGUI_TESTS}")
 
 add_subdirectory(core)
 add_subdirectory(backend)
@@ -32,8 +32,6 @@ target_link_libraries(bgui
         bgui_backend
 )
 
-enable_testing()
-
 target_include_directories(bgui
     INTERFACE
         ${PROJECT_SOURCE_DIR}/core/include
@@ -43,5 +41,6 @@ if(BGUI_BUILD_EXAMPLES)
     add_subdirectory(exemples)
 endif()
 if(BGUI_TESTS)
+    enable_testing()
     add_subdirectory(tests)
 endif()
