@@ -84,7 +84,7 @@ void element::update() {
     m_last_drag = {0, 0};
 }
 
-vec2i bgui::element::get_drag() const {
+vec2i bgui::element::is_drag() const {
     return m_last_drag;
 }
 void element::get_requests(bgui::draw_data* calls) {
@@ -100,6 +100,14 @@ void element::get_requests(bgui::draw_data* calls) {
             static_cast<float>(m_rect[3])
         }
     });
+}
+void bgui::element::apply_style(const style & style) {
+    m_style = style;
+    m_material.set("bg_color", m_style.m_box_color);
+    m_material.set("bordered", (bool)m_style.m_box_color[3]);
+    m_material.set("border_radius", 4.f);
+    m_material.set("border_size", 1.f);
+    m_material.set("border_color", m_style.m_button_border_color);
 }
 
 void element::update_size(const bgui::vec2i& available) {
