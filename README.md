@@ -1,9 +1,7 @@
 Bubble GUI
 ===
 
-<p style="display: block; margin: center; font-weight: bold;">
-    <em><q>I moved mountains to align a button.</q></em>
-</p>
+<p align="center"><b><em><q>I moved mountains to align a button.</q></em></b></p>
 
 <img width="1269" height="713" alt="image" src="https://github.com/user-attachments/assets/1e49c786-a744-4d42-8bf3-22f091e022e8" />
 
