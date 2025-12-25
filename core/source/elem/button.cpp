@@ -41,6 +41,10 @@ void bgui::button::update() {
     }
 }
 
+bgui::text &bgui::button::get_label() {
+    return m_label;
+}
+
 void bgui::button::get_requests(bgui::draw_data* data) {
     element::get_requests(data);
     m_label.get_requests(data);

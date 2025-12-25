@@ -6,10 +6,10 @@ TEST(ElementTest, GetID) {
     element a, b, c, d("TagTest");
 
     // 1. Id tests (different elements may have different ids)
-    EXPECT_EQ(a.get(), "#0");
-    EXPECT_EQ(b.get(), "#1");
-    EXPECT_EQ(c.get(), "#2");
-    EXPECT_EQ(d.get(), "TagTest#3");
+    EXPECT_EQ(a.get_id(), "#0");
+    EXPECT_EQ(b.get_id(), "#1");
+    EXPECT_EQ(c.get_id(), "#2");
+    EXPECT_EQ(d.get_id(), "TagTest#3");
 }
 
 TEST(ElementTest, RequestSizeAndMode) {

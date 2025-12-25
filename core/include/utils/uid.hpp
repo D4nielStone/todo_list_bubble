@@ -15,7 +15,7 @@ namespace bgui {
         // Set one tag
         uid(const std::string& s)  : m_uint(s_nextid++), m_str(s) {}
 
-        std::string get() const {
+        std::string get_id() const {
             return m_str + "#" + std::to_string(m_uint);
         };
     };

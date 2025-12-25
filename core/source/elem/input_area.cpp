@@ -4,8 +4,8 @@
 bgui::input_area::input_area(const std::string& buffer, const float scale, const std::string& placeholder) :
     linear(), m_placeholder(placeholder) {
     m_visible = true;
-    set_margin(5, 0);
-    set_padding(5, 0);
+    set_margin(5, 2);
+    set_padding(5, 0, 0, 0);
     m_material.m_shader_tag = "ui::default";
     m_text = &add<text>(buffer, scale);
     request_width(mode::wrap_content);
