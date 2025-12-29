@@ -20,16 +20,18 @@ void bgui::set_up_freetype() {
 
     std::cout << "[FREETYPE] Initialized.\n";
 
-    ft_search_system_fonts("Noto,Roboto,Serif");
+    ft_search_system_fonts("");
 
 
     std::cout << "[FREETYPE] Total system fonts found: " << s_system_fonts.size() << "\n";
 
-    if (s_system_fonts.find("Noto Serif-Medium") == s_system_fonts.end()) {
-        std::cerr << "[FREETYPE] WARNING: Default font not found.\n";
+    if (s_system_fonts.find("Arial CE-Bold") == s_system_fonts.end()) {
+        std::cerr << "[FREETYPE] WARNING: Default font not found. Trying another font instead.\n";
+        ft_load_font(s_system_fonts.begin()->first, s_system_fonts.begin()->second,
+                     bgui::font_manager::m_default_resolution);
     } else {
-        std::cout << "[FREETYPE] Loading default font: Noto Serif-Medium\n";
-        ft_load_font("Noto Serif-Medium", s_system_fonts["Noto Serif-Medium"],
+        std::cout << "[FREETYPE] Loading default font: Arial CE-Bold\n";
+        ft_load_font("Arial CE-Bold", s_system_fonts["Arial CE-Bold"],
                      bgui::font_manager::m_default_resolution);
     }
 }
@@ -88,18 +90,20 @@ void bgui::ft_search_system_fonts(const std::string& filter) {
     }
     std::cout << "\n";
 
+    // search recursivaly for font files
     for (const auto &entry : std::filesystem::recursive_directory_iterator(folder)) {
+        // first pick the file
         if (!entry.is_regular_file()) continue;
-
         auto path = entry.path().string();
 
-        // extensão
+        // then verify the extension
         if (!(ends_with(path, ".ttf") || ends_with(path, ".otf")))
             continue;
 
-        // filtros múltiplos (OR)
+        // multiple filters process
         if (!filters.empty()) {
             bool match = false;
+            // for each filter, verify in the path name if it contains.
             for (const auto& f : filters) {
                 if (path.find(f) != std::string::npos) {
                     match = true;
@@ -109,6 +113,7 @@ void bgui::ft_search_system_fonts(const std::string& filter) {
             if (!match) continue;
         }
 
+        // load a ft face to extract metadatas.
         FT_Face face;
         if (!FT_New_Face(s_ft, path.c_str(), 0, &face)) {
             std::string family = face->family_name ? face->family_name : "(unknown)";

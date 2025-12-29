@@ -61,6 +61,22 @@ void bgui::glfw_update(bgui::context &window_io) {
     double x, y;
     glfwGetCursorPos(s_window, &x, &y);
     window_io.m_mouse_position = bgui::vec2i{(int)x, (int)y};
+
+    static GLFWcursor* handCursor = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
+    static GLFWcursor* arrowCursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+    static GLFWcursor* ibeamCursor = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
+
+    switch(window_io.m_actual_cursor) {
+        case bgui::cursor::arrow:
+            glfwSetCursor(s_window, arrowCursor);
+        break;
+        case bgui::cursor::hand:
+            glfwSetCursor(s_window, handCursor);
+        break;
+        case bgui::cursor::ibeam:
+            glfwSetCursor(s_window, ibeamCursor);
+        break;
+    }
 }
 
 void bgui::glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
