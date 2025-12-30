@@ -1,6 +1,6 @@
 # GLAD
 add_library(glad STATIC glad/glad.c)
-target_include_directories(glad PUBLIC ${PROJECT_SOURCE_DIR}/backend/gl3)
+target_include_directories(glad PUBLIC ${PROJECT_SOURCE_DIR}/backend/gl3 ${PROJECT_SOURCE_DIR}/backend/glad)
 target_link_libraries(glad PUBLIC ${CMAKE_DL_LIBS})
 
 # BGUI OpenGL backend
