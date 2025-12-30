@@ -40,7 +40,7 @@ namespace bgui {
             return false;
         }
         void on_update() override;
-        void get_requests(bgui::draw_data* calls);
+        void get_requires(bgui::draw_data* calls);
         std::vector<std::unique_ptr<element>>& get_elements();
         bgui::layout* as_layout() override { return this; }
     };

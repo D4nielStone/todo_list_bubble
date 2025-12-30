@@ -28,10 +28,10 @@ void linear::on_update() {
     int stretch_count = 0;
 
     for (auto& elem : m_elements) {
-        auto mreq = elem->get_requested_mode()[main];
+        auto mreq = elem->get_required_mode()[main];
 
         if (mreq == mode::pixel || mreq == mode::wrap_content || mreq == mode::same) {
-            elem->update_size(available);
+            elem->process_required_size(available);
             fixed_main += elem->processed_size()[main];
             fixed_main += elem->get_margin()[main];
             fixed_main += elem->get_margin()[main + 2];
@@ -47,10 +47,11 @@ void linear::on_update() {
     }
 
     for (auto& elem : m_elements) {
+        if(!elem->is_enabled()) continue;
         vec2i final_available = elem->processed_size();
 
         for (int axis = 0; axis < 2; ++axis) {
-            auto req = elem->get_requested_mode()[axis];
+            auto req = elem->get_required_mode()[axis];
 
             int margin_before = elem->get_margin()[axis];
             int margin_after  = elem->get_margin()[axis + 2];
@@ -71,7 +72,7 @@ void linear::on_update() {
 
                 case mode::percent:
                     final_available[axis] =
-                        static_cast<int>(axis_available * elem->requested_size()[axis]);
+                        static_cast<int>(axis_available * elem->required_size()[axis]);
                     break;
 
                 case mode::pixel:
@@ -85,11 +86,12 @@ void linear::on_update() {
         final_available[0] = std::max(0, final_available[0]);
         final_available[1] = std::max(0, final_available[1]);
 
-        elem->update_size(final_available);
+        elem->process_required_size(final_available);
     }
 
     int content_main = 0;
     for (auto& elem : m_elements) {
+        if(!elem->is_enabled()) continue;
         content_main += elem->get_margin()[main];
         content_main += elem->processed_size()[main];
         content_main += elem->get_margin()[main + 2];
@@ -114,6 +116,8 @@ void linear::on_update() {
     }
 
     for (auto& elem : m_elements) {
+        if(!elem->is_enabled()) continue;
+
         cursor_main += elem->get_margin()[main];
 
         int cross_pos = pad_cross_start + elem->get_margin()[cross];
@@ -169,7 +173,9 @@ float linear::content_height() {
     int total = 0;
 
     for (auto& elem : m_elements) {
-        int h = elem->processed_height() +
+        if(!elem->is_enabled()) continue;
+        int h = elem->processed_height() 
+        +
                 elem->get_margin()[1] +
                 elem->get_margin()[3];
 
@@ -194,6 +200,7 @@ float bgui::linear::content_width() {
     int total_width = 0;
 
     for (auto& elem : m_elements) {
+        if(!elem->is_enabled()) continue;
         int w = elem->processed_width() +
                 elem->get_margin()[0] +
                 elem->get_margin()[2];

@@ -5,24 +5,24 @@
 bgui::checkbox::checkbox(bool* ref, bool actv, const std::string& title, const float scale) : m_ref(ref), m_active(actv), linear(bgui::orientation::horizontal) {
     m_visible = true;
     recives_input(true);
+    set_cross_alignment(alignment::center);
 
     // box should be a button
     auto& box = add<bgui::element>();
     if(title.empty() == false) {
         auto& txt = add<text>(title, scale);
         label = &txt;
-        txt.set_margin(0, 2);
         txt.recives_input(false);
-        txt.request_width(mode::stretch);
+        txt.require_width(mode::stretch);
         txt.set_alignment(alignment::end);
     }
     
     box.recives_input(false);
-    request_width(mode::match_parent);
-    request_height(mode::wrap_content);
-    box.set_margin(10, 10);
-    box.request_height(mode::match_parent);
-    box.request_width(mode::same);
+    require_width(mode::match_parent);
+    require_height(mode::wrap_content);
+    box.set_margin(5, 5);
+    box.require_height(mode::match_parent);
+    box.require_width(mode::same);
 }
 bgui::checkbox::checkbox(const std::string& title, const float scale, const bool actv) : m_ref(nullptr), m_active(actv), linear(bgui::orientation::horizontal) {
     m_visible = true;
@@ -35,16 +35,16 @@ bgui::checkbox::checkbox(const std::string& title, const float scale, const bool
         label = &txt;
         txt.set_margin(0, 2);
         txt.recives_input(false);
-        txt.request_width(mode::stretch);
+        txt.require_width(mode::stretch);
         txt.set_alignment(alignment::end);
     }
     
     box.recives_input(false);
-    request_width(mode::match_parent);
-    request_height(mode::wrap_content);
+    require_width(mode::match_parent);
+    require_height(mode::wrap_content);
     box.set_margin(10, 10);
-    box.request_height(mode::match_parent);
-    box.request_width(mode::same);
+    box.require_height(mode::match_parent);
+    box.require_width(mode::same);
 }
 
 void bgui::checkbox::on_clicked() {

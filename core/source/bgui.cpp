@@ -124,8 +124,8 @@ void bgui::on_update() {
     if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
     bgui::vec2i w_size = bgui::get_context_size();
     // the main layout must to be resized based on the window size by default.
-    bgui::m_main_layout->request_height(bgui::mode::match_parent);
-    bgui::m_main_layout->request_width(bgui::mode::match_parent);
+    bgui::m_main_layout->require_height(bgui::mode::match_parent);
+    bgui::m_main_layout->require_width(bgui::mode::match_parent);
     
     while(!s_functions.empty()) {
         auto& f = s_functions.front();
@@ -135,7 +135,7 @@ void bgui::on_update() {
 
     // update main layout and inputs
     get_context().m_actual_cursor = cursor::arrow;
-    bgui::m_main_layout->update_size(w_size);
+    bgui::m_main_layout->process_required_size(w_size);
     bgui::m_main_layout->on_update();
 
     // reset cursor
@@ -145,9 +145,9 @@ void bgui::on_update() {
     bgui::get_context().m_last_mouse_left = bgui::get_pressed(bgui::input_key::mouse_left);
     bgui::get_context().m_last_mouse_pos = bgui::get_mouse_position();
 
-    // get new requests
-    if(!get_draw_data()->m_quad_requests.empty()) std::cout << "[BGUI] Warning: draw data not empty at beginning of frame.\nMake sure you are resetting draw data each frame.\n";
-    bgui::m_main_layout->get_requests(get_draw_data());
+    // get new requires
+    if(!get_draw_data()->m_quad_requires.empty()) std::cout << "[BGUI] Warning: draw data not empty at beginning of frame.\nMake sure you are resetting draw data each frame.\n";
+    bgui::m_main_layout->get_requires(get_draw_data());
 }
 
 void bgui::add_function(const std::function<void()>& f) {

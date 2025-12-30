@@ -22,7 +22,7 @@ namespace bgui {
         float get_text_width();
         void set_buffer(const std::string& buffer) { m_buffer = buffer; };
         const std::string& get_buffer() const { return m_buffer; };
-        void get_requests(bgui::draw_data *calls) override;
+        void get_requires(bgui::draw_data *calls) override;
         void apply_style(const bgui::style& t) override {
             element::apply_style(t);
             // TODO: adds pointer to set material props

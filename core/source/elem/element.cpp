@@ -5,6 +5,9 @@
 
 using namespace bgui;
 
+void element::set_enable(bool b){
+    m_enabled = b;
+}
 // Margin
 void element::set_margin(int left, int top, int right, int bottom) {
     m_margin[0] = left;
@@ -52,24 +55,24 @@ void element::set_max_size(int width, int height) {
     m_max_size[1] = height;
 }
 
-// Requested size
-void element::request_size(float width, float height) {
-    m_requested_size[0] = width;
-    m_requested_size[1] = height;
+// required size
+void element::require_size(float width, float height) {
+    m_required_size[0] = width;
+    m_required_size[1] = height;
 }
 
-void element::request_mode(mode width, mode height) {
-    m_requested_mode[0] = width;
-    m_requested_mode[1] = height;
+void element::require_mode(mode width, mode height) {
+    m_required_mode[0] = width;
+    m_required_mode[1] = height;
 }
 
-void element::request_height(bgui::mode m, float h) {
-    m_requested_mode[1] = m;
-    m_requested_size[1] = h;
+void element::require_height(bgui::mode m, float h) {
+    m_required_mode[1] = m;
+    m_required_size[1] = h;
 }
-void element::request_width(bgui::mode m, float w) {
-    m_requested_mode[0] = m;
-    m_requested_size[0] = w;
+void element::require_width(bgui::mode m, float w) {
+    m_required_mode[0] = m;
+    m_required_size[0] = w;
 }
 
 // Material / visibility
@@ -92,10 +95,10 @@ void element::on_update() {
 vec2i bgui::element::is_drag() const {
     return m_last_drag;
 }
-void element::get_requests(bgui::draw_data* calls) {
+void element::get_requires(bgui::draw_data* calls) {
 
     if (!m_visible) return;
-    calls->m_quad_requests.push({
+    calls->m_quad_requires.push({
         m_material,
         6,
         vec4{
@@ -115,14 +118,14 @@ void bgui::element::apply_style(const style & style) {
     m_material.set("border_color", m_style.m_button_border_color);
 }
 
-void element::update_size(const bgui::vec2i& available) {
-    // Step 1: resolve requested size
+void element::process_required_size(const bgui::vec2i& available) {
+    // Step 1: resolve required size
     // padding removes available intern space
     auto resolve = [&](int vertical, float max) {
         int nvertical = vertical ? 0 : 1;
-        switch(m_requested_mode[vertical]) {
-            case bgui::mode::pixel:   return m_requested_size[vertical];
-            case bgui::mode::percent: return max * (std::clamp(m_requested_size[vertical], 0.f, 100.f)/100);
+        switch(m_required_mode[vertical]) {
+            case bgui::mode::pixel:   return m_required_size[vertical];
+            case bgui::mode::percent: return max * (std::clamp(m_required_size[vertical], 0.f, 100.f)/100);
             case bgui::mode::match_parent: return max;
             case bgui::mode::wrap_content: return vertical ? content_height() : content_width();
             case bgui::mode::stretch: return max;
@@ -133,9 +136,9 @@ void element::update_size(const bgui::vec2i& available) {
     float w = resolve(0, available[0]);
     float h = resolve(1, available[1]);
 
-    if(m_requested_mode[0] == bgui::mode::same)
+    if(m_required_mode[0] == bgui::mode::same)
         w = h;
-    if(m_requested_mode[1] == bgui::mode::same)
+    if(m_required_mode[1] == bgui::mode::same)
         h = w;
 
     // Step 2: enforce min/max rules

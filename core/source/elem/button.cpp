@@ -8,8 +8,8 @@ bgui::button::button(const std::string &name, const float scale, const std::func
     m_visible = true;
     m_label->recives_input(false);
     recives_input(true);
-    request_width(mode::wrap_content);
-    request_height(mode::wrap_content);
+    require_width(mode::wrap_content);
+    require_height(mode::wrap_content);
 }
 
 bgui::button::~button() {

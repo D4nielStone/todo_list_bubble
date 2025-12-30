@@ -227,7 +227,7 @@ void bgui::shutdown_gl3() {
 
 // Render main
 void bgui::gl3_render(bgui::draw_data* data) {
-    if(data->m_quad_requests.empty()) throw std::runtime_error("Nothing to render. Have you update the interface?");
+    if(data->m_quad_requires.empty()) throw std::runtime_error("Nothing to render. Have you update the interface?");
     // basic clear
     const auto& style = bgui::get_style();
     glClearColor(style.m_clear_color[0],
@@ -249,10 +249,10 @@ void bgui::gl3_render(bgui::draw_data* data) {
     // track last shader to reduce state changes
     bgl::gl3_shader* last_shader = nullptr;
 
-    // process all quad requests
-    while (!data->m_quad_requests.empty()) {
-        auto call = data->m_quad_requests.front();
-        data->m_quad_requests.pop();
+    // process all quad requires
+    while (!data->m_quad_requires.empty()) {
+        auto call = data->m_quad_requires.front();
+        data->m_quad_requires.pop();
 
         auto* shader = bgl::get_gl3_shader_from_tag(call.m_material.m_shader_tag);
         if (!shader) continue;

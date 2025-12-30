@@ -11,9 +11,9 @@ bgui::input_area::input_area(const std::string& buffer, const float scale, const
     m_text = &add<text>(buffer, scale);
     m_text->set_margin(5, 0);
     m_text->recives_input(false);
-    m_text->request_width(mode::stretch);
-    request_width(mode::wrap_content);
-    request_height(mode::wrap_content);
+    m_text->require_width(mode::stretch);
+    require_width(mode::wrap_content);
+    require_height(mode::wrap_content);
 }
 
 bgui::input_area::~input_area() {
@@ -51,8 +51,8 @@ void bgui::input_area::on_update() {
     linear::on_update();
 }
 
-void bgui::input_area::get_requests(bgui::draw_data* data) {
-    linear::get_requests(data);
+void bgui::input_area::get_requires(bgui::draw_data* data) {
+    linear::get_requires(data);
 }
 void bgui::input_area::apply_style(const bgui::style& t) {
     linear::apply_style(t);

@@ -5,20 +5,20 @@ bgui::window::window(const char* title) : linear(bgui::orientation::vertical), m
     // window widget experiment
     //TODO:: add parse init config for window
     set_position(20, 20);
-    request_size(300, 300);
+    require_size(300, 300);
     set_visible(true);
 
     // testing the header:
     m_header = &add<bgui::linear>(bgui::orientation::horizontal);
-    m_header->request_height(bgui::mode::wrap_content);
-    m_header->request_width(bgui::mode::match_parent);
+    m_header->require_height(bgui::mode::wrap_content);
+    m_header->require_width(bgui::mode::match_parent);
     // TODO: switch to icon image later
-    m_header->add<bgui::button>(" V ", 0.5f, [](){});
-    m_title = &m_header->add<bgui::text>(title, 0.5f);
-    m_title->request_width(bgui::mode::stretch);
+    m_header->add<bgui::button>(" V ", 0.35f, [](){});
+    m_title = &m_header->add<bgui::text>(title, 0.35f);
+    m_title->require_width(bgui::mode::stretch);
     m_title->set_alignment(bgui::alignment::center);
     // TODO: switch to image button later
-    m_header->add<bgui::button>(" X ", 0.5f, [this](){
+    m_header->add<bgui::button>(" X ", 0.35f, [this](){
         m_parent->remove(this);
     });
     m_header->set_visible(true);

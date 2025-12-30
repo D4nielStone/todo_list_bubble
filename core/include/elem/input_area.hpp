@@ -24,7 +24,7 @@ namespace bgui {
         void on_mouse_hover() override;
         void on_update() override;
         text& get_label();
-        void get_requests(bgui::draw_data* calls) override;
+        void get_requires(bgui::draw_data* calls) override;
         void apply_style(const bgui::style& t) override;
     };
 } // namespace bgui

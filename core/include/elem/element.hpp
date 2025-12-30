@@ -18,10 +18,12 @@ namespace bgui {
     /**
      * @brief The small part of the UI.
      * * The element class is the fundamental building block for all UI components.
-     * It handles style, size requests, layout results, and basic input events.
+     * It handles style, size requires, layout results, and basic input events.
      */
     class element : public uid {
     protected:
+        // Boolean that false means that the element is disabled.
+        bool m_enabled {true};
         // Pointer to the parent layout in the UI hierarchy. Not directly style, but crucial for layout calculation.
         layout* m_parent {nullptr};
         // The graphical material (shader, colors, textures) used for rendering the element.
@@ -31,10 +33,10 @@ namespace bgui {
         // Flag indicating if the element should process mouse/keyboard input. Not strictly style, but related to interaction.
         bool m_recives_input{true};
         
-        // Requested size measurement modes (pixel or relative).
-        vec<2, mode> m_requested_mode {mode::pixel, mode::pixel};
-        // The actual requested size values (can be pixels or percentage).
-        vec2  m_requested_size {0.f, 0.f};
+        // required size measurement modes (pixel or relative).
+        vec<2, mode> m_required_mode {mode::pixel, mode::pixel};
+        // The actual required size values (can be pixels or percentage).
+        vec2  m_required_size {0.f, 0.f};
 
         // Internal space: left, top, right, bottom padding.
         vec4i m_padding {0,0,0,0}; 
@@ -74,6 +76,10 @@ namespace bgui {
          */
         virtual ~element() = default;
 
+        void set_enable(bool);
+        bool is_enabled() const {
+            return m_enabled;
+        }
         // -- STYLE --
         /**
          * @brief Sets the margin (external spacing) around the element.
@@ -141,34 +147,34 @@ namespace bgui {
          */
         void set_border_radius(float radius);
 
-        // Requested size
+        // required size
         /**
-         * @brief Requests a specific size for the element using the currently set modes.
-         * @param width The requested width value.
-         * @param height The requested height value.
+         * @brief requires a specific size for the element using the currently set modes.
+         * @param width The required width value.
+         * @param height The required height value.
          */
-        void request_size(float width, float height);
+        void require_size(float width, float height);
         
         /**
-         * @brief Requests a specific size mode for the element using the currently set sizes.
-         * @param width The requested width mode.
-         * @param height The requested height mode.
+         * @brief requires a specific size mode for the element using the currently set sizes.
+         * @param width The required width mode.
+         * @param height The required height mode.
          */
-        void request_mode(mode width, mode height);
+        void require_mode(mode width, mode height);
 
         /**
-         * @brief Requests a specific width with a specified measurement mode.
+         * @brief requires a specific width with a specified measurement mode.
          * @param m The measurement mode (e.g., pixel, percentage).
          * @param value The width value. Defaults to 100.f.
          */
-        void request_width(mode m, float value = 100.f);
+        void require_width(mode m, float value = 100.f);
 
         /**
-         * @brief Requests a specific height with a specified measurement mode.
+         * @brief requires a specific height with a specified measurement mode.
          * @param m The measurement mode (e.g., pixel, percentage).
          * @param value The height value. Defaults to 100.f.
          */
-        void request_height(mode m, float value = 100.f);
+        void require_height(mode m, float value = 100.f);
 
         // Material / visibility
         /**
@@ -188,6 +194,9 @@ namespace bgui {
          * @param v True to make the element visible, false otherwise.
          */
         void set_visible(bool v);
+        bool is_visible() const {
+            return m_visible;
+        }
 
         /**
          * @brief Returns the material of the element
@@ -225,18 +234,18 @@ namespace bgui {
          */
         vec2i get_max_size() const { return m_max_size; }
 
-        // Requested size
+        // required size
         /**
-         * @brief Gets the raw requested size values (pixels or percentage).
-         * @return A vec2 containing the requested width and height.
+         * @brief Gets the raw required size values (pixels or percentage).
+         * @return A vec2 containing the required width and height.
          */
-        vec2 requested_size() const { return m_requested_size; }
+        vec2 required_size() const { return m_required_size; }
         
         /**
-         * @brief Gets the requested size measurement modes.
+         * @brief Gets the required size measurement modes.
          * @return A vec<2,mode> containing the width and height modes.
          */
-        vec<2,mode> get_requested_mode() const { return m_requested_mode; }
+        vec<2,mode> get_required_mode() const { return m_required_mode; }
 
         // Core Style Application
         /**
@@ -254,11 +263,11 @@ namespace bgui {
         }
 
         /**
-         * @brief Calculates the size based on the available space and requested size.
+         * @brief Calculates the size based on the available space and required size.
          * This is a layout-related method.
          * @param available_size The size provided by the parent layout.
          */
-        void update_size(const vec2i& available_size);
+        void process_required_size(const vec2i& available_size);
         /**
          * @brief Sets the parent layout of this element.
          * @param p Pointer to the parent layout.
@@ -422,7 +431,7 @@ namespace bgui {
          * @brief Collects draw calls required to render this element.
          * @param calls A pointer to the structure where draw data is collected.
          */
-        virtual void get_requests(draw_data* calls);
+        virtual void get_requires(draw_data* calls);
     };
 
 } // namespace bgui

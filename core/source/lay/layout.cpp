@@ -11,7 +11,8 @@ layout::layout() : element() {
 
 void layout::on_update() {
     for(auto& elem : m_elements) {
-        elem->update_size(processed_size());
+        if(!elem->is_enabled()) continue;
+        elem->process_required_size(processed_size());
         elem->on_update();
     }
 }
@@ -20,14 +21,15 @@ std::vector<std::unique_ptr<element>> &layout::get_elements() {
         return m_elements;
     }
 
-void layout::get_requests(bgui::draw_data* data) {
+void layout::get_requires(bgui::draw_data* data) {
     // the background quad
-    element::get_requests(data);
+    element::get_requires(data);
     // linear layouts get the draw call in addition order
     for (auto& elem : m_elements) {
-        // get the requests from each element
-        elem->get_requests(data);
+        if(!elem->is_enabled()) continue;
+        // get the requires from each element
+        elem->get_requires(data);
         // adjust the rect to be modular to this layout
-        if(data->m_quad_requests.empty()) continue;
+        if(data->m_quad_requires.empty()) continue;
     }
 };

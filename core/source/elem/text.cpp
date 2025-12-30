@@ -74,7 +74,7 @@ float bgui::text::get_text_width() {
     
     return max_line_width;
 }
-void bgui::text::get_requests(bgui::draw_data* data) {
+void bgui::text::get_requires(bgui::draw_data* data) {
     const auto& chs = m_font.chs;
     if (chs.empty()) return;
     float ascent = m_font.ascent * m_scale;
@@ -123,7 +123,7 @@ void bgui::text::get_requests(bgui::draw_data* data) {
         float w = m_scale * ch.size[0];
         float h = m_scale * ch.size[1];
 
-        data->m_quad_requests.push({
+        data->m_quad_requires.push({
             m_material, 6,
             { xpos, ypos, w, -h },
             ch.uv_min, ch.uv_max,
@@ -134,5 +134,5 @@ void bgui::text::get_requests(bgui::draw_data* data) {
 
     float total_height = line_count * (ascent + descent + line_gap);
 
-    request_size(total_width, total_height);
+    require_size(total_width, total_height);
 }
