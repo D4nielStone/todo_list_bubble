@@ -72,7 +72,7 @@ void linear::on_update() {
 
                 case mode::percent:
                     final_available[axis] =
-                        static_cast<int>(axis_available * elem->required_size()[axis]);
+                        static_cast<int>(axis_available);
                     break;
 
                 case mode::pixel:

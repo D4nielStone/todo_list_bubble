@@ -23,4 +23,4 @@ target_link_libraries(
     GTest::gtest_main 
 )
 
-add_test(NAME ElementTest COMMAND all_tests)
+add_test(NAME AllTests COMMAND all_tests)

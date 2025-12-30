@@ -125,7 +125,7 @@ void element::process_required_size(const bgui::vec2i& available) {
         int nvertical = vertical ? 0 : 1;
         switch(m_required_mode[vertical]) {
             case bgui::mode::pixel:   return m_required_size[vertical];
-            case bgui::mode::percent: return max * (std::clamp(m_required_size[vertical], 0.f, 100.f)/100);
+            case bgui::mode::percent: return max * (std::clamp(m_required_size[vertical], 0.f, 100.f)/100.f);
             case bgui::mode::match_parent: return max;
             case bgui::mode::wrap_content: return vertical ? content_height() : content_width();
             case bgui::mode::stretch: return max;

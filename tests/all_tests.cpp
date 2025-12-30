@@ -136,26 +136,15 @@ public:
     void on_update() override {}
 };
 
-class linear_test : public ::testing::Test {
-protected:
-    void SetUp() override {
-        // Setup common test fixtures
-    }
-
-    void TearDown() override {
-        // Cleanup
-    }
-};
-
 // Test: Constructor initializes correctly
-TEST_F(linear_test, ConstructorVertical) {
+TEST(LinearTest, ConstructorVertical) {
     bgui::set_up();
 
     linear layout(orientation::vertical);
     EXPECT_FALSE(layout.is_visible());
 }
 
-TEST_F(linear_test, ConstructorHorizontal) {
+TEST(LinearTest, ConstructorHorizontal) {
     bgui::set_up();
 
     linear layout(orientation::horizontal);
@@ -163,7 +152,7 @@ TEST_F(linear_test, ConstructorHorizontal) {
 }
 
 // Test: Empty layout
-TEST_F(linear_test, EmptyLayoutContentSize) {
+TEST(LinearTest, EmptyLayoutContentSize) {
     bgui::set_up();
 
     linear layout(orientation::vertical);
@@ -174,7 +163,7 @@ TEST_F(linear_test, EmptyLayoutContentSize) {
 }
 
 // Test: Vertical layout with fixed size elements
-TEST_F(linear_test, VerticalLayoutFixedSizes) {
+TEST(LinearTest, VerticalLayoutFixedSizes) {
     bgui::set_up();
     linear layout(orientation::vertical);
     layout.require_size(200, 400);
@@ -194,7 +183,7 @@ TEST_F(linear_test, VerticalLayoutFixedSizes) {
 }
 
 // Test: Horizontal layout with fixed size elements
-TEST_F(linear_test, HorizontalLayoutFixedSizes) {
+TEST(LinearTest, HorizontalLayoutFixedSizes) {
     bgui::set_up();
     linear layout(orientation::horizontal);
     layout.require_size(400, 200);
@@ -214,7 +203,7 @@ TEST_F(linear_test, HorizontalLayoutFixedSizes) {
 }
 
 // Test: Stretch mode in vertical layout
-TEST_F(linear_test, VerticalLayoutWithStretch) {
+TEST(LinearTest, VerticalLayoutWithStretch) {
     bgui::set_up();
     linear layout(orientation::vertical);
     layout.require_size(200, 400);
@@ -232,7 +221,7 @@ TEST_F(linear_test, VerticalLayoutWithStretch) {
 }
 
 // Test: Multiple stretch elements share space equally
-TEST_F(linear_test, MultipleStretchElements) {
+TEST(LinearTest, MultipleStretchElements) {
     bgui::set_up();
     linear layout(orientation::vertical);
     layout.require_size(200, 400);
@@ -250,7 +239,7 @@ TEST_F(linear_test, MultipleStretchElements) {
 }
 
 // Test: Match parent mode
-TEST_F(linear_test, MatchParentCrossAxis) {
+TEST(LinearTest, MatchParentCrossAxis) {
     linear layout(orientation::vertical);
     layout.require_size(200, 400);
     layout.require_mode(mode::pixel, mode::pixel);
@@ -265,7 +254,7 @@ TEST_F(linear_test, MatchParentCrossAxis) {
 }
 
 // Test: Padding affects layout
-TEST_F(linear_test, PaddingAffectsLayout) {
+TEST(LinearTest, PaddingAffectsLayout) {
     linear layout(orientation::vertical);
     layout.require_size(200, 400);
     layout.require_mode(mode::pixel, mode::pixel);
@@ -281,7 +270,7 @@ TEST_F(linear_test, PaddingAffectsLayout) {
 }
 
 // Test: Margins affect spacing
-TEST_F(linear_test, MarginsAffectSpacing) {
+TEST(LinearTest, MarginsAffectSpacing) {
     linear layout(orientation::vertical);
     layout.require_size(200, 400);
     layout.require_mode(mode::pixel, mode::pixel);
@@ -297,7 +286,7 @@ TEST_F(linear_test, MarginsAffectSpacing) {
 }
 
 // Test: Start alignment
-TEST_F(linear_test, AlignmentStart) {
+TEST(LinearTest, AlignmentStart) {
     bgui::set_up();
     linear layout(orientation::vertical);
     layout.require_size(200, 400);
@@ -312,7 +301,7 @@ TEST_F(linear_test, AlignmentStart) {
 }
 
 // Test: Center alignment
-TEST_F(linear_test, AlignmentCenter) {
+TEST(LinearTest, AlignmentCenter) {
     bgui::set_up();
     linear layout(orientation::vertical);
     layout.require_size(200, 400);
@@ -327,114 +316,104 @@ TEST_F(linear_test, AlignmentCenter) {
     // Element should be centered: (400 - 100) / 2 = 150
     EXPECT_EQ(elem1.processed_y(), 150);
 }
-/*
 // Test: End alignment
-TEST_F(linear_test, AlignmentEnd) {
+TEST(LinearTest, AlignmentEnd) {
+    bgui::set_up();
     linear layout(orientation::vertical);
-    layout.require_size({200, 400});
-    layout.require_mode({mode::pixel, mode::pixel});
+    layout.require_size(200, 400);
+    layout.require_mode(mode::pixel, mode::pixel);
     layout.set_alignment(alignment::end);
     layout.process_required_size({200, 400});
     
-    auto elem1 = std::make_shared<mock_element>(100, 100);
+    auto& elem1 = layout.add<mock_element>(100, 100);
     
-    layout.add(elem1);
     layout.on_update();
     
     // Element should be at end: 400 - 100 = 300
-    EXPECT_EQ(elem1->processed_y(), 300);
+    EXPECT_EQ(elem1.processed_y(), 300);
 }
 
 // Test: Cross-axis center alignment
-TEST_F(linear_test, CrossAxisCenterAlignment) {
+TEST(LinearTest, CrossAxisCenterAlignment) {
+    bgui::set_up();
     linear layout(orientation::vertical);
-    layout.require_size({200, 400});
-    layout.require_mode({mode::pixel, mode::pixel});
+    layout.require_size(200, 400);
+    layout.require_mode(mode::pixel, mode::pixel);
     layout.set_cross_alignment(alignment::center);
     layout.process_required_size({200, 400});
     
-    auto elem1 = std::make_shared<mock_element>(100, 50);
+    auto& elem1 = layout.add<mock_element>(100, 50);
     
-    layout.add(elem1);
     layout.on_update();
     
     // Element should be centered horizontally: (200 - 100) / 2 = 50
-    EXPECT_EQ(elem1->processed_x(), 50);
+    EXPECT_EQ(elem1.processed_x(), 50);
 }
 
 // Test: Content width calculation for vertical layout
-TEST_F(linear_test, ContentWidthVertical) {
+TEST(LinearTest, ContentWidthVertical) {
+    bgui::set_up();
     linear layout(orientation::vertical);
     layout.set_padding(5, 10, 5, 10);
     
-    auto elem1 = std::make_shared<mock_element>(100, 50);
-    auto elem2 = std::make_shared<mock_element>(150, 50);
-    auto elem3 = std::make_shared<mock_element>(80, 50);
+    auto& elem1 = layout.add<mock_element>(100, 50);
+    auto& elem2 = layout.add<mock_element>(150, 50);
+    auto& elem3 = layout.add<mock_element>(80, 50);
     
-    elem1->process_required_size({100, 50});
-    elem2->process_required_size({150, 50});
-    elem3->process_required_size({80, 50});
-    
-    layout.add(elem1);
-    layout.add(elem2);
-    layout.add(elem3);
+    elem1.process_required_size({100, 50});
+    elem2.process_required_size({150, 50});
+    elem3.process_required_size({80, 50});
     
     // Width should be max element width + padding: 150 + 5 + 5 = 160
     EXPECT_FLOAT_EQ(layout.content_width(), 160.0f);
 }
 
 // Test: Content height calculation for horizontal layout
-TEST_F(linear_test, ContentHeightHorizontal) {
+TEST(LinearTest, ContentHeightHorizontal) {
+    bgui::set_up();
     linear layout(orientation::horizontal);
     layout.set_padding(5, 10, 5, 10);
     
-    auto elem1 = std::make_shared<mock_element>(50, 100);
-    auto elem2 = std::make_shared<mock_element>(50, 150);
-    auto elem3 = std::make_shared<mock_element>(50, 80);
+    auto& elem1 = layout.add<mock_element>(50, 100);
+    auto& elem2 = layout.add<mock_element>(50, 150);
+    auto& elem3 = layout.add<mock_element>(50, 80);
     
-    elem1->process_required_size({50, 100});
-    elem2->process_required_size({50, 150});
-    elem3->process_required_size({50, 80});
-    
-    layout.add(elem1);
-    layout.add(elem2);
-    layout.add(elem3);
+    elem1.process_required_size({50, 100});
+    elem2.process_required_size({50, 150});
+    elem3.process_required_size({50, 80});
     
     // Height should be max element height + padding: 150 + 10 + 10 = 170
     EXPECT_FLOAT_EQ(layout.content_height(), 170.0f);
 }
 
 // Test: Percent mode
-TEST_F(linear_test, PercentMode) {
+TEST(LinearTest, PercentMode) {
+    bgui::set_up();
     linear layout(orientation::vertical);
-    layout.require_size({200, 400});
-    layout.require_mode({mode::pixel, mode::pixel});
+    layout.require_size(200, 400);
+    layout.require_mode(mode::pixel, mode::pixel);
     layout.process_required_size({200, 400});
     
-    auto elem1 = std::make_shared<mock_element>(0, 0, mode::percent, mode::percent);
-    elem1->require_size(50.f, 25.f); // 50% width, 25% height
+    auto& elem1 = layout.add<mock_element>(50, 25, mode::percent, mode::percent);
     
-    layout.add(elem1);
     layout.on_update();
     
-    EXPECT_EQ(elem1->processed_width(), 100);  // 50% of 200
-    EXPECT_EQ(elem1->processed_height(), 100); // 25% of 400
+    EXPECT_EQ(elem1.processed_width(), 100);  // 50% of 200
+    EXPECT_EQ(elem1.processed_height(), 100); // 25% of 400
 }
 
 // Test: Negative space handling
-TEST_F(linear_test, NegativeSpaceHandling) {
+TEST(LinearTest, NegativeSpaceHandling) {
+    bgui::set_up();
     linear layout(orientation::vertical);
-    layout.require_size({200, 100});
-    layout.require_mode({mode::pixel, mode::pixel});
+    layout.require_size(200, 100);
+    layout.require_mode(mode::pixel, mode::pixel);
     layout.process_required_size({200, 100});
     
     // Add elements that exceed available space
-    auto elem1 = std::make_shared<mock_element>(100, 80);
-    auto elem2 = std::make_shared<mock_element>(100, 80);
-    
-    layout.add(elem1);
-    layout.add(elem2);
+    auto& elem1 = layout.add<mock_element>(100, 80);
+    auto& elem2 = layout.add<mock_element>(100, 80);
     
     // Should not crash and handle gracefully
     EXPECT_NO_THROW(layout.on_update());
-}*/
+}
