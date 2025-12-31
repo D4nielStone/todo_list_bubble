@@ -3,7 +3,7 @@ Bubble GUI
 
 <p align="center"><b><em><q>I moved mountains to align a button.</q></em></b></p>
 
-<img width="1269" height="713" alt="image" src="https://github.com/user-attachments/assets/1e49c786-a744-4d42-8bf3-22f091e022e8" />
+<img width="1270" height="736" alt="image" src="https://github.com/user-attachments/assets/3837ef0e-0872-404a-bab9-69e2d26453d5" />
 
 ---
 
