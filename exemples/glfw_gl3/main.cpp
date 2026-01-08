@@ -12,7 +12,7 @@ int main() {
 
     // Adding elements
     auto& panel = root.add<bgui::linear>(bgui::orientation::vertical);
-    panel.set_padding(10, 2);
+    /*panel.set_padding(10, 2);
     panel.require_width(bgui::mode::pixel, 300.f);
     panel.require_height(bgui::mode::match_parent);
 
@@ -42,7 +42,7 @@ int main() {
     txt2.set_alignment(bgui::alignment::center);
     txt2.require_width(bgui::mode::stretch);
     auto& button2 = context.add<bgui::button>("Button inside window", 0.35f, [](){});
-    button2.require_width(bgui::mode::match_parent);
+    button2.require_width(bgui::mode::match_parent);*/
 
     // style must be applyed in the end
     bgui::apply_style(bgui::dark_style);
