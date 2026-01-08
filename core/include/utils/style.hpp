@@ -1,25 +1,9 @@
 #pragma once
 #include "material.hpp"
+#include "enums.hpp"
 #include "vec.hpp"
 
 namespace bgui {
-    enum class mode {
-        percent,
-        pixel,
-        match_parent,
-        wrap_content,
-        stretch,
-        same
-    };
-    enum class orientation {
-        vertical,
-        horizontal
-    };
-    enum class alignment {
-        start,
-        center,
-        end
-    };
     struct style{
         bgui::color m_clear_color = bgui::color(1.f);
         bgui::color m_text_color = bgui::color(1.f);
