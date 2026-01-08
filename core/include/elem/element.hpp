@@ -28,30 +28,9 @@ namespace bgui {
         layout* m_parent {nullptr};
         // The graphical material (shader, colors, textures) used for rendering the element.
         material m_material;
-        // Visibility state of the element.
-        bool m_visible {true};
         // Flag indicating if the element should process mouse/keyboard input. Not strictly style, but related to interaction.
         bool m_recives_input{true};
         
-        // required size measurement modes (pixel or relative).
-        vec<2, mode> m_required_mode {mode::pixel, mode::pixel};
-        // The actual required size values (can be pixels or percentage).
-        vec2  m_required_size {0.f, 0.f};
-
-        // Internal space: left, top, right, bottom padding.
-        vec4i m_padding {0,0,0,0}; 
-        // External space: left, top, right, bottom margin.
-        vec4i m_margin  {0,0,0,0}; 
-        // Border properties (size, color, radius).
-        border m_border;
-        // Stored style object, usually inherited or default (colors, fonts, etc.).
-        style m_style;
-
-        // Minimum allowed size constraint (width, height).
-        vec2i m_min_size {10, 10};
-        // Maximum allowed size constraint (width, height).
-        vec2i m_max_size {INT_MAX, INT_MAX};
-        // Stores the last mouse delta during a drag operation. Not style, but input/interaction.
         vec2i m_last_drag{0, 0};
 
         // FINAL COMPUTED RECT (layout writes this)
@@ -80,172 +59,13 @@ namespace bgui {
         bool is_enabled() const {
             return m_enabled;
         }
-        // -- STYLE --
-        /**
-         * @brief Sets the margin (external spacing) around the element.
-         * @param left Margin on the left side.
-         * @param top Margin on the top side.
-         * @param right Margin on the right side.
-         * @param bottom Margin on the bottom side.
-         */
-        void set_margin(int left, int top, int right, int bottom);
-
-        /**
-         * @brief Sets uniform horizontal and vertical margins.
-         * @param horizontal Margin for left and right sides.
-         * @param vertical Margin for top and bottom sides.
-         */
-        void set_margin(int horizontal, int vertical);
-
-        /**
-         * @brief Gets all margins from the element
-         */
-        vec4i get_margin() const {
-            return m_margin;
-        };
-
-        // Padding
-        /**
-         * @brief Sets the padding (internal spacing) inside the element.
-         * @param left Padding on the left side.
-         * @param top Padding on the top side.
-         * @param right Padding on the right side.
-         * @param bottom Padding on the bottom side.
-         */
-        void set_padding(int left, int top, int right, int bottom);
-
-        /**
-         * @brief Sets uniform horizontal and vertical padding.
-         * @param horizontal Padding for left and right sides.
-         * @param vertical Padding for top and bottom sides.
-         */
-        void set_padding(int horizontal, int vertical);
-
-        /**
-         * @brief Gets all the 4 paddings from the element.
-         */
-        vec4i get_padding() const {
-            return m_padding;
-        }
-        // Borders
-        /**
-         * @brief Sets the border size (thickness).
-         * @param x Horizontal border size (left/right).
-         * @param y Vertical border size (top/bottom).
-         */
-        void set_border_size(int x, int y);
-
-        /**
-         * @brief Sets the color of the border.
-         * @param c The color object.
-         */
-        void set_border_color(const color& c);
-
-        /**
-         * @brief Sets the border radius for rounded corners.
-         * @param radius The radius value.
-         */
-        void set_border_radius(float radius);
-
-        // required size
-        /**
-         * @brief requires a specific size for the element using the currently set modes.
-         * @param width The required width value.
-         * @param height The required height value.
-         */
-        void require_size(float width, float height);
         
-        /**
-         * @brief requires a specific size mode for the element using the currently set sizes.
-         * @param width The required width mode.
-         * @param height The required height mode.
-         */
-        void require_mode(mode width, mode height);
-
-        /**
-         * @brief requires a specific width with a specified measurement mode.
-         * @param m The measurement mode (e.g., pixel, percentage).
-         * @param value The width value. Defaults to 100.f.
-         */
-        void require_width(mode m, float value = 100.f);
-
-        /**
-         * @brief requires a specific height with a specified measurement mode.
-         * @param m The measurement mode (e.g., pixel, percentage).
-         * @param value The height value. Defaults to 100.f.
-         */
-        void require_height(mode m, float value = 100.f);
-
-        // Material / visibility
-        /**
-         * @brief Sets the shader tag to be used by the element's material.
-         * @param shd The string tag of the shader.
-         */
-        void set_shader_tag(const std::string& shd);
-
-        /**
-         * @brief Sets the entire material object for rendering.
-         * @param m The material object.
-         */
-        void set_material(const material& m);
-
-        /**
-         * @brief Sets the visibility of the element.
-         * @param v True to make the element visible, false otherwise.
-         */
-        void set_visible(bool v);
-        bool is_visible() const {
-            return m_visible;
-        }
-
         /**
          * @brief Returns the material of the element
          */
         material& get_material() {
             return m_material;
         };
-
-        // Size constraints
-        /**
-         * @brief Sets the minimum size constraints.
-         * @param width The minimum width in pixels.
-         * @param height The minimum height in pixels.
-         */
-        void set_min_size(int width, int height);
-
-        /**
-         * @brief Sets the maximum size constraints.
-         * @param width The maximum width in pixels.
-         * @param height The maximum height in pixels.
-         */
-        void set_max_size(int width, int height);
-        // -- /STYLE --
-
-        // Size constraints
-        /**
-         * @brief Gets the minimum size constraint.
-         * @return A vec2i containing the minimum width and height.
-         */
-        vec2i get_min_size() const { return m_min_size; }
-        
-        /**
-         * @brief Gets the maximum size constraint.
-         * @return A vec2i containing the maximum width and height.
-         */
-        vec2i get_max_size() const { return m_max_size; }
-
-        // required size
-        /**
-         * @brief Gets the raw required size values (pixels or percentage).
-         * @return A vec2 containing the required width and height.
-         */
-        vec2 required_size() const { return m_required_size; }
-        
-        /**
-         * @brief Gets the required size measurement modes.
-         * @return A vec<2,mode> containing the width and height modes.
-         */
-        vec<2,mode> get_required_mode() const { return m_required_mode; }
 
         // Core Style Application
         /**
@@ -258,9 +78,11 @@ namespace bgui {
          * @brief Getter to enable user to edit elemnt's local style.
          * @returns A style containing informations from it's style.
          */
+        /*
         style& get_style() {
-            return m_style;
-        }
+            // TODO: implement a stylemanager
+            //return m_style;
+        }*/
 
         /**
          * @brief Calculates the size based on the available space and required size.
@@ -425,7 +247,7 @@ namespace bgui {
          * @brief Gets the minimum required size for the element's content.
          * @return A vec2i representing the content size. Defaults to get_min_size().
          */
-        virtual vec2i get_content_size() {return get_min_size(); }
+        virtual vec2i get_content_size() {return {20, 20};/*get_min_size();*/ }
 
         /**
          * @brief Collects draw calls required to render this element.

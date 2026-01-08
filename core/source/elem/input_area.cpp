@@ -4,7 +4,7 @@
 
 bgui::input_area::input_area(const std::string& buffer, const float scale, const std::string& placeholder) :
     linear(), m_placeholder(placeholder) {
-    m_visible = true;
+    /*m_visible = true;
     recives_input(true);
     set_margin(10, 2);
     m_material.m_shader_tag = "ui::default";
@@ -13,7 +13,7 @@ bgui::input_area::input_area(const std::string& buffer, const float scale, const
     m_text->recives_input(false);
     m_text->require_width(mode::stretch);
     require_width(mode::wrap_content);
-    require_height(mode::wrap_content);
+    require_height(mode::wrap_content);*/
 }
 
 bgui::input_area::~input_area() {
@@ -46,7 +46,7 @@ void bgui::input_area::on_update() {
     }
     else {
         m_text->set_buffer(m_input_buffer);
-        m_text->get_material().set("text_color", m_style.m_text_color);
+        //m_text->get_material().set("text_color", m_style.m_text_color);
     }
     linear::on_update();
 }

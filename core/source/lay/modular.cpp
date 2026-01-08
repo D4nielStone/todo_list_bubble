@@ -4,7 +4,7 @@
 using namespace bgui;
     
 modular::modular(const orientation& ori) : m_orientation(ori) {
-    m_visible = false;
+    //m_visible = false;
 }
 
 void modular::on_update() {

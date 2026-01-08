@@ -8,85 +8,6 @@ using namespace bgui;
 void element::set_enable(bool b){
     m_enabled = b;
 }
-// Margin
-void element::set_margin(int left, int top, int right, int bottom) {
-    m_margin[0] = left;
-    m_margin[1] = top;
-    m_margin[2] = right;
-    m_margin[3] = bottom;
-}
-
-void element::set_margin(int x, int y) {
-    set_margin(x, y, x, y);
-}
-
-// Padding
-void element::set_padding(int left, int top, int right, int bottom) {
-    m_padding[0] = left;
-    m_padding[1] = top;
-    m_padding[2] = right;
-    m_padding[3] = bottom;
-}
-
-void element::set_padding(int x, int y) {
-    set_padding(x, y, x, y);
-}
-
-// Borders
-void element::set_border_size(int x, int y) {
-    m_border.m_size[0] = x;
-    m_border.m_size[1] = y;
-}
-void element::set_border_color(const color& c) {
-    m_border.m_color = c;
-}
-void element::set_border_radius(float radius) {
-    m_border.m_radius = radius;
-}
-
-// Size constraints
-void element::set_min_size(int width, int height) {
-    m_min_size[0] = width;
-    m_min_size[1] = height;
-}
-
-void element::set_max_size(int width, int height) {
-    m_max_size[0] = width;
-    m_max_size[1] = height;
-}
-
-// required size
-void element::require_size(float width, float height) {
-    m_required_size[0] = width;
-    m_required_size[1] = height;
-}
-
-void element::require_mode(mode width, mode height) {
-    m_required_mode[0] = width;
-    m_required_mode[1] = height;
-}
-
-void element::require_height(bgui::mode m, float h) {
-    m_required_mode[1] = m;
-    m_required_size[1] = h;
-}
-void element::require_width(bgui::mode m, float w) {
-    m_required_mode[0] = m;
-    m_required_size[0] = w;
-}
-
-// Material / visibility
-void element::set_shader_tag(const std::string &shd) {
-    m_material.m_shader_tag = shd;
-}
-
-void element::set_material(const bgui::material &mhd) {
-    m_material = mhd;
-}
-
-void element::set_visible(bool visible) {
-    m_visible = visible;
-}
 
 void element::on_update() {
     m_last_drag = {0, 0};
@@ -97,7 +18,7 @@ vec2i bgui::element::is_drag() const {
 }
 void element::get_requires(bgui::draw_data* calls) {
 
-    if (!m_visible) return;
+    //if (!m_visible) return;
     calls->m_quad_requires.push({
         m_material,
         6,
@@ -110,18 +31,18 @@ void element::get_requires(bgui::draw_data* calls) {
     });
 }
 void bgui::element::apply_style(const style & style) {
-    m_style = style;
+    /*m_style = style;
     m_material.set("bg_color", m_style.m_box_color);
     m_material.set("bordered", (bool)m_style.m_box_color[3]);
     m_material.set("border_radius", 2.f);
     m_material.set("border_size", 1.f);
-    m_material.set("border_color", m_style.m_button_border_color);
+    m_material.set("border_color", m_style.m_button_border_color);*/
 }
 
 void element::process_required_size(const bgui::vec2i& available) {
     // Step 1: resolve required size
     // padding removes available intern space
-    auto resolve = [&](int vertical, float max) {
+    /*auto resolve = [&](int vertical, float max) {
         int nvertical = vertical ? 0 : 1;
         switch(m_required_mode[vertical]) {
             case bgui::mode::pixel:   return m_required_size[vertical];
@@ -145,5 +66,5 @@ void element::process_required_size(const bgui::vec2i& available) {
     w = std::clamp((int)w, m_min_size[0], m_max_size[0]);
     h = std::clamp((int)h, m_min_size[1], m_max_size[1]);
 
-    m_rect = { m_rect[0], m_rect[1], static_cast<int>(w), static_cast<int>(h) };
+    m_rect = { m_rect[0], m_rect[1], static_cast<int>(w), static_cast<int>(h) };*/
 }

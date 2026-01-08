@@ -5,7 +5,7 @@ bgui::window::window(const char* title) : linear(bgui::orientation::vertical), m
     // window widget experiment
     //TODO:: add parse init config for window
     set_position(20, 20);
-    require_size(300, 300);
+    /*require_size(300, 300);
     set_visible(true);
 
     // testing the header:
@@ -21,7 +21,7 @@ bgui::window::window(const char* title) : linear(bgui::orientation::vertical), m
     m_header->add<bgui::button>(" X ", 0.35f, [this](){
         m_parent->remove(this);
     });
-    m_header->set_visible(true);
+    m_header->set_visible(true);*/
 }
 void bgui::window::on_update() {
     // drag system (title)

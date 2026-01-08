@@ -3,7 +3,7 @@
 #include "os/os.hpp"
 
 bgui::checkbox::checkbox(bool* ref, bool actv, const std::string& title, const float scale) : m_ref(ref), m_active(actv), linear(bgui::orientation::horizontal) {
-    m_visible = true;
+    //m_visible = true;
     recives_input(true);
     set_cross_alignment(alignment::center);
 
@@ -13,19 +13,19 @@ bgui::checkbox::checkbox(bool* ref, bool actv, const std::string& title, const f
         auto& txt = add<text>(title, scale);
         label = &txt;
         txt.recives_input(false);
-        txt.require_width(mode::stretch);
+        //txt.require_width(mode::stretch);
         txt.set_alignment(alignment::end);
     }
     
     box.recives_input(false);
-    require_width(mode::match_parent);
+    /*require_width(mode::match_parent);
     require_height(mode::wrap_content);
     box.set_margin(5, 5);
     box.require_height(mode::match_parent);
-    box.require_width(mode::same);
+    box.require_width(mode::same);*/
 }
 bgui::checkbox::checkbox(const std::string& title, const float scale, const bool actv) : m_ref(nullptr), m_active(actv), linear(bgui::orientation::horizontal) {
-    m_visible = true;
+    //m_visible = true;
     recives_input(true);
 
     // box should be a button
@@ -33,18 +33,18 @@ bgui::checkbox::checkbox(const std::string& title, const float scale, const bool
     if(title.empty() == false) {
         auto& txt = add<text>(title, scale);
         label = &txt;
-        txt.set_margin(0, 2);
+        /*txt.set_margin(0, 2);
         txt.recives_input(false);
         txt.require_width(mode::stretch);
-        txt.set_alignment(alignment::end);
+        txt.set_alignment(alignment::end);*/
     }
     
     box.recives_input(false);
-    require_width(mode::match_parent);
+    /*require_width(mode::match_parent);
     require_height(mode::wrap_content);
     box.set_margin(10, 10);
     box.require_height(mode::match_parent);
-    box.require_width(mode::same);
+    box.require_width(mode::same);*/
 }
 
 void bgui::checkbox::on_clicked() {
@@ -74,8 +74,8 @@ void bgui::checkbox::on_update() {
     auto bc = m_active_color/2;
     bc[3] = 1.f;
 
-    get_material().set("bg_color", get_style().m_cb_color);
-    get_material().set("border_color", get_style().m_cb_border_color);
+    //get_material().set("bg_color", get_style().m_cb_color);
+    //get_material().set("border_color", get_style().m_cb_border_color);
     get_elements()[0]->get_material().set("bg_color", m_active_color);
     get_elements()[0]->get_material().set("border_color", bc);
 }

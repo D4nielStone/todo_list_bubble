@@ -4,7 +4,7 @@
 using namespace bgui;
 
 layout::layout() : element() {
-    m_visible = false;
+    //m_visible = false;
     recives_input(false);
     apply_style(bgui::get_style());
 };

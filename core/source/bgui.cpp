@@ -124,8 +124,8 @@ void bgui::on_update() {
     if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
     bgui::vec2i w_size = bgui::get_context_size();
     // the main layout must to be resized based on the window size by default.
-    bgui::m_main_layout->require_height(bgui::mode::match_parent);
-    bgui::m_main_layout->require_width(bgui::mode::match_parent);
+    /*bgui::m_main_layout->require_height(bgui::mode::match_parent);
+    bgui::m_main_layout->require_width(bgui::mode::match_parent);*/
     
     while(!s_functions.empty()) {
         auto& f = s_functions.front();

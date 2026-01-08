@@ -134,5 +134,5 @@ void bgui::text::get_requires(bgui::draw_data* data) {
 
     float total_height = line_count * (ascent + descent + line_gap);
 
-    require_size(total_width, total_height);
+    //require_size(total_width, total_height);
 }

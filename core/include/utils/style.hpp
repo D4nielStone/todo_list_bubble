@@ -4,6 +4,22 @@
 #include "vec.hpp"
 
 namespace bgui {
+    struct layout_style {
+        mode width;
+        mode height;
+        vec4 margin;
+        vec4 padding;
+        alignment align;
+    };
+
+    struct visual_style {
+        color background;
+        color border;
+        float border_radius;
+        color text_color;
+        std::string font;
+    };
+
     struct style{
         bgui::color m_clear_color = bgui::color(1.f);
         bgui::color m_text_color = bgui::color(1.f);

@@ -5,11 +5,11 @@
 
 bgui::button::button(const std::string &name, const float scale, const std::function<void()> &f) : 
     m_label(&add<text>(name, scale)), m_function(f), linear(bgui::orientation::horizontal) {
-    m_visible = true;
+    /*m_visible = true;
     m_label->recives_input(false);
     recives_input(true);
     require_width(mode::wrap_content);
-    require_height(mode::wrap_content);
+    require_height(mode::wrap_content);*/
 }
 
 bgui::button::~button() {
@@ -19,9 +19,9 @@ void bgui::button::set_function(const std::function<void()>& f) {
     m_function = f;
 }
 
-void bgui::button::on_update() {
+void bgui::button::on_update() {/*
     m_material.set("bg_color", m_style.m_button_color);
-    m_material.set("border_color", m_style.m_button_border_color);
+    m_material.set("border_color", m_style.m_button_border_color);*/
     linear::on_update();
 }
 
