@@ -78,11 +78,8 @@ namespace bgui {
          * @brief Getter to enable user to edit elemnt's local style.
          * @returns A style containing informations from it's style.
          */
-        /*
-        style& get_style() {
-            // TODO: implement a stylemanager
-            //return m_style;
-        }*/
+        
+        bgui::style style;
 
         /**
          * @brief Calculates the size based on the available space and required size.
@@ -247,7 +244,7 @@ namespace bgui {
          * @brief Gets the minimum required size for the element's content.
          * @return A vec2i representing the content size. Defaults to get_min_size().
          */
-        virtual vec2i get_content_size() {return {20, 20};/*get_min_size();*/ }
+        virtual vec2i get_content_size() {return vec2i{style.limit.z, style.limit.w}; }
 
         /**
          * @brief Collects draw calls required to render this element.

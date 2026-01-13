@@ -12,26 +12,26 @@ int main() {
 
     // Adding elements
     auto& panel = root.add<bgui::linear>(bgui::orientation::vertical);
-    /*panel.set_padding(10, 2);
-    panel.require_width(bgui::mode::pixel, 300.f);
-    panel.require_height(bgui::mode::match_parent);
+    panel.style.layout.set_padding(10, 2);
+    panel.style.layout.require_width(bgui::mode::pixel, 300.f);
+    panel.style.layout.require_height(bgui::mode::match_parent);
 
     // layout are invisible by default
-    panel.set_visible(true);
+    panel.style.visual.visible = true;
 
     auto& txt = panel.add<bgui::text>("Linear Layout Exemple", 0.35f);
-    txt.require_width(bgui::mode::match_parent);
-    txt.set_alignment(bgui::alignment::center);
+    txt.style.layout.require_width(bgui::mode::match_parent);
+    txt.style.layout.align = bgui::alignment::center;
     auto& button = panel.add<bgui::button>("Button Exemple", 0.35f, [](){});
-    button.require_width(bgui::mode::match_parent);
+    button.style.layout.require_width(bgui::mode::match_parent);
     button.set_alignment(bgui::alignment::center);
 
     // window widget
     auto& win = root.add<bgui::window>("Hello Bubble!");
     auto& context = win.add<bgui::linear>(bgui::orientation::vertical);
-    context.require_height(bgui::mode::stretch);
-    context.require_width(bgui::mode::match_parent);
-    context.set_padding(10, 10);
+    context.style.layout.require_height(bgui::mode::stretch);
+    context.style.layout.require_width(bgui::mode::match_parent);
+    context.style.layout.set_padding(10, 10);
 
     context.add<bgui::text>("This is a window widget exemple.", 0.35f);
     auto& cb = context.add<bgui::checkbox>("Checkbox Exemple", 0.35f);
@@ -40,12 +40,9 @@ int main() {
     });
     auto& txt2 = context.add<bgui::text>("Centered text", 0.35f);
     txt2.set_alignment(bgui::alignment::center);
-    txt2.require_width(bgui::mode::stretch);
+    txt2.style.layout.require_width(bgui::mode::stretch);
     auto& button2 = context.add<bgui::button>("Button inside window", 0.35f, [](){});
-    button2.require_width(bgui::mode::match_parent);*/
-
-    // style must be applyed in the end
-    bgui::apply_style(bgui::dark_style);
+    button2.style.layout.require_width(bgui::mode::match_parent);
 
     while (!glfwWindowShouldClose(window)) {
         bgui::glfw_update(bgui::get_context());           // update events

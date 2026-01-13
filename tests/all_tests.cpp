@@ -105,7 +105,7 @@ TEST(ElementTest, UpdateSizeCalculation) {
 
     // 5. Test padding and margin:
     // Paddings and Margins SHOULD NOT affect the content.
-    elem.set_padding(10, 10, 10, 10); // L, T, R, B
+    elem.style.layout.set_padding(10, 10, 10, 10); // L, T, R, B
     elem.set_margin(5, 5, 5, 5);     // L, T, R, B
 
     elem.require_size(50.f, 50.f); 
@@ -156,7 +156,7 @@ TEST(LinearTest, EmptyLayoutContentSize) {
     bgui::set_up();
 
     linear layout(orientation::vertical);
-    layout.set_padding(10, 20, 10, 20);
+    layout.style.layout.set_padding(10, 20, 10, 20);
     
     EXPECT_FLOAT_EQ(layout.content_width(), 20.0f);  // left + right padding
     EXPECT_FLOAT_EQ(layout.content_height(), 40.0f); // top + bottom padding
@@ -258,7 +258,7 @@ TEST(LinearTest, PaddingAffectsLayout) {
     linear layout(orientation::vertical);
     layout.require_size(200, 400);
     layout.require_mode(mode::pixel, mode::pixel);
-    layout.set_padding(10, 20, 10, 20); // left, top, right, bottom
+    layout.style.layout.set_padding(10, 20, 10, 20); // left, top, right, bottom
     layout.process_required_size({200, 400});
     
     auto& elem1 = layout.add<mock_element>(100, 50);
@@ -354,7 +354,7 @@ TEST(LinearTest, CrossAxisCenterAlignment) {
 TEST(LinearTest, ContentWidthVertical) {
     bgui::set_up();
     linear layout(orientation::vertical);
-    layout.set_padding(5, 10, 5, 10);
+    layout.style.layout.set_padding(5, 10, 5, 10);
     
     auto& elem1 = layout.add<mock_element>(100, 50);
     auto& elem2 = layout.add<mock_element>(150, 50);
@@ -372,7 +372,7 @@ TEST(LinearTest, ContentWidthVertical) {
 TEST(LinearTest, ContentHeightHorizontal) {
     bgui::set_up();
     linear layout(orientation::horizontal);
-    layout.set_padding(5, 10, 5, 10);
+    layout.style.layout.set_padding(5, 10, 5, 10);
     
     auto& elem1 = layout.add<mock_element>(50, 100);
     auto& elem2 = layout.add<mock_element>(50, 150);

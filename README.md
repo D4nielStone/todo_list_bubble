@@ -101,7 +101,7 @@ int main() {
 
     // Adding elements
     auto& panel = root.add<bgui::linear>(bgui::orientation::vertical);
-    panel.set_padding(10, 2);
+    panel.style.layout.set_padding(10, 2);
     panel.require_width(bgui::mode::pixel, 300.f);
     panel.require_height(bgui::mode::match_parent);
 
@@ -122,7 +122,7 @@ int main() {
     auto& context = win.add<bgui::linear>(bgui::orientation::vertical);
     context.require_height(bgui::mode::stretch);
     context.require_width(bgui::mode::match_parent);
-    context.set_padding(10, 10);
+    context.style.layout.set_padding(10, 10);
 
     context.add<bgui::text>("This is a window widget exemple.", 0.35f);
     auto& txt2 = context.add<bgui::text>("Centered text", 0.35f);
