@@ -1,5 +1,6 @@
 #pragma once
 #include "utils/style.hpp"
+#include "utils/theme.hpp"
 
 namespace bgui {
     template<typename T>
@@ -56,6 +57,23 @@ namespace bgui {
             input_state state
         );  
 
+        void apply_theme(const theme& t) {
+            set_default(t.base);
+
+            for (auto& [type, style] : t.types)
+                set_type(type, style);
+
+            for (auto& [cls, style] : t.classes)
+                set_class(cls, style);
+            
+            m_global_computed = {};
+            merge(m_global_computed, t.base, input_state::normal);
+        }
+
+        computed_style get_global() const {
+            return m_global_computed;
+        }
+
         // singleton
         static style_manager& get_instance() {
             static style_manager sm;
@@ -68,6 +86,7 @@ namespace bgui {
         ~style_manager() = default;
 
         style m_default;
+        computed_style m_global_computed;
 
         std::unordered_map<std::string, style> m_types;
         std::unordered_map<std::string, style> m_classes;

@@ -133,6 +133,7 @@ public:
         // Atualiza o style bruto e computa na construção
         style.layout.require_size(static_cast<float>(w), static_cast<float>(h));
         style.layout.require_mode(w_mode, h_mode);
+        style.layout.limit_min = {0, 0};
         compute_style();
     }
 
@@ -441,4 +442,101 @@ TEST(LinearTest, NegativeSpaceHandling) {
     
     // Should not crash and handle gracefully
     EXPECT_NO_THROW(layout.on_update());
+}
+
+// Test: Basic style resolution
+TEST(StyleVisualTest, ResolveBackgroundColor) {
+    bgui::set_up();
+
+    auto& sm = bgui::style_manager::get_instance();
+
+    bgui::element elem;
+
+    elem.style.visual.background.normal = {1.f, 0.f, 0.f, 1.f}; // red
+    elem.compute_style();
+
+    const auto& cs = elem.computed_style.visual;
+
+    EXPECT_FLOAT_EQ(cs.background.r, 1.f);
+    EXPECT_FLOAT_EQ(cs.background.g, 0.f);
+    EXPECT_FLOAT_EQ(cs.background.b, 0.f);
+    EXPECT_FLOAT_EQ(cs.background.a, 1.f);
+}
+
+// Test: Visual Inherit
+TEST(StyleVisualTest, InheritBackgroundFromParent) {
+    bgui::set_up();
+
+    bgui::linear parent(bgui::orientation::vertical);
+    parent.style.visual.background = {0.f, 0.f, 1.f, 1.f}; // blue
+    parent.compute_style();
+
+    auto& child = parent.add<bgui::element>();
+    child.compute_style();
+
+    const auto& parent_bg = parent.computed_style.visual.background;
+    const auto& child_bg  = child.computed_style.visual.background;
+
+    EXPECT_EQ(parent_bg, child_bg);
+}
+
+// Test: Visual Child Override
+TEST(StyleVisualTest, ChildOverridesVisualStyle) {
+    bgui::set_up();
+
+    bgui::linear parent(bgui::orientation::vertical);
+    parent.style.visual.background.normal = {0.f, 0.f, 0.f, 1.f};
+    parent.compute_style();
+
+    auto& child = parent.add<bgui::element>();
+    child.style.visual.background.normal = {0.f, 1.f, 0.f, 1.f}; // green
+    child.compute_style();
+
+    EXPECT_NE(parent.computed_style.visual.background,
+              child.computed_style.visual.background);
+
+    EXPECT_FLOAT_EQ(child.computed_style.visual.background.g, 1.f);
+}
+
+// Test: Computed border
+TEST(StyleVisualTest, BorderStyleResolution) {
+    bgui::set_up();
+
+    bgui::element elem;
+    elem.style.visual.border = {1.f, 1.f, 1.f, 1.f};
+    elem.style.visual.border_radius = 6.f;
+
+    elem.compute_style();
+
+    const auto& cs = elem.computed_style.visual;
+
+    EXPECT_FLOAT_EQ(cs.border_radius, 6.f);
+    EXPECT_FLOAT_EQ(cs.border.a, 1.f);
+}
+
+// Test: Integration layout + visual
+TEST(StyleVisualTest, VisualStyleDoesNotBreakLayoutUpdate) {
+    bgui::set_up();
+
+    bgui::linear layout(bgui::orientation::vertical);
+    layout.style.layout.require_size(200, 100);
+    layout.style.layout.require_mode(bgui::mode::pixel, bgui::mode::pixel);
+    layout.style.visual.background = {0.2f, 0.2f, 0.2f, 1.f};
+
+    layout.compute_style();
+    layout.process_required_size({200, 100});
+
+    auto& elem1 = layout.add<mock_element>(100, 80);
+    elem1.style.visual.background = {1.f, 0.f, 0.f, 1.f};
+    elem1.compute_style();
+
+    EXPECT_NO_THROW(layout.on_update());
+}
+
+// Test: StyleMnager singleton
+TEST(StyleVisualTest, StyleManagerSingleton) {
+    auto& sm1 = bgui::style_manager::get_instance();
+    auto& sm2 = bgui::style_manager::get_instance();
+
+    EXPECT_EQ(&sm1, &sm2);
 }

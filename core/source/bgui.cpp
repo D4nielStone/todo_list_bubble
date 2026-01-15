@@ -25,41 +25,18 @@ void bgui::set_up() {
     // Create draw data structure
     if(!s_draw_data)
         s_draw_data = std::make_unique<bgui::draw_data>();
+    // Set up default theme
+    auto& sm = style_manager::get_instance();
+    sm.apply_theme(dark_theme());
 }
 
 void bgui::cascade_style() {
-    if(!init_trigger) throw std::runtime_error("[BGUI] You must initialize the library.");
+    if(!init_trigger)
+        throw std::runtime_error("[BGUI] You must initialize the library.");
+
     style_trigger = true;
 
-    std::cout << "[BGUI] Setting-up the default style.";
-
-    // setup and apply the default style
     auto& sm = style_manager::get_instance();
-
-    // ---------- DEFAULT ----------
-    bgui::style base;
-    base.visual.background.normal = bgui::color{0.15f, 0.15f, 0.15f, 1.f};
-    base.visual.text.normal       = bgui::color{1.f, 1.f, 1.f, 1.f};
-    sm.set_default(base);
-
-    // ---------- PANEL ----------
-    bgui::style panel_style;
-    panel_style.layout.padding = bgui::vec4i{10,10,10,10};
-    panel_style.visual.visible = true;
-    sm.set_type("linear", panel_style);
-
-    // ---------- BUTTON ----------
-    bgui::style button;
-    button.visual.background.normal = bgui::color{0.2f,0.4f,0.8f,1.f};
-    button.visual.background.hover  = bgui::color{0.3f,0.5f,0.9f,1.f};
-    button.visual.border_radius     = 6.f;
-    sm.set_type("button", button);
-
-    // ---------- PRIMARY ----------
-    bgui::style primary;
-    primary.visual.background.normal = bgui::color{0.8f,0.2f,0.2f,1.f};
-    sm.set_class("primary", primary);
-
     s_main_layout->cascade_style();
 }
 

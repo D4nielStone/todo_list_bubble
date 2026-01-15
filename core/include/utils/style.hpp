@@ -85,10 +85,10 @@ namespace bgui {
     struct computed_layout_style {
         vec<2, mode> size_mode {mode::pixel, mode::pixel};
         vec2 size {0.f, 0.f};
-        vec2i limit_min {20, 20};
+        vec2i limit_min {15, 15};
         vec2i limit_max {INT_MAX, INT_MAX};
-        vec4i padding {0};
-        vec4i margin {0};
+        vec4i padding {0, 0};
+        vec4i margin {0, 0};
         alignment align {alignment::start};
         alignment cross_align {alignment::start};
         orientation ori {orientation::horizontal};
