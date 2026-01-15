@@ -74,6 +74,7 @@ namespace bgui {
         void remove_class(const std::string& cls);
         bool has_class(const std::string& cls) const;
         void clear_classes();
+        void compute_style();
 
         void set_enable(bool);
         bool is_enabled() const {

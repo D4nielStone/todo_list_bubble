@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 #include "bgui.hpp"
+#include "os/style_manager.hpp"
 
 using namespace bgui;
 void element::mark_style_dirty() {
@@ -49,6 +50,19 @@ void element::on_update() {
 
 vec2i bgui::element::is_drag() const {
     return m_last_drag;
+}
+
+void element::compute_style() {
+    auto& sm = style_manager::get_instance();
+    // compute it' style
+    computed_style = sm.resolve(
+        type,
+        classes,
+        id,
+        style,
+        m_state
+    );
+    clear_style_dirty();
 }
 void element::get_requires(bgui::draw_data* calls) {
 

@@ -21,6 +21,9 @@ namespace bgui {
         void set_padding(int a, int b) {
             padding = vec4i{a, b, a, b};
         }
+        void set_margin(int a, int b) {
+            margin = vec4i{a, b, a, b};
+        }
 
         void require_height(mode m, float v = 100.f) {
             if(!size_mode) size_mode = {mode::pixel};
@@ -33,6 +36,15 @@ namespace bgui {
             if(!size) size = {100.f};
             (*size_mode)[0] = m;
             (*size)[0] = v;
+        }
+        void require_size(float a, float b) {
+            if(!size_mode) size_mode = {mode::pixel};
+            if(!size) size = {100.f};
+            size = {a, b};
+        }void require_mode(mode a, mode b) {
+            if(!size_mode) size_mode = {mode::pixel};
+            if(!size) size = {100.f};
+            size_mode = {a, b};
         }
     };
     
@@ -72,9 +84,9 @@ namespace bgui {
     };
     struct computed_layout_style {
         vec<2, mode> size_mode {mode::pixel, mode::pixel};
-        vec2 size {0.f};
-        vec2i limit_min {20};
-        vec2i limit_max {INT_MAX};
+        vec2 size {0.f, 0.f};
+        vec2i limit_min {20, 20};
+        vec2i limit_max {INT_MAX, INT_MAX};
         vec4i padding {0};
         vec4i margin {0};
         alignment align {alignment::start};

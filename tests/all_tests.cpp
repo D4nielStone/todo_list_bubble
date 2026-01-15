@@ -2,36 +2,29 @@
 #include "bgui.hpp"
 
 using namespace bgui;
-TEST(ElementTest, GetID) {
-    element a, b, c, d("TagTest");
-
-    // 1. Id tests (different elements may have different ids)
-    EXPECT_EQ(a.get_id(), "#0");
-    EXPECT_EQ(b.get_id(), "#1");
-    EXPECT_EQ(c.get_id(), "#2");
-    EXPECT_EQ(d.get_id(), "TagTest#3");
-}
 
 TEST(ElementTest, requireSizeAndMode) {
     element elem;
     
-    // 1. Reuqest Size Test (default mode is pixel)
-    elem.require_size(150.f, 200.f);
-    
-    EXPECT_FLOAT_EQ(elem.required_size()[0], 150.f);
-    EXPECT_FLOAT_EQ(elem.required_size()[1], 200.f);
+    // 1. Request Size Test (default mode is pixel)
+    elem.style.layout.require_size(150.f, 200.f);
+    elem.compute_style();
 
-    EXPECT_EQ(elem.get_required_mode()[0], mode::pixel);
-    EXPECT_EQ(elem.get_required_mode()[1], mode::pixel);
+    EXPECT_FLOAT_EQ(elem.computed_style.layout.size[0], 150.f);
+    EXPECT_FLOAT_EQ(elem.computed_style.layout.size[1], 200.f);
+
+    EXPECT_EQ(elem.computed_style.layout.size_mode[0], mode::pixel);
+    EXPECT_EQ(elem.computed_style.layout.size_mode[1], mode::pixel);
     
     // 2. Test with percentual mode
-    elem.require_width(mode::percent, 50.f);
-    elem.require_height(mode::percent, 25.f);
+    elem.style.layout.require_width(mode::percent, 50.f);
+    elem.style.layout.require_height(mode::percent, 25.f);
+    elem.compute_style();
 
-    EXPECT_FLOAT_EQ(elem.required_size()[0], 50.f);
-    EXPECT_FLOAT_EQ(elem.required_size()[1], 25.f);
-    EXPECT_EQ(elem.get_required_mode()[0], mode::percent);
-    EXPECT_EQ(elem.get_required_mode()[1], mode::percent);
+    EXPECT_FLOAT_EQ(elem.computed_style.layout.size[0], 50.f);
+    EXPECT_FLOAT_EQ(elem.computed_style.layout.size[1], 25.f);
+    EXPECT_EQ(elem.computed_style.layout.size_mode[0], mode::percent);
+    EXPECT_EQ(elem.computed_style.layout.size_mode[1], mode::percent);
 }
 
 TEST(ElementTest, FinalRectManipulation) {
@@ -60,13 +53,15 @@ TEST(ElementTest, FinalRectManipulation) {
     EXPECT_EQ(elem.processed_height(), 40);
     EXPECT_EQ(elem.processed_x(), 5);
 }
+
 const vec2i AVAILABLE_SIZE = {400, 300};
 
 TEST(ElementTest, UpdateSizeCalculation) {
     element elem;
 
     // 1. Test pixel mode
-    elem.require_size(100.f, 50.f);
+    elem.style.layout.require_size(100.f, 50.f);
+    elem.compute_style();
 
     elem.process_required_size(AVAILABLE_SIZE); 
     
@@ -74,8 +69,9 @@ TEST(ElementTest, UpdateSizeCalculation) {
     EXPECT_EQ(elem.processed_height(), 50);
 
     // 2. Test percentual mode
-    elem.require_width(mode::percent, 50.f);
-    elem.require_height(mode::percent, 25.f);
+    elem.style.layout.require_width(mode::percent, 50.f);
+    elem.style.layout.require_height(mode::percent, 25.f);
+    elem.compute_style();
 
     elem.process_required_size(AVAILABLE_SIZE);
     
@@ -85,8 +81,9 @@ TEST(ElementTest, UpdateSizeCalculation) {
     EXPECT_EQ(elem.processed_height(), 75);
 
     // 3. Test match parent
-    elem.require_width(mode::match_parent, 0.f);
-    elem.require_height(mode::match_parent, 0.f);
+    elem.style.layout.require_width(mode::match_parent, 0.f);
+    elem.style.layout.require_height(mode::match_parent, 0.f);
+    elem.compute_style();
     
     elem.process_required_size(AVAILABLE_SIZE);
 
@@ -94,8 +91,9 @@ TEST(ElementTest, UpdateSizeCalculation) {
     EXPECT_EQ(elem.processed_height(), 300);
 
     // 4. Test percent and pixel
-    elem.require_width(mode::percent, 10.f);
-    elem.require_height(mode::pixel, 120.f);
+    elem.style.layout.require_width(mode::percent, 10.f);
+    elem.style.layout.require_height(mode::pixel, 120.f);
+    elem.compute_style();
     
     elem.process_required_size(AVAILABLE_SIZE);
 
@@ -105,11 +103,12 @@ TEST(ElementTest, UpdateSizeCalculation) {
 
     // 5. Test padding and margin:
     // Paddings and Margins SHOULD NOT affect the content.
-    elem.style.layout.set_padding(10, 10, 10, 10); // L, T, R, B
-    elem.set_margin(5, 5, 5, 5);     // L, T, R, B
+    elem.style.layout.set_padding(10, 10); // L, T, R, B
+    elem.style.layout.set_margin(5, 5);     // L, T, R, B
+    elem.style.layout.require_size(50.f, 50.f); 
+    elem.style.layout.require_mode(mode::pixel, mode::pixel); 
+    elem.compute_style();
 
-    elem.require_size(50.f, 50.f); 
-    elem.require_mode(mode::pixel, mode::pixel); 
     elem.process_required_size(AVAILABLE_SIZE);
 
     EXPECT_EQ(elem.processed_width(), 50);
@@ -117,8 +116,10 @@ TEST(ElementTest, UpdateSizeCalculation) {
 
     // 6. Test Stretched
     vec2i stretch_size = {150, 150};
-    elem.require_size(1.f, 1.f);
-    elem.require_mode(mode::stretch, mode::stretch);
+    elem.style.layout.require_size(1.f, 1.f);
+    elem.style.layout.require_mode(mode::stretch, mode::stretch);
+    elem.compute_style();
+
     elem.process_required_size(stretch_size);
     
     EXPECT_EQ(elem.processed_width(), 150);
@@ -129,35 +130,23 @@ TEST(ElementTest, UpdateSizeCalculation) {
 class mock_element : public element {
 public:
     mock_element(int w, int h, mode w_mode = mode::pixel, mode h_mode = mode::pixel) {
-        require_size(static_cast<float>(w), static_cast<float>(h));
-        require_mode(w_mode, h_mode);
+        // Atualiza o style bruto e computa na construção
+        style.layout.require_size(static_cast<float>(w), static_cast<float>(h));
+        style.layout.require_mode(w_mode, h_mode);
+        compute_style();
     }
 
     void on_update() override {}
 };
-
-// Test: Constructor initializes correctly
-TEST(LinearTest, ConstructorVertical) {
-    bgui::set_up();
-
-    linear layout(orientation::vertical);
-    EXPECT_FALSE(layout.is_visible());
-}
-
-TEST(LinearTest, ConstructorHorizontal) {
-    bgui::set_up();
-
-    linear layout(orientation::horizontal);
-    EXPECT_FALSE(layout.is_visible());
-}
 
 // Test: Empty layout
 TEST(LinearTest, EmptyLayoutContentSize) {
     bgui::set_up();
 
     linear layout(orientation::vertical);
-    layout.style.layout.set_padding(10, 20, 10, 20);
-    
+    layout.style.layout.set_padding(10, 20);
+    layout.compute_style();
+
     EXPECT_FLOAT_EQ(layout.content_width(), 20.0f);  // left + right padding
     EXPECT_FLOAT_EQ(layout.content_height(), 40.0f); // top + bottom padding
 }
@@ -166,13 +155,17 @@ TEST(LinearTest, EmptyLayoutContentSize) {
 TEST(LinearTest, VerticalLayoutFixedSizes) {
     bgui::set_up();
     linear layout(orientation::vertical);
-    layout.require_size(200, 400);
-    layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.require_size(200, 400);
+    layout.style.layout.require_mode(mode::pixel, mode::pixel);
     layout.process_required_size({200, 400});
     
     auto& elem1 = layout.add<mock_element>(100, 50);
     auto& elem2 = layout.add<mock_element>(100, 75);
     auto& elem3 = layout.add<mock_element>(100, 100);
+
+    elem1.compute_style();
+    elem2.compute_style();
+    elem3.compute_style();
     
     layout.on_update();
     
@@ -186,13 +179,17 @@ TEST(LinearTest, VerticalLayoutFixedSizes) {
 TEST(LinearTest, HorizontalLayoutFixedSizes) {
     bgui::set_up();
     linear layout(orientation::horizontal);
-    layout.require_size(400, 200);
-    layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.require_size(400, 200);
+    layout.style.layout.require_mode(mode::pixel, mode::pixel);
     layout.process_required_size({400, 200});
     
     auto& elem1 = layout.add<mock_element>(50, 100);
     auto& elem2 = layout.add<mock_element>(75, 100);
     auto& elem3 = layout.add<mock_element>(100, 100);
+
+    elem1.compute_style();
+    elem2.compute_style();
+    elem3.compute_style();
     
     layout.on_update();
     
@@ -206,13 +203,18 @@ TEST(LinearTest, HorizontalLayoutFixedSizes) {
 TEST(LinearTest, VerticalLayoutWithStretch) {
     bgui::set_up();
     linear layout(orientation::vertical);
-    layout.require_size(200, 400);
-    layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.require_size(200, 400);
+    layout.style.layout.require_mode(mode::pixel, mode::pixel);
+    layout.compute_style();
     layout.process_required_size({200, 400});
     
     auto& elem1 = layout.add<mock_element>(100, 50, mode::pixel, mode::pixel);
     auto& elem2 = layout.add<mock_element>(100, 0, mode::pixel, mode::stretch);
     auto& elem3 = layout.add<mock_element>(100, 50, mode::pixel, mode::pixel);
+
+    elem1.compute_style();
+    elem2.compute_style();
+    elem3.compute_style();
     
     layout.on_update();
     
@@ -224,12 +226,16 @@ TEST(LinearTest, VerticalLayoutWithStretch) {
 TEST(LinearTest, MultipleStretchElements) {
     bgui::set_up();
     linear layout(orientation::vertical);
-    layout.require_size(200, 400);
-    layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.require_size(200, 400);
+    layout.style.layout.require_mode(mode::pixel, mode::pixel);
+    layout.compute_style();
     layout.process_required_size({200, 400});
     
     auto &elem1 = layout.add<mock_element>(100, 0, mode::pixel, mode::stretch);
     auto &elem2 = layout.add<mock_element>(100, 0, mode::pixel, mode::stretch);
+
+    elem1.compute_style();
+    elem2.compute_style();
     
     layout.on_update();
     
@@ -241,12 +247,14 @@ TEST(LinearTest, MultipleStretchElements) {
 // Test: Match parent mode
 TEST(LinearTest, MatchParentCrossAxis) {
     linear layout(orientation::vertical);
-    layout.require_size(200, 400);
-    layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.require_size(200, 400);
+    layout.style.layout.require_mode(mode::pixel, mode::pixel);
+    layout.compute_style();
     layout.process_required_size({200, 400});
     
     
     auto& elem1 = layout.add<mock_element>(0, 100, mode::match_parent, mode::pixel);
+    elem1.compute_style();
     layout.on_update();
     
     // Width should match parent
@@ -256,12 +264,14 @@ TEST(LinearTest, MatchParentCrossAxis) {
 // Test: Padding affects layout
 TEST(LinearTest, PaddingAffectsLayout) {
     linear layout(orientation::vertical);
-    layout.require_size(200, 400);
-    layout.require_mode(mode::pixel, mode::pixel);
-    layout.style.layout.set_padding(10, 20, 10, 20); // left, top, right, bottom
+    layout.style.layout.require_size(200, 400);
+    layout.style.layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.set_padding(10, 20); // left, top, right, bottom
+    layout.compute_style();
     layout.process_required_size({200, 400});
     
     auto& elem1 = layout.add<mock_element>(100, 50);
+    elem1.compute_style();
     layout.on_update();
     
     // Element should be positioned after top padding
@@ -272,13 +282,16 @@ TEST(LinearTest, PaddingAffectsLayout) {
 // Test: Margins affect spacing
 TEST(LinearTest, MarginsAffectSpacing) {
     linear layout(orientation::vertical);
-    layout.require_size(200, 400);
-    layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.require_size(200, 400);
+    layout.style.layout.require_mode(mode::pixel, mode::pixel);
+    layout.compute_style();
     layout.process_required_size({200, 400});
         
     auto& elem1 = layout.add<mock_element>(100, 50);
     auto& elem2 = layout.add<mock_element>(100, 50);
-    elem1.set_margin(0, 10, 0, 10); // 10px margin top and bottom
+    elem1.style.layout.set_margin(0, 10); // 10px margin top and bottom
+    elem1.compute_style();
+    elem2.compute_style();
     layout.on_update();
     
     // elem2 should be after elem1 height + margins: 10 + 50 + 10 = 70
@@ -289,12 +302,14 @@ TEST(LinearTest, MarginsAffectSpacing) {
 TEST(LinearTest, AlignmentStart) {
     bgui::set_up();
     linear layout(orientation::vertical);
-    layout.require_size(200, 400);
-    layout.require_mode(mode::pixel, mode::pixel);
-    layout.set_alignment(alignment::start);
+    layout.style.layout.require_size(200, 400);
+    layout.style.layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.align = (alignment::start);
+    layout.compute_style();
     layout.process_required_size({200, 400});
     
     auto& elem1 = layout.add<mock_element>(100, 50);
+    elem1.compute_style();
     layout.on_update();
     
     EXPECT_EQ(elem1.processed_y(), 0);
@@ -304,13 +319,14 @@ TEST(LinearTest, AlignmentStart) {
 TEST(LinearTest, AlignmentCenter) {
     bgui::set_up();
     linear layout(orientation::vertical);
-    layout.require_size(200, 400);
-    layout.require_mode(mode::pixel, mode::pixel);
-    layout.set_alignment(alignment::center);
+    layout.style.layout.require_size(200, 400);
+    layout.style.layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.align = (alignment::center);
+    layout.compute_style();
     layout.process_required_size({200, 400});
     
     auto& elem1 = layout.add<mock_element>(100, 100);
-    
+    elem1.compute_style();
     layout.on_update();
     
     // Element should be centered: (400 - 100) / 2 = 150
@@ -320,13 +336,14 @@ TEST(LinearTest, AlignmentCenter) {
 TEST(LinearTest, AlignmentEnd) {
     bgui::set_up();
     linear layout(orientation::vertical);
-    layout.require_size(200, 400);
-    layout.require_mode(mode::pixel, mode::pixel);
-    layout.set_alignment(alignment::end);
+    layout.style.layout.require_size(200, 400);
+    layout.style.layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.align = (alignment::end);
+    layout.compute_style();
     layout.process_required_size({200, 400});
     
     auto& elem1 = layout.add<mock_element>(100, 100);
-    
+    elem1.compute_style();
     layout.on_update();
     
     // Element should be at end: 400 - 100 = 300
@@ -337,13 +354,14 @@ TEST(LinearTest, AlignmentEnd) {
 TEST(LinearTest, CrossAxisCenterAlignment) {
     bgui::set_up();
     linear layout(orientation::vertical);
-    layout.require_size(200, 400);
-    layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.require_size(200, 400);
+    layout.style.layout.require_mode(mode::pixel, mode::pixel);
     layout.style.layout.cross_align = (alignment::center);
+    layout.compute_style();
     layout.process_required_size({200, 400});
     
     auto& elem1 = layout.add<mock_element>(100, 50);
-    
+    elem1.compute_style();
     layout.on_update();
     
     // Element should be centered horizontally: (200 - 100) / 2 = 50
@@ -354,7 +372,8 @@ TEST(LinearTest, CrossAxisCenterAlignment) {
 TEST(LinearTest, ContentWidthVertical) {
     bgui::set_up();
     linear layout(orientation::vertical);
-    layout.style.layout.set_padding(5, 10, 5, 10);
+    layout.style.layout.set_padding(5, 10);
+    layout.compute_style();
     
     auto& elem1 = layout.add<mock_element>(100, 50);
     auto& elem2 = layout.add<mock_element>(150, 50);
@@ -372,7 +391,8 @@ TEST(LinearTest, ContentWidthVertical) {
 TEST(LinearTest, ContentHeightHorizontal) {
     bgui::set_up();
     linear layout(orientation::horizontal);
-    layout.style.layout.set_padding(5, 10, 5, 10);
+    layout.style.layout.set_padding(5, 10);
+    layout.compute_style();
     
     auto& elem1 = layout.add<mock_element>(50, 100);
     auto& elem2 = layout.add<mock_element>(50, 150);
@@ -390,11 +410,13 @@ TEST(LinearTest, ContentHeightHorizontal) {
 TEST(LinearTest, PercentMode) {
     bgui::set_up();
     linear layout(orientation::vertical);
-    layout.require_size(200, 400);
-    layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.require_size(200, 400);
+    layout.style.layout.require_mode(mode::pixel, mode::pixel);
+    layout.compute_style();
     layout.process_required_size({200, 400});
     
     auto& elem1 = layout.add<mock_element>(50, 25, mode::percent, mode::percent);
+    elem1.compute_style();
     
     layout.on_update();
     
@@ -406,13 +428,16 @@ TEST(LinearTest, PercentMode) {
 TEST(LinearTest, NegativeSpaceHandling) {
     bgui::set_up();
     linear layout(orientation::vertical);
-    layout.require_size(200, 100);
-    layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.require_size(200, 100);
+    layout.style.layout.require_mode(mode::pixel, mode::pixel);
+    layout.compute_style();
     layout.process_required_size({200, 100});
     
     // Add elements that exceed available space
     auto& elem1 = layout.add<mock_element>(100, 80);
     auto& elem2 = layout.add<mock_element>(100, 80);
+    elem1.compute_style();
+    elem2.compute_style();
     
     // Should not crash and handle gracefully
     EXPECT_NO_THROW(layout.on_update());

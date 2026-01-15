@@ -27,28 +27,11 @@ namespace bgui {
             }
         }
         void cascade_style() {
-            auto& sm = style_manager::get_instance();
-                // compute it' style
-                computed_style = sm.resolve(
-                    type,
-                    classes,
-                    id,
-                    style,
-                    m_state
-                );
-            
+            compute_style();
             // compute children style
             for (auto& elem : get_elements()) {
                 if (elem->is_style_dirty()) {
-                    elem->computed_style = sm.resolve(
-                        elem->type,
-                        elem->classes,
-                        elem->id,
-                        elem->style,
-                        elem->m_state
-                    );
-
-                    elem->clear_style_dirty();
+                    elem->compute_style();
                     if(elem->as_layout()) {
                         elem->as_layout()->cascade_style();
                     }
