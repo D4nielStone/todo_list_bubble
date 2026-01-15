@@ -106,7 +106,7 @@ void linear::on_update() {
 
     int cursor_main = pad_main_start;
 
-    switch (style.layout.align) {
+    switch (computed_style.layout.align) {
         case alignment::start:
             break;
         case alignment::center:

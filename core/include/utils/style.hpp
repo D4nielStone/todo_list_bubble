@@ -23,10 +23,14 @@ namespace bgui {
         }
 
         void require_height(mode m, float v = 100.f) {
+            if(!size_mode) size_mode = {mode::pixel};
+            if(!size) size = {100.f};
             (*size_mode)[1] = m;
             (*size)[1] = v;
         }
         void require_width(mode m, float v = 100.f) {
+            if(!size_mode) size_mode = {mode::pixel};
+            if(!size) size = {100.f};
             (*size_mode)[0] = m;
             (*size)[0] = v;
         }

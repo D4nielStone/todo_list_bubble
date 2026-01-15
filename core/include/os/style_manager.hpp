@@ -6,7 +6,7 @@ namespace bgui {
     inline void apply_optional(T& dst, const std::optional<T>& src) {
         if (src) dst = *src;
     }
-    void merge(computed_layout_style& out, const layout_style& in) {
+    inline void merge(computed_layout_style& out, const layout_style& in) {
         apply_optional(out.size_mode, in.size_mode);
         apply_optional(out.margin,    in.margin);
         apply_optional(out.padding,   in.padding);
@@ -17,7 +17,7 @@ namespace bgui {
         apply_optional(out.cross_align,      in.cross_align);
         apply_optional(out.ori,      in.ori);
     }
-    void merge(
+    inline void merge(
         computed_visual_style& out,
         const visual_style& in,
         input_state state
@@ -30,7 +30,7 @@ namespace bgui {
         apply_optional(out.font, in.font);
         apply_optional(out.visible, in.visible);
     }
-    void merge(
+    inline void merge(
         computed_style& out,
         const style& in,
         input_state state

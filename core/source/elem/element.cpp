@@ -52,7 +52,7 @@ vec2i bgui::element::is_drag() const {
 }
 void element::get_requires(bgui::draw_data* calls) {
 
-    //if (!m_visible) return;
+    if (!computed_style.visual.visible) return;
     calls->m_quad_requires.push({
         m_material,
         6,
@@ -89,8 +89,8 @@ void element::process_required_size(const bgui::vec2i& available) {
         h = w;
 
     // Step 2: enforce min/max rules
-    w = std::clamp((int)w, (*style.layout.limit_min)[0], (*style.layout.limit_max)[0]);
-    h = std::clamp((int)h, (*style.layout.limit_min)[1], (*style.layout.limit_max)[1]);
+    w = std::clamp((int)w, computed_style.layout.limit_min[0], computed_style.layout.limit_max[0]);
+    h = std::clamp((int)h, computed_style.layout.limit_min[1], computed_style.layout.limit_max[1]);
 
     m_rect = { m_rect[0], m_rect[1], static_cast<int>(w), static_cast<int>(h) };
 }

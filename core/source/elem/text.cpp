@@ -106,7 +106,7 @@ void bgui::text::get_requires(bgui::draw_data* data) {
         const auto& ch = it->second;
 
         int originx = processed_x();
-        switch(style.layout.align.value()) {
+        switch(computed_style.layout.align) {
             case bgui::alignment::start:
                 originx = processed_x();
                 break;
