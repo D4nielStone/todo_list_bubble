@@ -339,7 +339,7 @@ TEST(LinearTest, CrossAxisCenterAlignment) {
     linear layout(orientation::vertical);
     layout.require_size(200, 400);
     layout.require_mode(mode::pixel, mode::pixel);
-    layout.set_cross_alignment(alignment::center);
+    layout.style.layout.cross_align = (alignment::center);
     layout.process_required_size({200, 400});
     
     auto& elem1 = layout.add<mock_element>(100, 50);

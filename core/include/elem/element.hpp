@@ -5,7 +5,6 @@
 
 #include "utils/style.hpp"
 #include "utils/draw.hpp"
-#include "utils/uid.hpp"
 #include "utils/border.hpp"
 
 /**
@@ -20,15 +19,15 @@ namespace bgui {
      * * The element class is the fundamental building block for all UI components.
      * It handles style, size requires, layout results, and basic input events.
      */
-    class element : public uid {
+    class element {
+    private:
+        bool m_style_dirty  = true;
     protected:
         // Boolean that false means that the element is disabled.
         bool m_enabled {true};
         // Pointer to the parent layout in the UI hierarchy. Not directly style, but crucial for layout calculation.
         layout* m_parent {nullptr};
         
-        // The input state of the element
-        input_state m_state;
         //TODO: remove material or change its responsabilities
         // The graphical material (shader, colors, textures) used for rendering the element.
         material m_material;
@@ -41,10 +40,22 @@ namespace bgui {
         // x, y, width, height - The final position and dimensions calculated by the layout.
         vec4i m_rect {0, 0, 0, 0};
     public:
+        void mark_style_dirty();
+        // The input state of the element
+        input_state m_state;
+        std::string type;                 // "button", "text", "linear"
+        std::vector<std::string> classes; // {"primary", "rounded"}
+        std::string id;                   // ex: "submitBtn"
+
+        bgui::style style;                // inline style
+        bgui::computed_style computed_style;       // final style
+
+        bool is_style_dirty() const { return m_style_dirty; }
+        void clear_style_dirty()    { m_style_dirty = false; }
         /**
          * @brief Default constructor.
          */
-        element() = default;
+        element() : type("element"), style() {}
 
         /// @brief Tag Constructor
         /// Creates a UID based on a string type (tag).
@@ -52,12 +63,17 @@ namespace bgui {
          * @brief Constructor that initializes the element with a tag.
          * @param tag A string identifier for the element's type.
          */
-        element(const std::string& tag) : uid(tag){};
 
         /**
          * @brief Virtual destructor.
          */
         virtual ~element() = default;
+
+        // ---- CLASSES ----
+        void add_class(const std::string& cls);
+        void remove_class(const std::string& cls);
+        bool has_class(const std::string& cls) const;
+        void clear_classes();
 
         void set_enable(bool);
         bool is_enabled() const {
@@ -70,21 +86,6 @@ namespace bgui {
         material& get_material() {
             return m_material;
         };
-
-        // Core Style Application
-        /**
-         * @brief Applies a given style object to the element, updating material properties.
-         * \param resolved_style The style to apply.
-         * \param state The current input state of the element.
-         */
-        virtual void apply_style(const style& resolved_style, input_state state);
-
-        /**
-         * @brief Getter to enable user to edit elemnt's local style.
-         * @returns A style containing informations from it's style.
-         */
-        
-        bgui::style style;
 
         /**
          * @brief Calculates the size based on the available space and required size.
@@ -259,7 +260,7 @@ namespace bgui {
          * @return A vec2i representing the content size. Defaults to get_min_size().
          */
         virtual vec2i get_content_size() {
-            return vec2i{(*style.layout.limit_min)[0], (*style.layout.limit_min)[1]}; 
+            return vec2i{computed_style.layout.limit_min[0], computed_style.layout.limit_min[1]}; 
         }
 
         /**

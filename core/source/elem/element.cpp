@@ -4,6 +4,40 @@
 #include "bgui.hpp"
 
 using namespace bgui;
+void element::mark_style_dirty() {
+    m_style_dirty = true;
+
+    if (auto* lay = as_layout()) {
+        lay->mark_children_style_dirty();
+    }
+}
+
+void element::add_class(const std::string& cls) {
+    if (std::find(classes.begin(), classes.end(), cls) != classes.end())
+        return;
+
+    classes.push_back(cls);
+    mark_style_dirty();
+}
+
+void element::remove_class(const std::string& cls) {
+    auto it = std::remove(classes.begin(), classes.end(), cls);
+    if (it != classes.end()) {
+        classes.erase(it, classes.end());
+        mark_style_dirty();
+    }
+}
+
+bool element::has_class(const std::string& cls) const {
+    return std::find(classes.begin(), classes.end(), cls) != classes.end();
+}
+
+void element::clear_classes() {
+    if (!classes.empty()) {
+        classes.clear();
+        mark_style_dirty();
+    }
+}
 
 void element::set_enable(bool b){
     m_enabled = b;
@@ -30,49 +64,15 @@ void element::get_requires(bgui::draw_data* calls) {
         }
     });
 }
-void bgui::element::apply_style(const bgui::style& resolved_style, input_state state) {
-    const auto& visual = resolved_style.visual;
-
-    // Background
-    color bg = visual.background.resolve(
-        state,
-        {0, 0, 0, 0}
-    );
-    m_material.set("bg_color", bg);
-
-    // Border
-    color border = visual.border.resolve(
-        state,
-        {0, 0, 0, 0}
-    );
-    m_material.set("border_color", border);
-
-    bool has_border = border[3] > 0.0f;
-    m_material.set("bordered", has_border);
-
-    m_material.set(
-        "border_radius",
-        visual.border_radius
-    );
-
-    // Text (if needed)
-    if ((*visual.text.normal)[3] != 0) {
-        color text = visual.text.resolve(
-            state,
-            {1, 1, 1, 1}
-        );
-        m_material.set("text_color", text);
-    }
-}
 
 void element::process_required_size(const bgui::vec2i& available) {
     // Step 1: resolve required size
     // padding removes available intern space
     auto resolve = [&](int vertical, float max) {
         int nvertical = vertical ? 0 : 1;
-        switch((*style.layout.size_mode)[vertical]) {
-            case bgui::mode::pixel:   return (*style.layout.size)[vertical];
-            case bgui::mode::percent: return max * (std::clamp((*style.layout.size)[vertical], 0.f, 100.f)/100.f);
+        switch(computed_style.layout.size_mode[vertical]) {
+            case bgui::mode::pixel:   return computed_style.layout.size[vertical];
+            case bgui::mode::percent: return max * (std::clamp(computed_style.layout.size[vertical], 0.f, 100.f)/100.f);
             case bgui::mode::match_parent: return max;
             case bgui::mode::wrap_content: return vertical ? content_height() : content_width();
             case bgui::mode::stretch: return max;
@@ -83,9 +83,9 @@ void element::process_required_size(const bgui::vec2i& available) {
     float w = resolve(0, available[0]);
     float h = resolve(1, available[1]);
 
-    if((*style.layout.size_mode)[0] == bgui::mode::same)
+    if(computed_style.layout.size_mode[0] == bgui::mode::same)
         w = h;
-    if((*style.layout.size_mode)[1] == bgui::mode::same)
+    if(computed_style.layout.size_mode[1] == bgui::mode::same)
         h = w;
 
     // Step 2: enforce min/max rules

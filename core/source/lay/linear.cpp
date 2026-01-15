@@ -5,8 +5,9 @@
 
 using namespace bgui;
 
-linear::linear(const orientation& ori) : m_orientation(ori) {
-    //m_visible = false;
+linear::linear(const orientation& ori) : m_orientation(ori), layout() {
+    style.visual.visible = false;
+    type = "linear";
 }
 
 void linear::on_update() {
@@ -16,26 +17,26 @@ void linear::on_update() {
     const int main = vertical ? 1 : 0;
     const int cross = vertical ? 0 : 1;
 
-    int pad_main_start  = vertical;// ? m_padding[1] : m_padding[0];
-    int pad_main_end    = vertical;// ? m_padding[3] : m_padding[2];
-    int pad_cross_start = vertical;// ? m_padding[0] : m_padding[1];
-    int pad_cross_end   = vertical;// ? m_padding[2] : m_padding[3];
+    int pad_main_start  = vertical ? computed_style.layout.padding[1] : computed_style.layout.padding[0];
+    int pad_main_end    = vertical ? computed_style.layout.padding[3] : computed_style.layout.padding[2];
+    int pad_cross_start = vertical ? computed_style.layout.padding[0] : computed_style.layout.padding[1];
+    int pad_cross_end   = vertical ? computed_style.layout.padding[2] : computed_style.layout.padding[3];
 
     vec2i available = processed_size();
-    available[0] -=0;// (m_padding[0] + m_padding[2]);
-    available[1] -=0;// (m_padding[1] + m_padding[3]);
+    available[0] -= (computed_style.layout.padding[0] + computed_style.layout.padding[2]);
+    available[1] -= (computed_style.layout.padding[1] + computed_style.layout.padding[3]);
 
     float fixed_main = 0.f;
     int stretch_count = 0;
 
     for (auto& elem : m_elements) {
-        auto mreq = mode::pixel;//elem->get_required_mode()[main];
+        auto mreq = elem->computed_style.layout.size_mode[main];
 
         if (mreq == mode::pixel || mreq == mode::wrap_content || mreq == mode::same) {
             elem->process_required_size(available);
-            fixed_main += elem->processed_size()[main];/*
-            fixed_main += elem->get_margin()[main];
-            fixed_main += elem->get_margin()[main + 2];*/
+            fixed_main += elem->processed_size()[main];
+            fixed_main += elem->computed_style.layout.margin[main];
+            fixed_main += elem->computed_style.layout.margin[main + 2];
         } else {
             stretch_count++;
         }
@@ -52,10 +53,10 @@ void linear::on_update() {
         vec2i final_available = elem->processed_size();
 
         for (int axis = 0; axis < 2; ++axis) {
-            auto req = mode::pixel;//elem->get_required_mode()[axis];
+            auto req = elem->computed_style.layout.size_mode[axis];
 
-            int margin_before = 0;//elem->get_margin()[axis];
-            int margin_after  = 0;//elem->get_margin()[axis + 2];
+            int margin_before = elem->computed_style.layout.margin[axis];
+            int margin_after  = elem->computed_style.layout.margin[axis + 2];
 
             int axis_available = available[axis] - margin_before - margin_after;
             axis_available = std::max(0, axis_available);
@@ -93,9 +94,9 @@ void linear::on_update() {
     int content_main = 0;
     for (auto& elem : m_elements) {
         if(!elem->is_enabled()) continue;
-        content_main += 0;//elem->get_margin()[main];
-        content_main += 0;//elem->processed_size()[main];
-        content_main += 0;//elem->get_margin()[main + 2];
+        content_main += elem->computed_style.layout.margin[main];
+        content_main += elem->processed_size()[main];
+        content_main += elem->computed_style.layout.margin[main + 2];
     }
 
     content_main += pad_main_start + pad_main_end;
@@ -105,7 +106,7 @@ void linear::on_update() {
 
     int cursor_main = pad_main_start;
 
-    switch (m_alignment) {
+    switch (style.layout.align) {
         case alignment::start:
             break;
         case alignment::center:
@@ -119,12 +120,12 @@ void linear::on_update() {
     for (auto& elem : m_elements) {
         if(!elem->is_enabled()) continue;
 
-        cursor_main += 0;//elem->get_margin()[main];
+        cursor_main += elem->computed_style.layout.margin[main];
 
-        int cross_pos = pad_cross_start;// + elem->get_margin()[cross];
+        int cross_pos = pad_cross_start + elem->computed_style.layout.margin[cross];
         int cross_size = elem->processed_size()[cross];
 
-        switch (m_cross_alignment) {
+        switch (computed_style.layout.cross_align) {
             case alignment::start:
                 break;
 
@@ -138,7 +139,7 @@ void linear::on_update() {
                 break;
 
             case alignment::end:
-                cross_pos = pad_cross_start + (available[cross] - cross_size);// - elem->get_margin()[cross + 2]);
+                cross_pos = pad_cross_start + ((available[cross] - cross_size) - elem->computed_style.layout.margin[cross + 2]);
                 break;
         }
 
@@ -159,7 +160,7 @@ void linear::on_update() {
         }
 
         cursor_main += elem->processed_size()[main];
-        cursor_main += 0;//elem->get_margin()[main + 2];
+        cursor_main += elem->computed_style.layout.margin[main + 2];
 
         elem->on_update();
     }
@@ -167,7 +168,7 @@ void linear::on_update() {
 
 float linear::content_height() {
     if (m_elements.empty()) {
-        return 0;//m_padding[1] + m_padding[3];
+        return computed_style.layout.padding[1] + computed_style.layout.padding[3];
     }
 
     const bool vertical = (m_orientation == orientation::vertical);
@@ -175,10 +176,10 @@ float linear::content_height() {
 
     for (auto& elem : m_elements) {
         if(!elem->is_enabled()) continue;
-        int h = elem->processed_height();/* 
+        int h = elem->processed_height()
         +
-                elem->get_margin()[1] +
-                elem->get_margin()[3];*/
+                elem->computed_style.layout.margin[1] +
+                elem->computed_style.layout.margin[3];
 
         if (vertical) {
             total += h;
@@ -187,14 +188,14 @@ float linear::content_height() {
         }
     }
 
-    total +=0;// m_padding[1] + m_padding[3];
+    total += computed_style.layout.padding[1] + computed_style.layout.padding[3];
 
     return static_cast<float>(total);
 }
 
 float bgui::linear::content_width() {
     if (m_elements.empty()) {
-        return 0;// m_padding[0] + m_padding[2];
+        return  computed_style.layout.padding[0] + computed_style.layout.padding[2];
     }
 
     const bool vertical = (m_orientation == orientation::vertical);
@@ -202,9 +203,9 @@ float bgui::linear::content_width() {
 
     for (auto& elem : m_elements) {
         if(!elem->is_enabled()) continue;
-        int w = elem->processed_width();/* +
-                elem->get_margin()[0] +
-                elem->get_margin()[2];*/
+        int w = elem->processed_width(); +
+                elem->computed_style.layout.margin[0] +
+                elem->computed_style.layout.margin[2];
 
         if (!vertical) {
             total_width += w;
@@ -213,7 +214,7 @@ float bgui::linear::content_width() {
         }
     }
 
-    total_width += 0;//m_padding[0] + m_padding[2];
+    total_width += computed_style.layout.padding[0] + computed_style.layout.padding[2];
 
     return static_cast<float>(total_width);
 }

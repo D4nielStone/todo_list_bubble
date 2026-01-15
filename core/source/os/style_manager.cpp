@@ -18,35 +18,34 @@ namespace bgui {
         m_ids[id] = s;
     }
 
-    style style_manager::resolve(
+    computed_style style_manager::resolve(
         const std::string& type,
         const std::vector<std::string>& classes,
         const std::string& id,
-        const std::optional<style>& inline_style
-    ) const {
-        style result = m_default;
+        const style& inline_style,
+        input_state state
+    ) {
+        computed_style out;
 
-        // type
+        // 1. type
         if (auto it = m_types.find(type); it != m_types.end())
-            merge(result, it->second);
+            merge(out, it->second, state);
 
-        // classes
-        for (const auto& cls : classes) {
-            if (auto it = m_classes.find(cls); it != m_classes.end())
-                merge(result, it->second);
+        // 2. classes
+        for (auto& c : classes) {
+            if (auto it = m_classes.find(c); it != m_classes.end())
+                merge(out, it->second, state);
         }
 
-        // ID
+        // 3. id
         if (!id.empty()) {
             if (auto it = m_ids.find(id); it != m_ids.end())
-                merge(result, it->second);
+                merge(out, it->second, state);
         }
 
-        // Inline
-        if (inline_style)
-            merge(result, *inline_style);
+        // 4. inline style
+        merge(out, inline_style, state);
 
-        return result;
+        return out;
     }
-
 }

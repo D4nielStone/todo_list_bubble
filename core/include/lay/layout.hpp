@@ -5,6 +5,7 @@
 
 #pragma once
 #include "elem/element.hpp"
+#include "os/style_manager.hpp"
 #include <algorithm>
 #include <queue>
 
@@ -16,11 +17,44 @@ namespace bgui {
         layout();
         ~layout() = default;
     
-        void apply_style(const bgui::style& resolved_style, input_state state) override {
-        element::apply_style(resolved_style, state);
-            for(auto& e: m_elements) e->apply_style(resolved_style, state);
-        };
-    
+        void mark_children_style_dirty() {
+            for (auto& elem : get_elements()) {
+                elem->mark_style_dirty();
+                
+                if (auto* lay = elem->as_layout()) {
+                    lay->mark_children_style_dirty();
+                }
+            }
+        }
+        void cascade_style() {
+            auto& sm = style_manager::get_instance();
+                // compute it' style
+                computed_style = sm.resolve(
+                    type,
+                    classes,
+                    id,
+                    style,
+                    m_state
+                );
+            
+            // compute children style
+            for (auto& elem : get_elements()) {
+                if (elem->is_style_dirty()) {
+                    elem->computed_style = sm.resolve(
+                        elem->type,
+                        elem->classes,
+                        elem->id,
+                        elem->style,
+                        elem->m_state
+                    );
+
+                    elem->clear_style_dirty();
+                    if(elem->as_layout()) {
+                        elem->as_layout()->cascade_style();
+                    }
+                }
+            }
+        }
         template<typename T, typename... Args>
         T& add(Args&&... args) {
             auto elem = std::make_unique<T>(std::forward<Args>(args)...);

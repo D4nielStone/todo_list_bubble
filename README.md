@@ -132,7 +132,7 @@ int main() {
     button2.require_width(bgui::mode::match_parent);
 
     // style must be applyed in the end
-    bgui::apply_style(bgui::dark_style);
+    bgui::cascade_style(bgui::dark_style);
 ```
 
 ## Back end

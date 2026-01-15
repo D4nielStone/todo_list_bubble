@@ -9,13 +9,11 @@ namespace bgui {
     private:
         std::string m_buffer;
         std::string m_font_name;
-        alignment m_self_alignment;
         float m_scale;
         bgui::font m_font;
     public:
         text(const std::string& buffer, float scale);
         ~text();
-        void set_alignment(const alignment& align) { m_self_alignment = align; };
         // sets to this text the font with `name`.
         void set_font(const std::string& name);
         void on_update() override;

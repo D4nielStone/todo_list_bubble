@@ -4,6 +4,7 @@
 using namespace bgui;
 
 layout::layout() : element() {
+    type = "layout";
     style.visual.visible = false;
     recives_input(false);
 };

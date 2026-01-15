@@ -3,16 +3,19 @@
 #include "enums.hpp"
 #include "vec.hpp"
 #include <optional>
+#include <climits>
 
 namespace bgui {
     struct layout_style {
-        std::optional<vec<2, mode>> size_mode = vec<2, mode>{mode::pixel, mode::pixel};
-        std::optional<vec4i> margin = vec4i{0, 0, 0, 0};
-        std::optional<vec4i> padding = vec4i{0, 0, 0, 0};
-        std::optional<vec2i> limit_min = vec2i{20, 20};
-        std::optional<vec2i> limit_max = vec2i{INT_MAX, INT_MAX};
-        std::optional<vec2> size = vec2{0.f, 0.f};
-        std::optional<alignment> align {alignment::start};
+        std::optional<vec<2, mode>> size_mode;
+        std::optional<vec4i> margin;
+        std::optional<vec4i> padding;
+        std::optional<vec2i> limit_min;
+        std::optional<vec2i> limit_max;
+        std::optional<vec2> size;
+        std::optional<alignment> align;
+        std::optional<alignment> cross_align;
+        std::optional<orientation> ori;
 
 
         void set_padding(int a, int b) {
@@ -51,10 +54,11 @@ namespace bgui {
         state_color border;
         state_color text;
 
-        float border_radius = 0.0f;
-        std::string font = "default";
-        bool visible     = true;
+        std::optional<float> border_radius;
+        std::optional<std::string> font;
+        std::optional<bool> visible;
     };
+
     // \brief Style structure that contains visual and layout styles
     struct style {
         // Layout style parameters
@@ -62,4 +66,31 @@ namespace bgui {
         // Visual style parameters
         visual_style visual;
     };
+    struct computed_layout_style {
+        vec<2, mode> size_mode {mode::pixel, mode::pixel};
+        vec2 size {0.f};
+        vec2i limit_min {20};
+        vec2i limit_max {INT_MAX};
+        vec4i padding {0};
+        vec4i margin {0};
+        alignment align {alignment::start};
+        alignment cross_align {alignment::start};
+        orientation ori {orientation::horizontal};
+    };
+
+    struct computed_visual_style {
+        color background {0.f};
+        color border {0.f};
+        color text {1.f};
+
+        std::string font = "default";
+        float border_radius {0.f};
+        bool visible {true};
+    };
+
+    struct computed_style {
+        computed_layout_style layout;
+        computed_visual_style visual;
+    };
+
 } // namespace bgui

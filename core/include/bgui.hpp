@@ -27,18 +27,18 @@
 #endif
 
 namespace bgui {
-    extern std::unique_ptr<layout> m_main_layout;
+    extern std::unique_ptr<layout> s_main_layout;
 
     template<typename T, typename... Args>
     T& set_layout(Args&&... args) {
-        m_main_layout = std::make_unique<T>(std::forward<Args>(args)...);
-        static_assert(std::is_base_of<layout, T>::value, "BGUI::the class T must be a layout type.");
-        return static_cast<T&>(*m_main_layout);
+        s_main_layout = std::make_unique<T>(std::forward<Args>(args)...);
+        static_assert(std::is_base_of<layout, T>::value, "[BGUI] the class T must be a layout type.");
+        return static_cast<T&>(*s_main_layout);
     }
 
     void add_function(const std::function<void()>& f);
     layout& get_layout();
-    void apply_style(const bgui::style& gui_style);
+    void cascade_style();
     bgui::draw_data* get_draw_data();
     void set_up();
     bool shutdown_lib();

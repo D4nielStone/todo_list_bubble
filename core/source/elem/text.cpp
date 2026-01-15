@@ -31,6 +31,7 @@ std::u32string utf8_to_utf32(const std::string& str) {
 
 bgui::text::text(const std::string &buffer, float scale) : m_buffer(buffer),
     m_font_name("Arial CE-Bold#40"), m_scale(scale) {
+    type = "text";
     set_font(m_font_name);
     m_material.m_use_tex = true;
     m_material.m_shader_tag = "ui::text";
@@ -105,7 +106,7 @@ void bgui::text::get_requires(bgui::draw_data* data) {
         const auto& ch = it->second;
 
         int originx = processed_x();
-        switch(m_self_alignment) {
+        switch(style.layout.align.value()) {
             case bgui::alignment::start:
                 originx = processed_x();
                 break;

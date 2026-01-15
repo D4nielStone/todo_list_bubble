@@ -3,13 +3,16 @@
 #include "bgui.hpp"
 #include <iostream>
 
-bgui::button::button(const std::string &name, const float scale, const std::function<void()> &f) : 
-    m_label(&add<text>(name, scale)), m_function(f), linear(bgui::orientation::horizontal) {
-    (*style.visual.background.normal)[3] = 0;
-    m_label->recives_input(false);
+bgui::button::button(const std::string& name,
+                     float scale,
+                     const std::function<void()>& f)
+    : m_label(&add<text>(name, scale)),
+      m_function(f),
+      linear(bgui::orientation::horizontal)
+{
+    type = "button";
     recives_input(true);
-    style.layout.require_width(mode::wrap_content);
-    style.layout.require_height(mode::wrap_content);
+    m_label->recives_input(false);
 }
 
 bgui::button::~button() {

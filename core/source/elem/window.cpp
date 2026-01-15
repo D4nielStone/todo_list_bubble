@@ -2,6 +2,7 @@
 #include "elem/button.hpp"
 
 bgui::window::window(const char* title) : linear(bgui::orientation::vertical), m_title(nullptr), m_header(nullptr) {
+    type = "window";
     // window widget experiment
     //TODO:: add parse init config for window
     set_position(20, 20);
@@ -17,7 +18,7 @@ bgui::window::window(const char* title) : linear(bgui::orientation::vertical), m
     m_header->add<bgui::button>(" V ", 0.35f, [](){});
     m_title = &m_header->add<bgui::text>(title, 0.35f);
     m_title->style.layout.require_width(bgui::mode::stretch);
-    m_title->set_alignment(bgui::alignment::center);
+    m_title->style.layout.align = bgui::alignment::center;
     // TODO: switch to image button later
     m_header->add<bgui::button>(" X ", 0.35f, [this](){
         m_parent->remove(this);

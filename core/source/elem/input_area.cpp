@@ -4,6 +4,7 @@
 
 bgui::input_area::input_area(const std::string& buffer, const float scale, const std::string& placeholder) :
     linear(), m_placeholder(placeholder) {
+    type = "inputarea";
     /*m_visible = true;
     recives_input(true);
     set_margin(10, 2);
@@ -42,11 +43,9 @@ bgui::text& bgui::input_area::get_label() {
 void bgui::input_area::on_update() {
     if(m_input_buffer.empty()) {
         m_text->set_buffer(m_placeholder);
-        m_text->get_material().set("text_color", color{0.5, 0.5, 0.5, 1});
     }
     else {
         m_text->set_buffer(m_input_buffer);
-        //m_text->get_material().set("text_color", m_style.m_text_color);
     }
     linear::on_update();
 }

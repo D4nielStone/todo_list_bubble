@@ -3,9 +3,11 @@
 #include "os/os.hpp"
 
 bgui::checkbox::checkbox(bool* ref, bool actv, const std::string& title, const float scale) : m_ref(ref), m_active(actv), linear(bgui::orientation::horizontal) {
-    //m_visible = true;
+
+    type = "checkbox";
+    style.visual.visible = true;
     recives_input(true);
-    set_cross_alignment(alignment::center);
+    style.layout.cross_align = (alignment::center);
 
     // box should be a button
     auto& box = add<bgui::element>();
@@ -13,8 +15,8 @@ bgui::checkbox::checkbox(bool* ref, bool actv, const std::string& title, const f
         auto& txt = add<text>(title, scale);
         label = &txt;
         txt.recives_input(false);
-        //txt.require_width(mode::stretch);
-        txt.set_alignment(alignment::end);
+        txt.style.layout.require_width(mode::stretch);
+        txt.style.layout.align = alignment::end;
     }
     
     box.recives_input(false);
@@ -33,18 +35,18 @@ bgui::checkbox::checkbox(const std::string& title, const float scale, const bool
     if(title.empty() == false) {
         auto& txt = add<text>(title, scale);
         label = &txt;
-        /*txt.set_margin(0, 2);
+        txt.style.layout.margin = {0, 2};
         txt.recives_input(false);
-        txt.require_width(mode::stretch);
-        txt.set_alignment(alignment::end);*/
+        txt.style.layout.require_width(mode::stretch);
+        txt.style.layout.align = alignment::end;
     }
     
     box.recives_input(false);
-    /*require_width(mode::match_parent);
-    require_height(mode::wrap_content);
-    box.set_margin(10, 10);
-    box.require_height(mode::match_parent);
-    box.require_width(mode::same);*/
+    style.layout.require_width(mode::match_parent);
+    style.layout.require_height(mode::wrap_content);
+    box.style.layout.margin = {10, 10};
+    box.style.layout.require_height(mode::match_parent);
+    box.style.layout.require_width(mode::same);
 }
 
 void bgui::checkbox::on_clicked() {
@@ -73,11 +75,8 @@ void bgui::checkbox::on_update() {
     m_active_color[3] = m_active ? 1.f : 0.f;
     auto bc = m_active_color/2;
     bc[3] = 1.f;
-
-    //get_material().set("bg_color", style.m_cb_color);
-    //get_material().set("border_color", style.m_cb_border_color);
-    get_elements()[0]->get_material().set("bg_color", m_active_color);
-    get_elements()[0]->get_material().set("border_color", bc);
+    get_elements()[0]->style.visual.background.normal = m_active_color;
+    get_elements()[0]->style.visual.border.normal = bc;
 }
 
 bgui::text& bgui::checkbox::get_label() {

@@ -1,50 +1,77 @@
 #include "bgui.hpp"
 #include "os/os.hpp"
+#include "os/style_manager.hpp"
 #include <utils/vec.hpp>
 #include <stdexcept>
 #include <iostream>
 
 static bool init_trigger = false;
-std::unique_ptr<bgui::layout> bgui::m_main_layout;
-static std::unique_ptr<bgui::draw_data> m_draw_data;
-bgui::style m_style;
+static bool style_trigger = false;
+std::unique_ptr<bgui::layout> bgui::s_main_layout;
+static std::unique_ptr<bgui::draw_data> s_draw_data;
 static std::queue<std::function<void()>> s_functions;
 
 bgui::layout& bgui::get_layout() {
-    if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
-    return *bgui::m_main_layout;
+    if(!init_trigger) throw std::runtime_error("[BGUI] You must initialize the library.");
+    return *s_main_layout;
 }
 
 void bgui::set_up() {
+    std::cout << "[BGUI] Setting-up the library.";
     init_trigger = true;
-    if(!m_main_layout)
+    // Create the default layout
+    if(!s_main_layout)
         set_layout<bgui::layout>();
-    if(!m_draw_data)
-        m_draw_data = std::make_unique<bgui::draw_data>();
-
-    // apply default style
-    //TODO: Create a style manager
-    //m_style = bgui::dark_style;
-    m_main_layout->apply_style(m_style, bgui::input_state::normal);
+    // Create draw data structure
+    if(!s_draw_data)
+        s_draw_data = std::make_unique<bgui::draw_data>();
 }
 
-void bgui::apply_style(const bgui::style& gui_style) {
-    if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
-    // set the style and update params recursively accordingly
-    m_style = gui_style;
+void bgui::cascade_style() {
+    if(!init_trigger) throw std::runtime_error("[BGUI] You must initialize the library.");
+    style_trigger = true;
 
-    m_main_layout->apply_style(m_style, bgui::input_state::normal);
+    std::cout << "[BGUI] Setting-up the default style.";
+
+    // setup and apply the default style
+    auto& sm = style_manager::get_instance();
+
+    // ---------- DEFAULT ----------
+    bgui::style base;
+    base.visual.background.normal = bgui::color{0.15f, 0.15f, 0.15f, 1.f};
+    base.visual.text.normal       = bgui::color{1.f, 1.f, 1.f, 1.f};
+    sm.set_default(base);
+
+    // ---------- PANEL ----------
+    bgui::style panel_style;
+    panel_style.layout.padding = bgui::vec4i{10,10,10,10};
+    panel_style.visual.visible = true;
+    sm.set_type("linear", panel_style);
+
+    // ---------- BUTTON ----------
+    bgui::style button;
+    button.visual.background.normal = bgui::color{0.2f,0.4f,0.8f,1.f};
+    button.visual.background.hover  = bgui::color{0.3f,0.5f,0.9f,1.f};
+    button.visual.border_radius     = 6.f;
+    sm.set_type("button", button);
+
+    // ---------- PRIMARY ----------
+    bgui::style primary;
+    primary.visual.background.normal = bgui::color{0.8f,0.2f,0.2f,1.f};
+    sm.set_class("primary", primary);
+
+    s_main_layout->cascade_style();
 }
 
 bgui::draw_data* bgui::get_draw_data() {
-    if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
-    return m_draw_data.get();
+    if(!init_trigger) throw std::runtime_error("[BGUI] You must initialize the library.");
+    return s_draw_data.get();
 }
 bool bgui::shutdown_lib() {
-    if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
+    if(!init_trigger) throw std::runtime_error("[BGUI] You must initialize the library.");
     init_trigger = false;
-    bgui::m_main_layout.reset();
-    m_draw_data.reset();
+    bgui::s_main_layout.reset();
+    s_draw_data.reset();
     return true;
 }
 
@@ -119,12 +146,14 @@ bool update_inputs(bgui::layout &lay){
 }
 // Updates the main layout
 void bgui::on_update() {
-    if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
+    if(!init_trigger) throw std::runtime_error("[BGUI] You must initialize the library.");
+    if(!style_trigger) throw std::runtime_error("[BGUI] You must compute the style.");
+
     bgui::vec2i w_size = bgui::get_context_size();
 
     // the main layout must to be resized based on the window size by default.
-    bgui::m_main_layout->style.layout.require_height(bgui::mode::match_parent);
-    bgui::m_main_layout->style.layout.require_width(bgui::mode::match_parent);
+    bgui::s_main_layout->style.layout.require_height(bgui::mode::match_parent);
+    bgui::s_main_layout->style.layout.require_width(bgui::mode::match_parent);
     
     while(!s_functions.empty()) {
         auto& f = s_functions.front();
@@ -134,22 +163,22 @@ void bgui::on_update() {
 
     // update main layout and inputs
     get_context().m_actual_cursor = cursor::arrow;
-    bgui::m_main_layout->process_required_size(w_size);
-    bgui::m_main_layout->on_update();
+    bgui::s_main_layout->process_required_size(w_size);
+    bgui::s_main_layout->on_update();
 
     // reset cursor
 
-    update_inputs(*bgui::m_main_layout);
+    update_inputs(*bgui::s_main_layout);
 
     bgui::get_context().m_last_mouse_left = bgui::get_pressed(bgui::input_key::mouse_left);
     bgui::get_context().m_last_mouse_pos = bgui::get_mouse_position();
 
     // get new requires
     if(!get_draw_data()->m_quad_requires.empty()) std::cout << "[BGUI] Warning: draw data not empty at beginning of frame.\nMake sure you are resetting draw data each frame.\n";
-    bgui::m_main_layout->get_requires(get_draw_data());
+    bgui::s_main_layout->get_requires(get_draw_data());
 }
 
 void bgui::add_function(const std::function<void()>& f) {
-    if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
+    if(!init_trigger) throw std::runtime_error("[BGUI] You must initialize the library.");
     s_functions.push(f);
 }
