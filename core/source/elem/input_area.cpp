@@ -54,6 +54,3 @@ void bgui::input_area::on_update() {
 void bgui::input_area::get_requires(bgui::draw_data* data) {
     linear::get_requires(data);
 }
-void bgui::input_area::apply_style(const bgui::style& t) {
-    linear::apply_style(t);
-}

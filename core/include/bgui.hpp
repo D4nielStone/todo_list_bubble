@@ -39,7 +39,6 @@ namespace bgui {
     void add_function(const std::function<void()>& f);
     layout& get_layout();
     void apply_style(const bgui::style& gui_style);
-    bgui::style& get_style();
     bgui::draw_data* get_draw_data();
     void set_up();
     bool shutdown_lib();

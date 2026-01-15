@@ -21,9 +21,11 @@ void bgui::set_up() {
         set_layout<bgui::layout>();
     if(!m_draw_data)
         m_draw_data = std::make_unique<bgui::draw_data>();
+
     // apply default style
-    m_style = bgui::dark_style;
-    m_main_layout->apply_style(m_style);
+    //TODO: Create a style manager
+    //m_style = bgui::dark_style;
+    m_main_layout->apply_style(m_style, bgui::input_state::normal);
 }
 
 void bgui::apply_style(const bgui::style& gui_style) {
@@ -31,13 +33,9 @@ void bgui::apply_style(const bgui::style& gui_style) {
     // set the style and update params recursively accordingly
     m_style = gui_style;
 
-    m_main_layout->apply_style(m_style);
+    m_main_layout->apply_style(m_style, bgui::input_state::normal);
 }
 
-bgui::style& bgui::get_style() {
-    if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
-    return m_style;
-}
 bgui::draw_data* bgui::get_draw_data() {
     if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
     return m_draw_data.get();
@@ -123,9 +121,10 @@ bool update_inputs(bgui::layout &lay){
 void bgui::on_update() {
     if(!init_trigger) throw std::runtime_error("BGUI::You must initialize the library.");
     bgui::vec2i w_size = bgui::get_context_size();
+
     // the main layout must to be resized based on the window size by default.
-    /*bgui::m_main_layout->require_height(bgui::mode::match_parent);
-    bgui::m_main_layout->require_width(bgui::mode::match_parent);*/
+    bgui::m_main_layout->style.layout.require_height(bgui::mode::match_parent);
+    bgui::m_main_layout->style.layout.require_width(bgui::mode::match_parent);
     
     while(!s_functions.empty()) {
         auto& f = s_functions.front();

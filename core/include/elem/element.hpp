@@ -26,6 +26,10 @@ namespace bgui {
         bool m_enabled {true};
         // Pointer to the parent layout in the UI hierarchy. Not directly style, but crucial for layout calculation.
         layout* m_parent {nullptr};
+        
+        // The input state of the element
+        input_state m_state;
+        //TODO: remove material or change its responsabilities
         // The graphical material (shader, colors, textures) used for rendering the element.
         material m_material;
         // Flag indicating if the element should process mouse/keyboard input. Not strictly style, but related to interaction.
@@ -70,9 +74,10 @@ namespace bgui {
         // Core Style Application
         /**
          * @brief Applies a given style object to the element, updating material properties.
-         * @param style The style object to apply.
+         * \param resolved_style The style to apply.
+         * \param state The current input state of the element.
          */
-        virtual void apply_style(const style& style);
+        virtual void apply_style(const style& resolved_style, input_state state);
 
         /**
          * @brief Getter to enable user to edit elemnt's local style.
@@ -117,6 +122,7 @@ namespace bgui {
          * @return The Y coordinate in pixels.
          */
         int processed_y()     const { return m_rect[1]; }
+
         
         /**
          * @brief Gets the final computed width of the element.
@@ -217,7 +223,9 @@ namespace bgui {
         /**
          * @brief Callback invoked when the element is initially pressed (mouse down).
          */
-        virtual void on_pressed() {};
+        virtual void on_pressed() {
+            m_state = input_state::pressed;
+        };
 
         /**
          * @brief Callback invoked when the mouse is moved while pressed over the element.
@@ -228,23 +236,31 @@ namespace bgui {
         /**
          * @brief Callback invoked when the element is clicked (pressed and released).
          */
-        virtual void on_clicked() {};
+        virtual void on_clicked() {
+            m_state = input_state::pressed;
+        };
 
         /**
          * @brief Callback invoked when the press is released (mouse up).
          */
-        virtual void on_released() {};
+        virtual void on_released() {
+            m_state = input_state::normal;
+        };
 
         /**
          * @brief Callback invoked when the mouse cursor hovers over the element.
          */
-        virtual void on_mouse_hover() {};
+        virtual void on_mouse_hover() {
+            m_state = input_state::hover;
+        };
 
         /**
          * @brief Gets the minimum required size for the element's content.
          * @return A vec2i representing the content size. Defaults to get_min_size().
          */
-        virtual vec2i get_content_size() {return vec2i{style.limit.z, style.limit.w}; }
+        virtual vec2i get_content_size() {
+            return vec2i{(*style.layout.limit_min)[0], (*style.layout.limit_min)[1]}; 
+        }
 
         /**
          * @brief Collects draw calls required to render this element.

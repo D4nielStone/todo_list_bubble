@@ -44,6 +44,8 @@ int main() {
     auto& button2 = context.add<bgui::button>("Button inside window", 0.35f, [](){});
     button2.style.layout.require_width(bgui::mode::match_parent);
 
+    bgui::apply_style({}); // apply default style
+
     while (!glfwWindowShouldClose(window)) {
         bgui::glfw_update(bgui::get_context());           // update events
         bgui::on_update();                 // update layout

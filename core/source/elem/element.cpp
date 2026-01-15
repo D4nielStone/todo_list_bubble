@@ -30,23 +30,49 @@ void element::get_requires(bgui::draw_data* calls) {
         }
     });
 }
-void bgui::element::apply_style(const style & style) {
-    /*m_style = style;
-    m_material.set("bg_color", m_style.m_box_color);
-    m_material.set("bordered", (bool)m_style.m_box_color[3]);
-    m_material.set("border_radius", 2.f);
-    m_material.set("border_size", 1.f);
-    m_material.set("border_color", m_style.m_button_border_color);*/
+void bgui::element::apply_style(const bgui::style& resolved_style, input_state state) {
+    const auto& visual = resolved_style.visual;
+
+    // Background
+    color bg = visual.background.resolve(
+        state,
+        {0, 0, 0, 0}
+    );
+    m_material.set("bg_color", bg);
+
+    // Border
+    color border = visual.border.resolve(
+        state,
+        {0, 0, 0, 0}
+    );
+    m_material.set("border_color", border);
+
+    bool has_border = border[3] > 0.0f;
+    m_material.set("bordered", has_border);
+
+    m_material.set(
+        "border_radius",
+        visual.border_radius
+    );
+
+    // Text (if needed)
+    if ((*visual.text.normal)[3] != 0) {
+        color text = visual.text.resolve(
+            state,
+            {1, 1, 1, 1}
+        );
+        m_material.set("text_color", text);
+    }
 }
 
 void element::process_required_size(const bgui::vec2i& available) {
     // Step 1: resolve required size
     // padding removes available intern space
-    /*auto resolve = [&](int vertical, float max) {
+    auto resolve = [&](int vertical, float max) {
         int nvertical = vertical ? 0 : 1;
-        switch(m_required_mode[vertical]) {
-            case bgui::mode::pixel:   return m_required_size[vertical];
-            case bgui::mode::percent: return max * (std::clamp(m_required_size[vertical], 0.f, 100.f)/100.f);
+        switch((*style.layout.size_mode)[vertical]) {
+            case bgui::mode::pixel:   return (*style.layout.size)[vertical];
+            case bgui::mode::percent: return max * (std::clamp((*style.layout.size)[vertical], 0.f, 100.f)/100.f);
             case bgui::mode::match_parent: return max;
             case bgui::mode::wrap_content: return vertical ? content_height() : content_width();
             case bgui::mode::stretch: return max;
@@ -57,14 +83,14 @@ void element::process_required_size(const bgui::vec2i& available) {
     float w = resolve(0, available[0]);
     float h = resolve(1, available[1]);
 
-    if(m_required_mode[0] == bgui::mode::same)
+    if((*style.layout.size_mode)[0] == bgui::mode::same)
         w = h;
-    if(m_required_mode[1] == bgui::mode::same)
+    if((*style.layout.size_mode)[1] == bgui::mode::same)
         h = w;
 
     // Step 2: enforce min/max rules
-    w = std::clamp((int)w, m_min_size[0], m_max_size[0]);
-    h = std::clamp((int)h, m_min_size[1], m_max_size[1]);
+    w = std::clamp((int)w, (*style.layout.limit_min)[0], (*style.layout.limit_max)[0]);
+    h = std::clamp((int)h, (*style.layout.limit_min)[1], (*style.layout.limit_max)[1]);
 
-    m_rect = { m_rect[0], m_rect[1], static_cast<int>(w), static_cast<int>(h) };*/
+    m_rect = { m_rect[0], m_rect[1], static_cast<int>(w), static_cast<int>(h) };
 }

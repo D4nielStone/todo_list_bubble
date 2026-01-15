@@ -18,11 +18,11 @@ bgui::checkbox::checkbox(bool* ref, bool actv, const std::string& title, const f
     }
     
     box.recives_input(false);
-    /*require_width(mode::match_parent);
-    require_height(mode::wrap_content);
-    box.set_margin(5, 5);
-    box.require_height(mode::match_parent);
-    box.require_width(mode::same);*/
+    style.layout.require_width(mode::match_parent);
+    style.layout.require_height(mode::wrap_content);
+    box.style.layout.margin = {5, 5};
+    box.style.layout.require_height(mode::match_parent);
+    box.style.layout.require_width(mode::same);
 }
 bgui::checkbox::checkbox(const std::string& title, const float scale, const bool actv) : m_ref(nullptr), m_active(actv), linear(bgui::orientation::horizontal) {
     //m_visible = true;
@@ -74,8 +74,8 @@ void bgui::checkbox::on_update() {
     auto bc = m_active_color/2;
     bc[3] = 1.f;
 
-    //get_material().set("bg_color", get_style().m_cb_color);
-    //get_material().set("border_color", get_style().m_cb_border_color);
+    //get_material().set("bg_color", style.m_cb_color);
+    //get_material().set("border_color", style.m_cb_border_color);
     get_elements()[0]->get_material().set("bg_color", m_active_color);
     get_elements()[0]->get_material().set("border_color", bc);
 }
