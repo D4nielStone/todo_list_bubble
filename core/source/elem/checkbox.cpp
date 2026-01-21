@@ -72,9 +72,9 @@ void bgui::checkbox::on_mouse_hover() {
 
 void bgui::checkbox::on_update() {
     linear::on_update();
-    m_active_color[3] = m_active ? 1.f : 0.f;
+    m_active_color.w = m_active ? 1.f : 0.f;
     auto bc = m_active_color/2;
-    bc[3] = 1.f;
+    bc.w = 1.f;
     get_elements()[0]->style.visual.background.normal = m_active_color;
     get_elements()[0]->style.visual.border.normal = bc;
 }
