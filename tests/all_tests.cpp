@@ -41,7 +41,7 @@ TEST(ElementTest, FinalRectManipulation) {
 
     EXPECT_EQ(elem.processed_position()[0], 10);
     EXPECT_EQ(elem.processed_size()[1], 50);
-    EXPECT_EQ(elem.processed_rect()[3], 50); // height
+    EXPECT_EQ(elem.processed_rect().w, 50); // height
 
     elem.set_position(5, 15);
     EXPECT_EQ(elem.processed_x(), 5);
@@ -539,4 +539,439 @@ TEST(StyleVisualTest, StyleManagerSingleton) {
     auto& sm2 = bgui::style_manager::get_instance();
 
     EXPECT_EQ(&sm1, &sm2);
+}
+
+// Test: Basic class style application
+TEST(DeclarativeStyleTest, ApplyClassStyle) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    // Define a class style
+    style button_style;
+    button_style.layout.require_size(100.f, 40.f);
+    button_style.visual.background.normal = {0.2f, 0.4f, 0.8f, 1.f};
+    sm.set_class("button", button_style);
+    
+    // Create element with class
+    element elem;
+    elem.classes = {"button"};
+    elem.compute_style();
+    
+    EXPECT_FLOAT_EQ(elem.computed_style.layout.size[0], 100.f);
+    EXPECT_FLOAT_EQ(elem.computed_style.layout.size[1], 40.f);
+    EXPECT_FLOAT_EQ(elem.computed_style.visual.background.b, 0.8f);
+}
+
+// Test: Multiple classes cascade
+TEST(DeclarativeStyleTest, MultipleClassesCascade) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    style base_style;
+    base_style.layout.require_width(mode::pixel, 200.f);
+    base_style.visual.background.normal = {0.5f, 0.5f, 0.5f, 1.f};
+    sm.set_class("base", base_style);
+    
+    style highlight_style;
+    highlight_style.visual.background.normal = {1.f, 1.f, 0.f, 1.f}; // yellow
+    sm.set_class("highlight", highlight_style);
+    
+    element elem;
+    elem.classes = {"base", "highlight"};
+    elem.compute_style();
+    
+    // Should have width from base, but color from highlight (later override)
+    EXPECT_FLOAT_EQ(elem.computed_style.layout.size[0], 200.f);
+    EXPECT_FLOAT_EQ(elem.computed_style.visual.background.g, 1.f);
+    EXPECT_FLOAT_EQ(elem.computed_style.visual.background.b, 0.f);
+}
+
+// Test: ID style has higher priority than class
+TEST(DeclarativeStyleTest, IDOverridesClass) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    style class_style;
+    class_style.layout.require_height(mode::pixel, 50.f);
+    sm.set_class("normal", class_style);
+    
+    style id_style;
+    id_style.layout.require_height(mode::pixel, 100.f);
+    sm.set_id("special", id_style);
+    
+    element elem;
+    elem.classes = {"normal"};
+    elem.id = ("special");
+    elem.compute_style();
+    
+    // ID should override class
+    EXPECT_FLOAT_EQ(elem.computed_style.layout.size[1], 100.f);
+}
+
+// Test: Inline style has highest priority
+TEST(DeclarativeStyleTest, InlineOverridesAll) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    style class_style;
+    class_style.visual.background.normal = {1.f, 0.f, 0.f, 1.f}; // red
+    sm.set_class("themed", class_style);
+    
+    element elem;
+    elem.classes = {"themed"};
+    elem.style.visual.background.normal = {0.f, 1.f, 0.f, 1.f}; // green inline
+    elem.compute_style();
+    
+    // Inline should win
+    EXPECT_FLOAT_EQ(elem.computed_style.visual.background.r, 0.f);
+    EXPECT_FLOAT_EQ(elem.computed_style.visual.background.g, 1.f);
+}
+
+// Test: Type-based styles
+TEST(DeclarativeStyleTest, TypeStyleApplication) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    style button_type_style;
+    button_type_style.layout.require_size(120.f, 40.f);
+    button_type_style.visual.border_radius = 8.f;
+    sm.set_type("button", button_type_style);
+    
+    element elem;
+    elem.type = ("button");
+    elem.compute_style();
+    
+    EXPECT_FLOAT_EQ(elem.computed_style.layout.size[0], 120.f);
+    EXPECT_FLOAT_EQ(elem.computed_style.visual.border_radius, 8.f);
+}
+
+// Test: Default style applies to all elements
+TEST(DeclarativeStyleTest, DefaultStyleApplication) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    style default_style;
+    default_style.visual.font = std::make_optional("Arial");
+    default_style.visual.text.normal = {0.9f, 0.9f, 0.9f, 1.f};
+    sm.set_default(default_style);
+    
+    element elem;
+    elem.compute_style();
+    
+    EXPECT_EQ(elem.computed_style.visual.font, "Arial");
+    EXPECT_FLOAT_EQ(elem.computed_style.visual.text.r, 0.9f);
+}
+
+// Test: Cascade priority order (default < type < class < id < inline)
+TEST(DeclarativeStyleTest, CompleteCascadePriority) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    style default_style;
+    default_style.layout.require_width(mode::pixel, 50.f);
+    sm.set_default(default_style);
+    
+    style type_style;
+    type_style.layout.require_width(mode::pixel, 100.f);
+    sm.set_type("widget", type_style);
+    
+    style class_style;
+    class_style.layout.require_width(mode::pixel, 150.f);
+    sm.set_class("large", class_style);
+    
+    style id_style;
+    id_style.layout.require_width(mode::pixel, 200.f);
+    sm.set_id("mega", id_style);
+    
+    element elem;
+    elem.type = ("widget");
+    elem.classes = {"large"};
+    elem.id = ("mega");
+    elem.style.layout.require_width(mode::pixel, 300.f); // inline
+    elem.compute_style();
+    
+    // Inline should win (highest priority)
+    EXPECT_FLOAT_EQ(elem.computed_style.layout.size[0], 300.f);
+    
+    // Test without inline
+    element elem2;
+    elem2.type = ("widget");
+    elem2.classes = {"large"};
+    elem2.id = ("mega");
+    elem2.compute_style();
+    
+    // ID should win
+    EXPECT_FLOAT_EQ(elem2.computed_style.layout.size[0], 200.f);
+}
+
+// Test: Theme application
+TEST(DeclarativeStyleTest, ThemeApplication) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    theme dark_theme;
+    dark_theme.base.visual.background.normal = {0.1f, 0.1f, 0.1f, 1.f};
+    dark_theme.base.visual.text.normal = {0.9f, 0.9f, 0.9f, 1.f};
+    
+    style dark_button;
+    dark_button.visual.background.normal = {0.2f, 0.2f, 0.3f, 1.f};
+    dark_theme.types["button"] = dark_button;
+    
+    style primary_class;
+    primary_class.visual.background.normal = {0.2f, 0.4f, 0.9f, 1.f};
+    dark_theme.classes["primary"] = primary_class;
+    
+    sm.apply_theme(dark_theme);
+    
+    element elem;
+    elem.type = ("button");
+    elem.classes = {"primary"};
+    elem.compute_style();
+    
+    // Should have primary color (class overrides type)
+    EXPECT_FLOAT_EQ(elem.computed_style.visual.background.b, 0.9f);
+    
+    // Text should come from base theme
+    EXPECT_FLOAT_EQ(elem.computed_style.visual.text.r, 0.9f);
+}
+
+// Test: Class removal and recomputation
+TEST(DeclarativeStyleTest, ClassRemovalRecomputation) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    style active_style;
+    active_style.visual.background.normal = {0.f, 1.f, 0.f, 1.f};
+    sm.set_class("active", active_style);
+    
+    element elem;
+    elem.classes = {"active"};
+    elem.compute_style();
+    
+    EXPECT_FLOAT_EQ(elem.computed_style.visual.background.g, 1.f);
+    
+    // Remove class and recompute
+    elem.remove_class("active");
+    elem.compute_style();
+    
+    // Should revert to default (no green)
+    EXPECT_NE(elem.computed_style.visual.background.g, 1.f);
+}
+
+// Test: Pseudo-class states (hover, active, disabled)
+TEST(DeclarativeStyleTest, InputStateResolution) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    style button_style;
+    button_style.visual.background.normal = {0.5f, 0.5f, 0.5f, 1.f};
+    button_style.visual.background.hover = {0.7f, 0.7f, 0.7f, 1.f};
+    button_style.visual.background.pressed = {0.3f, 0.3f, 0.3f, 1.f};
+    sm.set_class("button", button_style);
+    
+    element elem;
+    elem.classes = {"button"};
+    
+    // Normal state
+    elem.set_input_state(input_state::normal);
+    elem.compute_style();
+    EXPECT_FLOAT_EQ(elem.computed_style.visual.background.r, 0.5f);
+    
+    // Hover state
+    elem.set_input_state(input_state::hover);
+    elem.compute_style();
+    EXPECT_FLOAT_EQ(elem.computed_style.visual.background.r, 0.7f);
+    
+    // Active state
+    elem.set_input_state(input_state::pressed);
+    elem.compute_style();
+    EXPECT_FLOAT_EQ(elem.computed_style.visual.background.r, 0.3f);
+}
+
+// Test: Layout in vertical with declarative classes
+TEST(DeclarativeStyleTest, LayoutWithDeclarativeClasses) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    style sidebar_style;
+    sidebar_style.layout.require_width(mode::pixel, 250.f);
+    sidebar_style.layout.require_height(mode::match_parent);
+    sidebar_style.layout.set_padding(15, 10);
+    sm.set_class("sidebar", sidebar_style);
+    
+    style button_style;
+    button_style.layout.require_width(mode::match_parent);
+    button_style.layout.require_height(mode::pixel, 40.f);
+    button_style.layout.align = alignment::center;
+    sm.set_class("sidebar-button", button_style);
+    
+    linear layout(orientation::vertical);
+    layout.classes = {"sidebar"};
+    layout.style.layout.require_size(250, 500);
+    layout.compute_style();
+    layout.process_required_size({250, 500});
+    
+    auto& btn1 = layout.add<mock_element>(0, 0);
+    btn1.classes = {"sidebar-button"};
+    btn1.compute_style();
+    
+    auto& btn2 = layout.add<mock_element>(0, 0);
+    btn2.classes = {"sidebar-button"};
+    btn2.compute_style();
+    
+    layout.on_update();
+
+    // Buttons should match parent width (250 - padding)
+    EXPECT_EQ(btn1.processed_width(), 220); // 250 - 15 - 15
+    EXPECT_EQ(btn1.processed_height(), 40);
+    EXPECT_EQ(btn2.processed_height(), 40);
+    
+    // Second button positioned after first
+    EXPECT_EQ(btn2.processed_y(), 40);
+}
+
+// Test: Global computed style caching
+TEST(DeclarativeStyleTest, GlobalComputedStyleCaching) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    theme app_theme;
+    app_theme.base.visual.font = std::make_optional("Arial");
+    app_theme.base.visual.text.normal = {1.f, 1.f, 1.f, 1.f};
+    sm.apply_theme(app_theme);
+    
+    auto global = sm.get_global();
+    
+    EXPECT_EQ(global.visual.font, "Arial");
+    EXPECT_FLOAT_EQ(global.visual.text.r, 1.f);
+}
+
+// Test: Empty classes don't break resolution
+TEST(DeclarativeStyleTest, EmptyClassesHandling) {
+    bgui::set_up();
+    
+    element elem;
+    elem.classes = {};
+    
+    EXPECT_NO_THROW(elem.compute_style());
+}
+
+// Test: Non-existent class doesn't break resolution
+TEST(DeclarativeStyleTest, NonExistentClassHandling) {
+    bgui::set_up();
+    
+    element elem;
+    elem.classes = {"non-existent-class"};
+    
+    EXPECT_NO_THROW(elem.compute_style());
+}
+
+// Test: Partial style override
+TEST(DeclarativeStyleTest, PartialStyleOverride) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    style base_style;
+    base_style.layout.require_size(100.f, 100.f);
+    base_style.visual.background.normal = {1.f, 0.f, 0.f, 1.f};
+    base_style.visual.border_radius = 5.f;
+    sm.set_class("base", base_style);
+    
+    style modifier_style;
+    modifier_style.visual.background.normal = {0.f, 0.f, 1.f, 1.f}; // only background
+    sm.set_class("blue", modifier_style);
+    
+    element elem;
+    elem.classes = {"base", "blue"};
+    elem.compute_style();
+    
+    // Size and border from base, color from blue
+    EXPECT_FLOAT_EQ(elem.computed_style.layout.size[0], 100.f);
+    EXPECT_FLOAT_EQ(elem.computed_style.visual.border_radius, 5.f);
+    EXPECT_FLOAT_EQ(elem.computed_style.visual.background.b, 1.f);
+}
+
+// Test: Declarative style with stretch mode
+TEST(DeclarativeStyleTest, StretchModeWithClasses) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    style fill_style;
+    fill_style.layout.require_mode(mode::stretch, mode::stretch);
+    sm.set_class("fill", fill_style);
+    
+    linear layout(orientation::vertical);
+    layout.style.layout.require_size(300, 400);
+    layout.compute_style();
+    layout.process_required_size({300, 400});
+    
+    auto& elem = layout.add<mock_element>(0, 0);
+    elem.classes = {"fill"};
+    elem.compute_style();
+    
+    layout.on_update();
+    
+    EXPECT_EQ(elem.processed_width(), 300);
+    EXPECT_EQ(elem.processed_height(), 400);
+}
+
+// Test: Class toggle behavior
+TEST(DeclarativeStyleTest, ClassToggle) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    style hidden_style;
+    hidden_style.visual.visible = false;
+    sm.set_class("hidden", hidden_style);
+    
+    element elem;
+    elem.compute_style();
+    
+    EXPECT_TRUE(elem.computed_style.visual.visible);
+    
+    elem.add_class("hidden");
+    elem.compute_style();
+    
+    EXPECT_FALSE(elem.computed_style.visual.visible);
+    
+    elem.remove_class("hidden");
+    elem.compute_style();
+    
+    EXPECT_TRUE(elem.computed_style.visual.visible);
+}
+
+// Test: Complex nested layout with declarative styles
+TEST(DeclarativeStyleTest, ComplexNestedLayoutWithClasses) {
+    bgui::set_up();
+    auto& sm = style_manager::get_instance();
+    
+    style container_style;
+    container_style.layout.set_padding(20, 20);
+    container_style.visual.background.normal = {0.1f, 0.1f, 0.1f, 1.f};
+    sm.set_class("container", container_style);
+    
+    style card_style;
+    card_style.layout.require_width(mode::match_parent);
+    card_style.layout.set_padding(10, 10);
+    card_style.visual.background.normal = {0.2f, 0.2f, 0.2f, 1.f};
+    card_style.visual.border_radius = 8.f;
+    sm.set_class("card", card_style);
+    
+    linear root(orientation::vertical);
+    root.classes = {"container"};
+    root.style.layout.require_size(400, 600);
+    root.compute_style();
+    root.process_required_size({400, 600});
+    
+    auto& card = root.add<linear>(orientation::vertical);
+    card.classes = {"card"};
+    card.compute_style();
+    
+    auto& content = card.add<mock_element>(0, 100);
+    content.compute_style();
+    
+    root.on_update();
+    
+    // Card should match parent width minus container padding
+    EXPECT_EQ(card.processed_width(), 360); // 400 - 20 - 20
 }
