@@ -28,6 +28,7 @@ namespace bgui {
         out.text       = in.text.resolve(state, out.text);
 
         apply_optional(out.border_radius, in.border_radius);
+        apply_optional(out.border_size, in.border_size);
         apply_optional(out.font, in.font);
         apply_optional(out.visible, in.visible);
     }
@@ -58,16 +59,16 @@ namespace bgui {
         );  
 
         void apply_theme(const theme& t) {
-            set_default(t.base);
-
+            m_types.clear();
+            m_ids.clear();
+            m_classes.clear();
             for (auto& [type, style] : t.types)
                 set_type(type, style);
 
             for (auto& [cls, style] : t.classes)
                 set_class(cls, style);
             
-            m_global_computed = {};
-            merge(m_global_computed, t.base, input_state::normal);
+            set_default(t.base);
         }
 
         computed_style get_global() const {
@@ -82,7 +83,9 @@ namespace bgui {
         style_manager(const style_manager&) = delete;
         style_manager& operator=(const style_manager&) = delete;
     private:
-        style_manager() = default;
+        style_manager() {
+            apply_theme(dark_theme());
+        };
         ~style_manager() = default;
 
         style m_default;
