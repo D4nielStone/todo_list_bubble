@@ -20,13 +20,13 @@ void linear::on_update() {
     const int cross = vertical ? 0 : 1;
 
     int pad_main_start  = vertical ? computed_style.layout.padding[1] : computed_style.layout.padding[0];
-    int pad_main_end    = vertical ? computed_style.layout.padding[3] : computed_style.layout.padding[2];
+    int pad_main_end    = vertical ? computed_style.layout.padding.w : computed_style.layout.padding.z;
     int pad_cross_start = vertical ? computed_style.layout.padding[0] : computed_style.layout.padding[1];
-    int pad_cross_end   = vertical ? computed_style.layout.padding[2] : computed_style.layout.padding[3];
+    int pad_cross_end   = vertical ? computed_style.layout.padding.z : computed_style.layout.padding.w;
 
     vec2i available = processed_size();
-    available[0] -= (computed_style.layout.padding[0] + computed_style.layout.padding[2]);
-    available[1] -= (computed_style.layout.padding[1] + computed_style.layout.padding[3]);
+    available[0] -= (computed_style.layout.padding[0] + computed_style.layout.padding.z);
+    available[1] -= (computed_style.layout.padding[1] + computed_style.layout.padding.w);
 
     float fixed_main = 0.f;
     int stretch_count = 0;
@@ -170,7 +170,7 @@ void linear::on_update() {
 
 float linear::content_height() {
     if (m_elements.empty()) {
-        return computed_style.layout.padding[1] + computed_style.layout.padding[3];
+        return computed_style.layout.padding[1] + computed_style.layout.padding.w;
     }
 
     const bool vertical = (m_orientation == orientation::vertical);
@@ -181,7 +181,7 @@ float linear::content_height() {
         int h = elem->processed_height()
         +
                 elem->computed_style.layout.margin[1] +
-                elem->computed_style.layout.margin[3];
+                elem->computed_style.layout.margin.w;
 
         if (vertical) {
             total += h;
@@ -190,14 +190,14 @@ float linear::content_height() {
         }
     }
 
-    total += computed_style.layout.padding[1] + computed_style.layout.padding[3];
+    total += computed_style.layout.padding[1] + computed_style.layout.padding.w;
 
     return static_cast<float>(total);
 }
 
 float bgui::linear::content_width() {
     if (m_elements.empty()) {
-        return  computed_style.layout.padding[0] + computed_style.layout.padding[2];
+        return  computed_style.layout.padding[0] + computed_style.layout.padding.z;
     }
 
     const bool vertical = (m_orientation == orientation::vertical);
@@ -207,7 +207,7 @@ float bgui::linear::content_width() {
         if(!elem->is_enabled()) continue;
         int w = elem->processed_width(); +
                 elem->computed_style.layout.margin[0] +
-                elem->computed_style.layout.margin[2];
+                elem->computed_style.layout.margin.z;
 
         if (!vertical) {
             total_width += w;
@@ -216,7 +216,7 @@ float bgui::linear::content_width() {
         }
     }
 
-    total_width += computed_style.layout.padding[0] + computed_style.layout.padding[2];
+    total_width += computed_style.layout.padding[0] + computed_style.layout.padding.z;
 
     return static_cast<float>(total_width);
 }
