@@ -65,7 +65,11 @@ void element::compute_style() {
     clear_style_dirty();
 }
 void element::get_requires(bgui::draw_data* calls) {
-
+    m_material.set("bg_color", computed_style.visual.background);
+    m_material.set("border_color", computed_style.visual.border);
+    m_material.set("bordered", computed_style.visual.border_radius > 0.f ? true : false);
+    m_material.set("border_radius", computed_style.visual.border_radius);
+    m_material.set("border_size", computed_style.visual.border_size);
     if (!computed_style.visual.visible) return;
     calls->m_quad_requires.push({
         m_material,
@@ -73,8 +77,8 @@ void element::get_requires(bgui::draw_data* calls) {
         vec4{
             static_cast<float>(m_rect[0]),
             static_cast<float>(m_rect[1]),
-            static_cast<float>(m_rect[2]),
-            static_cast<float>(m_rect[3])
+            static_cast<float>(m_rect.z),
+            static_cast<float>(m_rect.w)
         }
     });
 }
