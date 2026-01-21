@@ -69,12 +69,16 @@ namespace bgui {
          */
         virtual ~element() = default;
 
-        // ---- CLASSES ----
         void add_class(const std::string& cls);
         void remove_class(const std::string& cls);
         bool has_class(const std::string& cls) const;
         void clear_classes();
         void compute_style();
+
+
+        void set_input_state(const input_state& s) {
+            m_state = s;
+        }
 
         void set_enable(bool);
         bool is_enabled() const {
@@ -130,13 +134,13 @@ namespace bgui {
          * @brief Gets the final computed width of the element.
          * @return The width in pixels.
          */
-        int processed_width() const { return m_rect[2]; }
+        int processed_width() const { return m_rect.z; }
         
         /**
          * @brief Gets the final computed height of the element.
          * @return The height in pixels.
          */
-        int processed_height()const { return m_rect[3]; }
+        int processed_height()const { return m_rect.w; }
 
         /**
          * @brief Sets the final computed position and size of the element.
@@ -160,7 +164,7 @@ namespace bgui {
          * @param x The final width.
          * @param y The final height.
          */
-        void set_final_size(int x, int y) {m_rect[2] = x; m_rect[3] = y;}
+        void set_final_size(int x, int y) {m_rect.z = x; m_rect.w = y;}
 
         /**
          * @brief Gets the final computed position as a 2D vector.
@@ -172,7 +176,7 @@ namespace bgui {
          * @brief Gets the final computed size as a 2D vector.
          * @return A vec2i containing the width and height.
          */
-        vec2i processed_size()     const { return vec2i({m_rect[2], m_rect[3]}); }
+        vec2i processed_size()     const { return vec2i({m_rect.z, m_rect.w}); }
         
         /**
          * @brief Gets the final computed rectangle (X, Y, W, H).
