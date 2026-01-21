@@ -70,7 +70,7 @@ namespace bgui {
         state_color border;
         state_color text;
 
-        std::optional<float> border_radius;
+        std::optional<float> border_radius, border_size;
         std::optional<std::string> font;
         std::optional<bool> visible;
     };
@@ -100,7 +100,7 @@ namespace bgui {
         color text {1.f};
 
         std::string font = "default";
-        float border_radius {0.f};
+        float border_radius {2.f}, border_size{2.f};
         bool visible {true};
     };
 
