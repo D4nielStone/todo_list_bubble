@@ -4,6 +4,8 @@ namespace bgui {
 
     void style_manager::set_default(const style& s) {
         m_default = s;
+        m_global_computed = {};
+        merge(m_global_computed, m_default, input_state::normal);
     }
 
     void style_manager::set_type(const std::string& type, const style& s) {
@@ -25,7 +27,7 @@ namespace bgui {
         const style& inline_style,
         input_state state
     ) {
-        computed_style out;
+        computed_style out = get_global();
 
         // 1. type
         if (auto it = m_types.find(type); it != m_types.end())
