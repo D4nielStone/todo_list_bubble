@@ -892,22 +892,30 @@ TEST(DeclarativeStyleTest, PartialStyleOverride) {
 
 // Test: Declarative style with stretch mode
 TEST(DeclarativeStyleTest, StretchModeWithClasses) {
+    // Set up
     bgui::set_up();
     auto& sm = style_manager::get_instance();
     
+    // Creates stretch style
     style fill_style;
     fill_style.layout.require_mode(mode::stretch, mode::stretch);
+    // Set it's class
     sm.set_class("fill", fill_style);
     
+    // Creates the layout to be the parent
     linear layout(orientation::vertical);
     layout.style.layout.require_size(300, 400);
     layout.process_required_size({300, 400});
     
+    // Give the "fill" class to the child elemnt
     auto& elem = layout.add<element>();
     elem.add_class("fill");
+
+    // Compute styles
     layout.compute_style();
     elem.compute_style();
     
+    // Update sizes
     layout.on_update();
     
     EXPECT_EQ(elem.processed_width(), 300);

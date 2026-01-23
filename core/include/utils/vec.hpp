@@ -211,6 +211,71 @@ namespace bgui {
             return result;
         }
     };
+
+    template<typename T>
+    class vec<2, T> {
+    public:
+        union {
+            struct { T x, y, z; };
+            struct { T r, g, b; };
+            std::array<T, 2> v;
+        };
+
+        vec() : x(0), y(0), z(0) {}
+
+        vec(T scalar) : x(scalar), y(scalar), z(scalar) {}
+
+        vec(std::initializer_list<T> list) {
+            auto it = list.begin();
+            x = (it != list.end()) ? *it++ : T(0);
+            y = (it != list.end()) ? *it++ : T(0);
+            z = (it != list.end()) ? *it++ : T(0);
+        }
+
+        T& operator[](size_t i) { return v[i]; }
+        const T& operator[](size_t i) const { return v[i]; }
+
+        bool operator==(const vec& other) const {
+            return v == other.v;
+        }
+        vec<2, T> operator+(const vec<2, T>& other) const {
+            vec<2, T> result;
+            for (size_t i = 0; i < 2; ++i) {
+                result[i] = v[i] + other[i];
+            }
+            return result;
+        }
+
+        vec<2, T> operator-(const vec<2, T>& other) const {
+            vec<2, T> result;
+            for (size_t i = 0; i < 2; ++i) {
+                result[i] = v[i] - other[i];
+            }
+            return result;
+        }
+
+        vec<2, T> operator*(const T& scalar) const {
+            vec<2, T> result;
+            for (size_t i = 0; i < 2; ++i) {
+                result[i] = v[i] * scalar;
+            }
+            return result;
+        }
+        vec<2, T> operator/(const T& scalar) const {
+            vec<2, T> result;
+            for (size_t i = 0; i < 2; ++i) {
+                result[i] = v[i] / scalar;
+            }
+            return result;
+        }
+        vec<2, T> operator*(const vec<2, T>& other) const {
+            vec<2, T> result;
+            for (size_t i = 0; i < 2; ++i) {
+                result[i] = v[i] * other[i];
+            }
+            return result;
+        }
+    };
     
     using vec4 = vec<4, float>;
     using vec3 = vec<3, float>;
