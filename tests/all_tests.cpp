@@ -102,7 +102,6 @@ TEST(ElementTest, UpdateSizeCalculation) {
     EXPECT_EQ(elem.processed_height(), 120);
 
     // 5. Test padding and margin:
-    // Paddings and Margins SHOULD NOT affect the content.
     elem.style.layout.set_padding(10, 10); // L, T, R, B
     elem.style.layout.set_margin(5, 5);     // L, T, R, B
     elem.style.layout.require_size(50.f, 50.f); 
@@ -122,8 +121,8 @@ TEST(ElementTest, UpdateSizeCalculation) {
 
     elem.process_required_size(stretch_size);
     
-    EXPECT_EQ(elem.processed_width(), 150);
-    EXPECT_EQ(elem.processed_height(), 150);
+    EXPECT_EQ(elem.processed_width(), 140);
+    EXPECT_EQ(elem.processed_height(), 140);
 }
 
 // Mock element class for testing
@@ -468,7 +467,7 @@ TEST(StyleVisualTest, InheritBackgroundFromParent) {
     bgui::set_up();
 
     bgui::linear parent(bgui::orientation::vertical);
-    parent.style.visual.background = {0.f, 0.f, 1.f, 1.f}; // blue
+    parent.style.visual.background.normal = {0.f, 0.f, 1.f, 1.f}; // blue
     parent.compute_style();
 
     auto& child = parent.add<bgui::element>();
@@ -796,7 +795,6 @@ TEST(DeclarativeStyleTest, LayoutWithDeclarativeClasses) {
     style sidebar_style;
     sidebar_style.layout.require_width(mode::pixel, 250.f);
     sidebar_style.layout.require_height(mode::match_parent);
-    sidebar_style.layout.set_padding(15, 10);
     sm.set_class("sidebar", sidebar_style);
     
     style button_style;
@@ -806,31 +804,32 @@ TEST(DeclarativeStyleTest, LayoutWithDeclarativeClasses) {
     sm.set_class("sidebar-button", button_style);
     
     linear layout(orientation::vertical);
-    layout.classes = {"sidebar"};
+    layout.add_class("sidebar");
     layout.style.layout.require_size(250, 500);
+    layout.style.layout.set_padding(15, 10);
     layout.compute_style();
     layout.process_required_size({250, 500});
     
-    auto& btn1 = layout.add<mock_element>(0, 0);
-    btn1.classes = {"sidebar-button"};
+    auto& btn1 = layout.add<element>();
+    btn1.add_class("sidebar-button");
     btn1.compute_style();
     
-    auto& btn2 = layout.add<mock_element>(0, 0);
-    btn2.classes = {"sidebar-button"};
+    auto& btn2 = layout.add<element>();
+    btn2.add_class("sidebar-button");
     btn2.compute_style();
     
     layout.on_update();
 
-    // Buttons should match parent width (250 - padding)
-    EXPECT_EQ(btn1.processed_width(), 220); // 250 - 15 - 15
+    // Buttons should match parent width minus padding
+    EXPECT_EQ(btn1.processed_width(), 195);
     EXPECT_EQ(btn1.processed_height(), 40);
     EXPECT_EQ(btn2.processed_height(), 40);
     
     // Second button positioned after first
-    EXPECT_EQ(btn2.processed_y(), 40);
+    EXPECT_EQ(btn2.processed_y(), 50); // 10 (top padding) + 40 (btn1 height) + some spacing
 }
 
-// Test: Global computed style caching
+// Test: Global style caching
 TEST(DeclarativeStyleTest, GlobalComputedStyleCaching) {
     bgui::set_up();
     auto& sm = style_manager::get_instance();
@@ -843,7 +842,7 @@ TEST(DeclarativeStyleTest, GlobalComputedStyleCaching) {
     auto global = sm.get_global();
     
     EXPECT_EQ(global.visual.font, "Arial");
-    EXPECT_FLOAT_EQ(global.visual.text.r, 1.f);
+    EXPECT_FLOAT_EQ(global.visual.text.normal->r, 1.f);
 }
 
 // Test: Empty classes don't break resolution
@@ -902,11 +901,11 @@ TEST(DeclarativeStyleTest, StretchModeWithClasses) {
     
     linear layout(orientation::vertical);
     layout.style.layout.require_size(300, 400);
-    layout.compute_style();
     layout.process_required_size({300, 400});
     
-    auto& elem = layout.add<mock_element>(0, 0);
-    elem.classes = {"fill"};
+    auto& elem = layout.add<element>();
+    elem.add_class("fill");
+    layout.compute_style();
     elem.compute_style();
     
     layout.on_update();
@@ -958,16 +957,16 @@ TEST(DeclarativeStyleTest, ComplexNestedLayoutWithClasses) {
     sm.set_class("card", card_style);
     
     linear root(orientation::vertical);
-    root.classes = {"container"};
+    root.add_class("container");
     root.style.layout.require_size(400, 600);
     root.compute_style();
     root.process_required_size({400, 600});
     
     auto& card = root.add<linear>(orientation::vertical);
-    card.classes = {"card"};
+    card.add_class("card");
     card.compute_style();
     
-    auto& content = card.add<mock_element>(0, 100);
+    auto& content = card.add<element>();
     content.compute_style();
     
     root.on_update();

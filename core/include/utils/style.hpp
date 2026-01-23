@@ -6,6 +6,16 @@
 #include <climits>
 
 namespace bgui {
+
+    template<typename T>
+    inline void apply_optional(T& dst, const std::optional<T>& src) {
+        if (src.has_value()) dst = *src;
+    }
+    template<typename T>
+    inline void merge_optional(std::optional<T>& dst, const std::optional<T>& src) {
+        if(dst) return;
+        else if (src) dst = src;
+    }
     struct layout_style {
         std::optional<vec<2, mode>> size_mode;
         std::optional<vec4i> margin;
@@ -63,6 +73,13 @@ namespace bgui {
             if (normal) return *normal;
             return fallback;
         }
+        void merge(const state_color& other) {
+            merge_optional(normal, other.normal);
+            merge_optional(hover, other.hover);
+            merge_optional(pressed, other.pressed);
+            merge_optional(focused, other.focused);
+            merge_optional(disabled, other.disabled);
+        }
     };
 
     struct visual_style {
@@ -95,9 +112,9 @@ namespace bgui {
     };
 
     struct computed_visual_style {
-        color background {0.f};
-        color border {0.f};
-        color text {1.f};
+        color background {0.f, 0.f, 0.f, 0.f};
+        color border {1.f, 1.f, 1.f, 1.f};
+        color text {0.f, 0.f, 0.f, 0.f};
 
         std::string font = "default";
         float border_radius {2.f}, border_size{2.f};

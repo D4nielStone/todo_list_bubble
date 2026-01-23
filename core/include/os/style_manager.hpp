@@ -3,10 +3,6 @@
 #include "utils/theme.hpp"
 
 namespace bgui {
-    template<typename T>
-    inline void apply_optional(T& dst, const std::optional<T>& src) {
-        if (src) dst = *src;
-    }
     inline void merge(computed_layout_style& out, const layout_style& in) {
         apply_optional(out.size_mode, in.size_mode);
         apply_optional(out.margin,    in.margin);
@@ -33,6 +29,18 @@ namespace bgui {
         apply_optional(out.visible, in.visible);
     }
     inline void merge(
+        visual_style& out,
+        const visual_style& in
+    ) {
+        out.background.merge(in.background);
+        out.border.merge(in.border);
+        out.text.merge(in.text);
+        merge_optional(out.border_radius, in.border_radius);
+        merge_optional(out.border_size, in.border_size);
+        merge_optional(out.font, in.font);
+        merge_optional(out.visible, in.visible);
+    }
+    inline void merge(
         computed_style& out,
         const style& in,
         input_state state
@@ -50,11 +58,11 @@ namespace bgui {
         void set_id(const std::string& id, const style& s);
 
         // Final Resolve
-        computed_style resolve(
+        void resolve(
+            computed_style& cs,
             const std::string& type,
             const std::vector<std::string>& classes,
             const std::string& id,
-            const style& inline_style,
             input_state state
         );  
 
@@ -71,8 +79,8 @@ namespace bgui {
             set_default(t.base);
         }
 
-        computed_style get_global() const {
-            return m_global_computed;
+        style get_global() const {
+            return m_default;
         }
 
         // singleton
@@ -83,13 +91,10 @@ namespace bgui {
         style_manager(const style_manager&) = delete;
         style_manager& operator=(const style_manager&) = delete;
     private:
-        style_manager() {
-            apply_theme(dark_theme());
-        };
+        style_manager() = default;
         ~style_manager() = default;
 
         style m_default;
-        computed_style m_global_computed;
 
         std::unordered_map<std::string, style> m_types;
         std::unordered_map<std::string, style> m_classes;

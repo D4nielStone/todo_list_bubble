@@ -54,14 +54,21 @@ vec2i bgui::element::is_drag() const {
 
 void element::compute_style() {
     auto& sm = style_manager::get_instance();
+    
+    computed_style = {};
     // compute it' style
-    computed_style = sm.resolve(
+    sm.resolve(
+        computed_style,
         type,
         classes,
         id,
-        style,
         m_state
     );
+
+    if(get_parent())
+        bgui::merge(computed_style.visual, get_parent()->style.visual, m_state);
+    bgui::merge(computed_style, style, m_state);
+
     clear_style_dirty();
 }
 void element::get_requires(bgui::draw_data* calls) {
@@ -84,31 +91,59 @@ void element::get_requires(bgui::draw_data* calls) {
 }
 
 void element::process_required_size(const bgui::vec2i& available) {
-    // Step 1: resolve required size
-    // padding removes available intern space
+    // Step 1: Account for parent's padding (reduces available space for this element)
+    vec2i available_with_parent_padding = available;
+    if (get_parent()) {
+        auto& parent_padding = get_parent()->computed_style.layout.padding;
+        available_with_parent_padding[0] -= (parent_padding.x + parent_padding.y);
+        available_with_parent_padding[1] -= (parent_padding.z + parent_padding.w);
+        available_with_parent_padding[0] = std::max(0, available_with_parent_padding[0]);
+        available_with_parent_padding[1] = std::max(0, available_with_parent_padding[1]);
+    }
+
+    // Step 2: Account for own margin (further reduces available space)
+    auto& margin = computed_style.layout.margin;
+    vec2i available_after_margin = {
+        available_with_parent_padding[0] - static_cast<int>(margin.x + margin.y),
+        available_with_parent_padding[1] - static_cast<int>(margin.z + margin.w)
+    };
+    available_after_margin[0] = std::max(0, available_after_margin[0]);
+    available_after_margin[1] = std::max(0, available_after_margin[1]);
+
+    // Step 3: Resolve required size based on size_mode
     auto resolve = [&](int vertical, float max) {
-        int nvertical = vertical ? 0 : 1;
         switch(computed_style.layout.size_mode[vertical]) {
-            case bgui::mode::pixel:   return computed_style.layout.size[vertical];
-            case bgui::mode::percent: return max * (std::clamp(computed_style.layout.size[vertical], 0.f, 100.f)/100.f);
-            case bgui::mode::match_parent: return max;
-            case bgui::mode::wrap_content: return vertical ? content_height() : content_width();
-            case bgui::mode::stretch: return max;
+            case bgui::mode::pixel:
+                return computed_style.layout.size[vertical];
+            case bgui::mode::percent:
+                return max * (std::clamp(computed_style.layout.size[vertical], 0.f, 100.f) / 100.f);
+            case bgui::mode::match_parent:
+                return max;
+            case bgui::mode::wrap_content:
+                return vertical ? content_height() : content_width();
+            case bgui::mode::stretch:
+                return max;
         }
         return 0.f;
     };
 
-    float w = resolve(0, available[0]);
-    float h = resolve(1, available[1]);
+    float w = resolve(0, available_after_margin[0]);
+    float h = resolve(1, available_after_margin[1]);
 
-    if(computed_style.layout.size_mode[0] == bgui::mode::same)
+    // Step 4: Handle 'same' mode (square elements)
+    if (computed_style.layout.size_mode[0] == bgui::mode::same)
         w = h;
-    if(computed_style.layout.size_mode[1] == bgui::mode::same)
+    if (computed_style.layout.size_mode[1] == bgui::mode::same)
         h = w;
 
-    // Step 2: enforce min/max rules
-    w = std::clamp((int)w, computed_style.layout.limit_min[0], computed_style.layout.limit_max[0]);
-    h = std::clamp((int)h, computed_style.layout.limit_min[1], computed_style.layout.limit_max[1]);
+    // Step 5: Enforce min/max constraints
+    w = std::clamp(static_cast<int>(w), 
+                   computed_style.layout.limit_min[0], 
+                   computed_style.layout.limit_max[0]);
+    h = std::clamp(static_cast<int>(h), 
+                   computed_style.layout.limit_min[1], 
+                   computed_style.layout.limit_max[1]);
 
-    m_rect = { m_rect[0], m_rect[1], static_cast<int>(w), static_cast<int>(h) };
+    // Step 6: Set final rect dimensions
+    m_rect = { m_rect.x, m_rect.y, static_cast<int>(w), static_cast<int>(h) };
 }
