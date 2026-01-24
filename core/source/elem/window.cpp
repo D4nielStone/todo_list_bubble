@@ -9,13 +9,15 @@ bgui::window::window(const char* title) : linear(bgui::orientation::vertical), m
 
     // testing the header:
     m_header = &add<bgui::linear>(bgui::orientation::horizontal);
+    m_header->type = "window-header";
     // TODO: switch to icon image later
-    m_header->add<bgui::button>(" V ", 0.35f, [](){});
+    m_header->add<bgui::button>(" V ", 0.35f, [](){}).type = "window-button";
     m_title = &m_header->add<bgui::text>(title, 0.35f);
+    m_title->type = "window-label";
     // TODO: switch to image button later
     m_header->add<bgui::button>(" X ", 0.35f, [this](){
         m_parent->remove(this);
-    });
+    }).type = "window-button";
 }
 void bgui::window::on_update() {
     // drag system (title)

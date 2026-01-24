@@ -28,7 +28,12 @@ namespace bgui {
         t.types["window"].visual.background.normal = {0.08f, 0.08f, 0.08f, 1.f};  // m_box_color
         t.types["window"].visual.border.normal = {0.2f};
         t.types["window"].visual.visible = true;
-        t.types["window"].layout.padding = {10, 10, 10, 10};
+        t.types["window"].layout.set_padding(0, 0);
+        t.types["window"].layout.require_size(400, 300);
+        t.types["window-header"].layout.require_mode(mode::stretch, mode::wrap_content);
+        t.types["window-button"].layout.require_mode(mode::wrap_content, mode::wrap_content);
+        t.types["window-button"].visual.background.normal = {0.f};    // m_button_color (released)
+        t.types["window-button"].visual.border.normal  = {0.f}; // m_button_hovered_color
 
         t.types["element"].visual.background.normal = {0.08f, 0.08f, 0.08f, 1.f};  // m_box_color
 
@@ -40,7 +45,7 @@ namespace bgui {
         t.types["button"].visual.border_radius     = 4.f;
         t.types["button"].layout.padding           = {5, 5, 5, 5};
         t.types["button"].visual.border_size      = 1.f;
-        t.types["button"].layout.require_mode(mode::match_parent, mode::wrap_content);
+        t.types["button"].layout.require_mode(mode::stretch, mode::wrap_content);
 
         // ---------- CHECKBOX (from old m_cb_color, m_cb_border_color) ----------
         t.types["checkbox"].visual.background.normal = {0.2f, 0.2f, 0.2f, 1.f};   // m_cb_color (released)
@@ -48,6 +53,11 @@ namespace bgui {
         t.types["checkbox"].visual.border.normal     = {0.04f, 0.04f, 0.04f, 1.f}; // m_cb_border_color
         t.types["checkbox"].visual.border_radius     = 3.f;
 
+        
+        t.types["window-label"].visual.border.normal = {0.f};
+        t.types["window-label"].visual.background.normal = {0.f};
+        t.types["window-label"].layout.align = alignment::center;
+        t.types["window-label"].layout.require_mode(mode::stretch, mode::wrap_content);
         // ----------- TEXT
         t.types["text"].visual.border.normal = {0.f};
         t.types["text"].visual.text.normal = {1.f};
