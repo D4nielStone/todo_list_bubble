@@ -121,8 +121,8 @@ TEST(ElementTest, UpdateSizeCalculation) {
 
     elem.process_required_size(stretch_size);
     
-    EXPECT_EQ(elem.processed_width(), 140);
-    EXPECT_EQ(elem.processed_height(), 140);
+    EXPECT_EQ(elem.processed_width(), 150);
+    EXPECT_EQ(elem.processed_height(), 150);
 }
 
 // Mock element class for testing
@@ -205,6 +205,7 @@ TEST(LinearTest, VerticalLayoutWithStretch) {
     linear layout(orientation::vertical);
     layout.style.layout.require_size(200, 400);
     layout.style.layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.set_padding(0, 0);
     layout.compute_style();
     layout.process_required_size({200, 400});
     
@@ -228,11 +229,15 @@ TEST(LinearTest, MultipleStretchElements) {
     linear layout(orientation::vertical);
     layout.style.layout.require_size(200, 400);
     layout.style.layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.set_padding(0, 0);
+
     layout.compute_style();
     layout.process_required_size({200, 400});
     
     auto &elem1 = layout.add<mock_element>(100, 0, mode::pixel, mode::stretch);
+    elem1.style.layout.margin = {0, 0};
     auto &elem2 = layout.add<mock_element>(100, 0, mode::pixel, mode::stretch);
+    elem2.style.layout.margin = {0, 0};
 
     elem1.compute_style();
     elem2.compute_style();
@@ -248,6 +253,7 @@ TEST(LinearTest, MultipleStretchElements) {
 TEST(LinearTest, MatchParentCrossAxis) {
     linear layout(orientation::vertical);
     layout.style.layout.require_size(200, 400);
+    layout.style.layout.set_padding(0, 0);
     layout.style.layout.require_mode(mode::pixel, mode::pixel);
     layout.compute_style();
     layout.process_required_size({200, 400});
@@ -284,6 +290,7 @@ TEST(LinearTest, MarginsAffectSpacing) {
     linear layout(orientation::vertical);
     layout.style.layout.require_size(200, 400);
     layout.style.layout.require_mode(mode::pixel, mode::pixel);
+    layout.style.layout.set_padding(0, 0);
     layout.compute_style();
     layout.process_required_size({200, 400});
         
@@ -303,6 +310,7 @@ TEST(LinearTest, AlignmentStart) {
     bgui::set_up();
     linear layout(orientation::vertical);
     layout.style.layout.require_size(200, 400);
+    layout.style.layout.set_padding(0, 0);
     layout.style.layout.require_mode(mode::pixel, mode::pixel);
     layout.style.layout.align = (alignment::start);
     layout.compute_style();
@@ -320,6 +328,7 @@ TEST(LinearTest, AlignmentCenter) {
     bgui::set_up();
     linear layout(orientation::vertical);
     layout.style.layout.require_size(200, 400);
+    layout.style.layout.set_padding(0, 0);
     layout.style.layout.require_mode(mode::pixel, mode::pixel);
     layout.style.layout.align = (alignment::center);
     layout.compute_style();
@@ -337,6 +346,7 @@ TEST(LinearTest, AlignmentEnd) {
     bgui::set_up();
     linear layout(orientation::vertical);
     layout.style.layout.require_size(200, 400);
+    layout.style.layout.set_padding(0, 0);
     layout.style.layout.require_mode(mode::pixel, mode::pixel);
     layout.style.layout.align = (alignment::end);
     layout.compute_style();
@@ -355,6 +365,7 @@ TEST(LinearTest, CrossAxisCenterAlignment) {
     bgui::set_up();
     linear layout(orientation::vertical);
     layout.style.layout.require_size(200, 400);
+    layout.style.layout.set_padding(0, 0);
     layout.style.layout.require_mode(mode::pixel, mode::pixel);
     layout.style.layout.cross_align = (alignment::center);
     layout.compute_style();
@@ -410,6 +421,7 @@ TEST(LinearTest, ContentHeightHorizontal) {
 TEST(LinearTest, PercentMode) {
     bgui::set_up();
     linear layout(orientation::vertical);
+    layout.style.layout.set_padding(0, 0);
     layout.style.layout.require_size(200, 400);
     layout.style.layout.require_mode(mode::pixel, mode::pixel);
     layout.compute_style();
@@ -428,6 +440,7 @@ TEST(LinearTest, PercentMode) {
 TEST(LinearTest, NegativeSpaceHandling) {
     bgui::set_up();
     linear layout(orientation::vertical);
+    layout.style.layout.set_padding(0, 0);
     layout.style.layout.require_size(200, 100);
     layout.style.layout.require_mode(mode::pixel, mode::pixel);
     layout.compute_style();
@@ -518,6 +531,7 @@ TEST(StyleVisualTest, VisualStyleDoesNotBreakLayoutUpdate) {
     bgui::set_up();
 
     bgui::linear layout(bgui::orientation::vertical);
+    layout.style.layout.set_padding(0, 0);
     layout.style.layout.require_size(200, 100);
     layout.style.layout.require_mode(bgui::mode::pixel, bgui::mode::pixel);
     layout.style.visual.background = {0.2f, 0.2f, 0.2f, 1.f};
@@ -821,7 +835,7 @@ TEST(DeclarativeStyleTest, LayoutWithDeclarativeClasses) {
     layout.on_update();
 
     // Buttons should match parent width minus padding
-    EXPECT_EQ(btn1.processed_width(), 195);
+    EXPECT_EQ(btn1.processed_width(), 220);
     EXPECT_EQ(btn1.processed_height(), 40);
     EXPECT_EQ(btn2.processed_height(), 40);
     
@@ -905,6 +919,8 @@ TEST(DeclarativeStyleTest, StretchModeWithClasses) {
     // Creates the layout to be the parent
     linear layout(orientation::vertical);
     layout.style.layout.require_size(300, 400);
+    layout.style.layout.set_padding(0, 0);
+    layout.compute_style();
     layout.process_required_size({300, 400});
     
     // Give the "fill" class to the child elemnt
@@ -912,13 +928,13 @@ TEST(DeclarativeStyleTest, StretchModeWithClasses) {
     elem.add_class("fill");
 
     // Compute styles
-    layout.compute_style();
-    elem.compute_style();
+    layout.cascade_style();
     
     // Update sizes
     layout.on_update();
     
-    EXPECT_EQ(elem.processed_width(), 300);
+    // Width must be the minimum size becuse only works with the main axis (vertical).
+    EXPECT_EQ(elem.processed_width(), 15);
     EXPECT_EQ(elem.processed_height(), 400);
 }
 

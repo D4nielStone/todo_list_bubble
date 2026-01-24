@@ -6,7 +6,6 @@
 #include <iostream>
 
 static bool init_trigger = false;
-static bool style_trigger = false;
 std::unique_ptr<bgui::layout> bgui::s_main_layout;
 static std::unique_ptr<bgui::draw_data> s_draw_data;
 static std::queue<std::function<void()>> s_functions;
@@ -34,9 +33,10 @@ void bgui::cascade_style() {
     if(!init_trigger)
         throw std::runtime_error("[BGUI] You must initialize the library.");
 
-    style_trigger = true;
-
     auto& sm = style_manager::get_instance();
+
+    bgui::s_main_layout->style.layout.require_height(bgui::mode::match_parent);
+    bgui::s_main_layout->style.layout.require_width(bgui::mode::match_parent);
     s_main_layout->cascade_style();
 }
 
@@ -124,19 +124,18 @@ bool update_inputs(bgui::layout &lay){
 // Updates the main layout
 void bgui::on_update() {
     if(!init_trigger) throw std::runtime_error("[BGUI] You must initialize the library.");
-    if(!style_trigger) throw std::runtime_error("[BGUI] You must compute the style.");
 
     bgui::vec2i w_size = bgui::get_context_size();
 
     // the main layout must to be resized based on the window size by default.
-    bgui::s_main_layout->style.layout.require_height(bgui::mode::match_parent);
-    bgui::s_main_layout->style.layout.require_width(bgui::mode::match_parent);
-    
     while(!s_functions.empty()) {
         auto& f = s_functions.front();
         f();
         s_functions.pop();
     }
+
+    // cascade style
+    cascade_style();
 
     // update main layout and inputs
     get_context().m_actual_cursor = cursor::arrow;
@@ -144,7 +143,6 @@ void bgui::on_update() {
     bgui::s_main_layout->on_update();
 
     // reset cursor
-
     update_inputs(*bgui::s_main_layout);
 
     bgui::get_context().m_last_mouse_left = bgui::get_pressed(bgui::input_key::mouse_left);

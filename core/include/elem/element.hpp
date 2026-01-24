@@ -74,6 +74,7 @@ namespace bgui {
         bool has_class(const std::string& cls) const;
         void clear_classes();
         void compute_style();
+        void set_properties();
 
 
         void set_input_state(const input_state& s) {

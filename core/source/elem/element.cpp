@@ -56,7 +56,7 @@ void element::compute_style() {
     auto& sm = style_manager::get_instance();
     
     computed_style = {};
-    // compute it' style
+    // compute it's style
     sm.resolve(
         computed_style,
         type,
@@ -65,18 +65,24 @@ void element::compute_style() {
         m_state
     );
 
+    // inherit parent's style
     if(get_parent())
         bgui::merge(computed_style.visual, get_parent()->style.visual, m_state);
     bgui::merge(computed_style, style, m_state);
 
     clear_style_dirty();
 }
-void element::get_requires(bgui::draw_data* calls) {
+void element::set_properties() {
     m_material.set("bg_color", computed_style.visual.background);
     m_material.set("border_color", computed_style.visual.border);
     m_material.set("bordered", computed_style.visual.border_radius > 0.f ? true : false);
+    m_material.set("bordered", computed_style.visual.border.a > 0.f ? true : false);
     m_material.set("border_radius", computed_style.visual.border_radius);
     m_material.set("border_size", computed_style.visual.border_size);
+    m_material.set("text_color", computed_style.visual.text);
+}
+void element::get_requires(bgui::draw_data* calls) {
+    set_properties();
     if (!computed_style.visual.visible) return;
     calls->m_quad_requires.push({
         m_material,
@@ -91,26 +97,6 @@ void element::get_requires(bgui::draw_data* calls) {
 }
 
 void element::process_required_size(const bgui::vec2i& available) {
-    // Step 1: Account for parent's padding (reduces available space for this element)
-    vec2i available_with_parent_padding = available;
-    if (get_parent()) {
-        auto& parent_padding = get_parent()->computed_style.layout.padding;
-        available_with_parent_padding[0] -= (parent_padding.x + parent_padding.y);
-        available_with_parent_padding[1] -= (parent_padding.z + parent_padding.w);
-        available_with_parent_padding[0] = std::max(0, available_with_parent_padding[0]);
-        available_with_parent_padding[1] = std::max(0, available_with_parent_padding[1]);
-    }
-
-    // Step 2: Account for own margin (further reduces available space)
-    auto& margin = computed_style.layout.margin;
-    vec2i available_after_margin = {
-        available_with_parent_padding[0] - static_cast<int>(margin.x + margin.y),
-        available_with_parent_padding[1] - static_cast<int>(margin.z + margin.w)
-    };
-    available_after_margin[0] = std::max(0, available_after_margin[0]);
-    available_after_margin[1] = std::max(0, available_after_margin[1]);
-
-    // Step 3: Resolve required size based on size_mode
     auto resolve = [&](int vertical, float max) {
         switch(computed_style.layout.size_mode[vertical]) {
             case bgui::mode::pixel:
@@ -127,8 +113,8 @@ void element::process_required_size(const bgui::vec2i& available) {
         return 0.f;
     };
 
-    float w = resolve(0, available_after_margin[0]);
-    float h = resolve(1, available_after_margin[1]);
+    float w = resolve(0, available[0]);
+    float h = resolve(1, available[1]);
 
     // Step 4: Handle 'same' mode (square elements)
     if (computed_style.layout.size_mode[0] == bgui::mode::same)

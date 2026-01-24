@@ -6,10 +6,7 @@
 using namespace bgui;
 
 linear::linear(const orientation& ori) : m_orientation(ori), layout() {
-    style.visual.visible = false;
     type = "linear";
-    style.layout.set_margin(0, 0);
-    style.layout.set_padding(0, 0);
 }
 
 void linear::on_update() {

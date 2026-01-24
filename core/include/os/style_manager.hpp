@@ -79,7 +79,7 @@ namespace bgui {
             set_default(t.base);
         }
 
-        style get_global() const {
+        style& get_global() {
             return m_default;
         }
 

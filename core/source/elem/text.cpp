@@ -124,6 +124,7 @@ void bgui::text::get_requires(bgui::draw_data* data) {
         float w = m_scale * ch.size[0];
         float h = m_scale * ch.size[1];
 
+        set_properties();
         data->m_quad_requires.push({
             m_material, 6,
             { xpos, ypos, w, -h },
@@ -135,5 +136,6 @@ void bgui::text::get_requires(bgui::draw_data* data) {
 
     float total_height = line_count * (ascent + descent + line_gap);
 
-    //require_size(total_width, total_height);
+    style.layout.require_size(total_width, total_height);
+    style.layout.require_mode(mode::pixel, mode::pixel);
 }

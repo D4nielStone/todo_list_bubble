@@ -31,10 +31,10 @@ namespace bgui {
             // compute children style
             for (auto& elem : get_elements()) {
                 if (elem->is_style_dirty()) {
-                    elem->compute_style();
                     if(elem->as_layout()) {
                         elem->as_layout()->cascade_style();
-                    }
+                    } else
+                    elem->compute_style();
                 }
             }
         }
