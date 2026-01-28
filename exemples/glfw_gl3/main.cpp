@@ -11,29 +11,38 @@ int main() {
     // Build UI declaratively
     bgui::layout& root = bgui::get_layout();
 
-    bgui::style_manager::get_instance().set_class("panel", {
+    bgui::style_manager::get_instance().set_id("panel", {
         .layout = {
             .size_mode = std::make_optional<bgui::vec<2UL, bgui::mode>>({bgui::mode::pixel, bgui::mode::match_parent}),
-            .size = std::make_optional<bgui::vec2>({300.f, 1.f})
+            .size = std::make_optional<bgui::vec<2UL, float>>({300.f, 1.f})
         },
         .visual = {
             .visible = true
         }
     });
+    bgui::style_manager::get_instance().set_id("window_ctx", {
+        .layout = {
+            .size_mode = std::make_optional<bgui::vec<2UL, bgui::mode>>({bgui::mode::match_parent, bgui::mode::match_parent})
+        },
+        .visual = {
+            .visible = false
+        }
+    });
 
     auto& panel = root.add<bgui::linear>(bgui::orientation::vertical);
-    panel.add_class("panel");
+    panel.id = "panel";
     auto& txt = panel.add<bgui::text>("Linear Layout Exemple", 0.35f);
     auto& button = panel.add<bgui::button>("Button Exemple", 0.35f, [](){});
     auto& win = root.add<bgui::window>("Hello Bubble!");
     auto& context = win.add<bgui::linear>(bgui::orientation::vertical);
+    context.id = "window_ctx";
     context.add<bgui::text>("This is a window widget exemple.", 0.35f);
     auto& cb = context.add<bgui::checkbox>("Checkbox Exemple", 0.35f);
     context.add<bgui::checkbox>("Allow the checkbox above", 0.35f, true)
         .set_on_change([&cb](bool checked){
             cb.set_enable(checked);
         });
-    auto& txt2 = context.add<bgui::text>("Centered text", 0.35f);
+    auto& txt2 = context.add<bgui::text>("Another text", 0.35f);
     auto& button2 = context.add<bgui::button>("Button inside window", 0.35f, [](){});
 
     // Main loop

@@ -7,8 +7,10 @@ bgui::checkbox::checkbox(bool* ref, bool actv, const std::string& title, const f
     recives_input(true);
     // box should be a button
     auto& box = add<bgui::element>();
+    box.add_class("checkbox-box");
     if(title.empty() == false) {
         auto& txt = add<text>(title, scale);
+        txt.add_class("checkbox-txt");
         label = &txt;
         txt.recives_input(false);
     }
@@ -16,7 +18,8 @@ bgui::checkbox::checkbox(bool* ref, bool actv, const std::string& title, const f
     box.recives_input(false);
 }
 bgui::checkbox::checkbox(const std::string& title, const float scale, const bool actv) : m_ref(nullptr), m_active(actv), linear(bgui::orientation::horizontal) {
-    //m_visible = true;
+    type = "checkbox";
+
     recives_input(true);
 
     // box should be a button
@@ -31,6 +34,7 @@ bgui::checkbox::checkbox(const std::string& title, const float scale, const bool
 }
 
 void bgui::checkbox::on_clicked() {
+    element::on_clicked();
     bgui::get_context().m_actual_cursor = cursor::hand;
     m_active = m_active ? false : true;
     if(m_ref != nullptr) *m_ref = m_active;
@@ -42,12 +46,15 @@ void bgui::checkbox::set_on_change(const std::function<void(bool)>& f) {
 }
 
 void bgui::checkbox::on_released() {
+    element::on_released();
     bgui::get_context().m_actual_cursor = cursor::hand;
 }
 void bgui::checkbox::on_pressed() {
+    element::on_pressed();
     bgui::get_context().m_actual_cursor = cursor::hand;
 }
 void bgui::checkbox::on_mouse_hover() {
+    element::on_mouse_hover();
     bgui::get_context().m_actual_cursor = cursor::hand;
 }
 
