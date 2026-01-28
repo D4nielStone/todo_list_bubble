@@ -169,6 +169,7 @@ void linear::on_update() {
 }
 
 void linear::calc_content_size() {
+    if(!is_style_dirty()) return;
     const bool vertical = (m_orientation == orientation::vertical);
 
     int content_w = 0;

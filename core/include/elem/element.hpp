@@ -39,10 +39,10 @@ namespace bgui {
         // FINAL COMPUTED RECT (layout writes this)
         // x, y, width, height - The final position and dimensions calculated by the layout.
         vec4i m_rect {0, 0, 0, 0};
+        input_state m_state;
     public:
         void mark_style_dirty();
         // The input state of the element
-        input_state m_state;
         std::string type;                 // "button", "text", "linear"
         std::vector<std::string> classes; // {"primary", "rounded"}
         std::string id;                   // ex: "submitBtn"
@@ -50,8 +50,16 @@ namespace bgui {
         bgui::style style;                // inline style
         bgui::computed_style computed_style;       // final style
 
+        input_state get_state() const {
+            return m_state;
+        }
+        void set_state(const input_state s) {
+            m_state = s;
+            mark_style_dirty();
+        }
+
         bool is_style_dirty() const { return m_style_dirty; }
-        void clear_style_dirty()    { /*m_style_dirty = false;*/ }
+        void clear_style_dirty()    { m_style_dirty = false; }
         /**
          * @brief Default constructor.
          */
@@ -75,11 +83,6 @@ namespace bgui {
         void clear_classes();
         void compute_style();
         void set_properties();
-
-
-        void set_input_state(const input_state& s) {
-            m_state = s;
-        }
 
         void set_enable(bool);
         bool is_enabled() const {
@@ -231,7 +234,7 @@ namespace bgui {
          * @brief Callback invoked when the element is initially pressed (mouse down).
          */
         virtual void on_pressed() {
-            m_state = input_state::pressed;
+            set_state(input_state::pressed);
         };
 
         /**
@@ -244,21 +247,21 @@ namespace bgui {
          * @brief Callback invoked when the element is clicked (pressed and released).
          */
         virtual void on_clicked() {
-            m_state = input_state::pressed;
+            set_state(input_state::pressed);
         };
 
         /**
          * @brief Callback invoked when the press is released (mouse up).
          */
         virtual void on_released() {
-            m_state = input_state::normal;
+            set_state(input_state::normal);
         };
 
         /**
          * @brief Callback invoked when the mouse cursor hovers over the element.
          */
         virtual void on_mouse_hover() {
-            m_state = input_state::hover;
+            set_state(input_state::hover);
         };
 
         virtual void calc_content_size() {};

@@ -60,7 +60,8 @@ void bgui::checkbox::on_mouse_hover() {
 
 void bgui::checkbox::on_update() {
     linear::on_update();
-    get_elements()[0]->m_state = m_active ? input_state::pressed : input_state::normal;
+    auto& box = get_elements()[0];
+    m_active ? box->set_state(input_state::pressed) : box->set_state(input_state::normal);
 }
 
 bgui::text& bgui::checkbox::get_label() {
