@@ -3,25 +3,9 @@
 #include <string>
 #include "utils/vec.hpp"
 #include "utils/mat.hpp"
+#include "utils/enums.hpp"
 
 namespace bgui {
-    enum class cursor {
-        arrow,
-        hand,
-        ibeam
-    };
-    enum class input_key {
-        none,
-        mouse_left,
-        mouse_right,
-        mouse_middle
-    };
-    enum class input_action {
-        none,
-        press,
-        release,
-        repeat
-    };
     struct context {
         bgui::vec2i m_size{800, 600};
         bgui::vec2i m_mouse_position{0, 0};

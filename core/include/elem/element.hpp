@@ -5,7 +5,6 @@
 
 #include "utils/style.hpp"
 #include "utils/draw.hpp"
-#include "utils/uid.hpp"
 #include "utils/border.hpp"
 
 /**
@@ -20,48 +19,43 @@ namespace bgui {
      * * The element class is the fundamental building block for all UI components.
      * It handles style, size requires, layout results, and basic input events.
      */
-    class element : public uid {
+    class element {
+    private:
+        bool m_style_dirty  = true;
     protected:
         // Boolean that false means that the element is disabled.
         bool m_enabled {true};
         // Pointer to the parent layout in the UI hierarchy. Not directly style, but crucial for layout calculation.
         layout* m_parent {nullptr};
+        
+        //TODO: remove material or change its responsabilities
         // The graphical material (shader, colors, textures) used for rendering the element.
         material m_material;
-        // Visibility state of the element.
-        bool m_visible {true};
         // Flag indicating if the element should process mouse/keyboard input. Not strictly style, but related to interaction.
         bool m_recives_input{true};
         
-        // required size measurement modes (pixel or relative).
-        vec<2, mode> m_required_mode {mode::pixel, mode::pixel};
-        // The actual required size values (can be pixels or percentage).
-        vec2  m_required_size {0.f, 0.f};
-
-        // Internal space: left, top, right, bottom padding.
-        vec4i m_padding {0,0,0,0}; 
-        // External space: left, top, right, bottom margin.
-        vec4i m_margin  {0,0,0,0}; 
-        // Border properties (size, color, radius).
-        border m_border;
-        // Stored style object, usually inherited or default (colors, fonts, etc.).
-        style m_style;
-
-        // Minimum allowed size constraint (width, height).
-        vec2i m_min_size {10, 10};
-        // Maximum allowed size constraint (width, height).
-        vec2i m_max_size {INT_MAX, INT_MAX};
-        // Stores the last mouse delta during a drag operation. Not style, but input/interaction.
         vec2i m_last_drag{0, 0};
 
         // FINAL COMPUTED RECT (layout writes this)
         // x, y, width, height - The final position and dimensions calculated by the layout.
         vec4i m_rect {0, 0, 0, 0};
     public:
+        void mark_style_dirty();
+        // The input state of the element
+        input_state m_state;
+        std::string type;                 // "button", "text", "linear"
+        std::vector<std::string> classes; // {"primary", "rounded"}
+        std::string id;                   // ex: "submitBtn"
+
+        bgui::style style;                // inline style
+        bgui::computed_style computed_style;       // final style
+
+        bool is_style_dirty() const { return m_style_dirty; }
+        void clear_style_dirty()    { m_style_dirty = false; }
         /**
          * @brief Default constructor.
          */
-        element() = default;
+        element() : type("element"), style() {}
 
         /// @brief Tag Constructor
         /// Creates a UID based on a string type (tag).
@@ -69,198 +63,35 @@ namespace bgui {
          * @brief Constructor that initializes the element with a tag.
          * @param tag A string identifier for the element's type.
          */
-        element(const std::string& tag) : uid(tag){};
 
         /**
          * @brief Virtual destructor.
          */
         virtual ~element() = default;
 
+        void add_class(const std::string& cls);
+        void remove_class(const std::string& cls);
+        bool has_class(const std::string& cls) const;
+        void clear_classes();
+        void compute_style();
+        void set_properties();
+
+
+        void set_input_state(const input_state& s) {
+            m_state = s;
+        }
+
         void set_enable(bool);
         bool is_enabled() const {
             return m_enabled;
         }
-        // -- STYLE --
-        /**
-         * @brief Sets the margin (external spacing) around the element.
-         * @param left Margin on the left side.
-         * @param top Margin on the top side.
-         * @param right Margin on the right side.
-         * @param bottom Margin on the bottom side.
-         */
-        void set_margin(int left, int top, int right, int bottom);
-
-        /**
-         * @brief Sets uniform horizontal and vertical margins.
-         * @param horizontal Margin for left and right sides.
-         * @param vertical Margin for top and bottom sides.
-         */
-        void set_margin(int horizontal, int vertical);
-
-        /**
-         * @brief Gets all margins from the element
-         */
-        vec4i get_margin() const {
-            return m_margin;
-        };
-
-        // Padding
-        /**
-         * @brief Sets the padding (internal spacing) inside the element.
-         * @param left Padding on the left side.
-         * @param top Padding on the top side.
-         * @param right Padding on the right side.
-         * @param bottom Padding on the bottom side.
-         */
-        void set_padding(int left, int top, int right, int bottom);
-
-        /**
-         * @brief Sets uniform horizontal and vertical padding.
-         * @param horizontal Padding for left and right sides.
-         * @param vertical Padding for top and bottom sides.
-         */
-        void set_padding(int horizontal, int vertical);
-
-        /**
-         * @brief Gets all the 4 paddings from the element.
-         */
-        vec4i get_padding() const {
-            return m_padding;
-        }
-        // Borders
-        /**
-         * @brief Sets the border size (thickness).
-         * @param x Horizontal border size (left/right).
-         * @param y Vertical border size (top/bottom).
-         */
-        void set_border_size(int x, int y);
-
-        /**
-         * @brief Sets the color of the border.
-         * @param c The color object.
-         */
-        void set_border_color(const color& c);
-
-        /**
-         * @brief Sets the border radius for rounded corners.
-         * @param radius The radius value.
-         */
-        void set_border_radius(float radius);
-
-        // required size
-        /**
-         * @brief requires a specific size for the element using the currently set modes.
-         * @param width The required width value.
-         * @param height The required height value.
-         */
-        void require_size(float width, float height);
         
-        /**
-         * @brief requires a specific size mode for the element using the currently set sizes.
-         * @param width The required width mode.
-         * @param height The required height mode.
-         */
-        void require_mode(mode width, mode height);
-
-        /**
-         * @brief requires a specific width with a specified measurement mode.
-         * @param m The measurement mode (e.g., pixel, percentage).
-         * @param value The width value. Defaults to 100.f.
-         */
-        void require_width(mode m, float value = 100.f);
-
-        /**
-         * @brief requires a specific height with a specified measurement mode.
-         * @param m The measurement mode (e.g., pixel, percentage).
-         * @param value The height value. Defaults to 100.f.
-         */
-        void require_height(mode m, float value = 100.f);
-
-        // Material / visibility
-        /**
-         * @brief Sets the shader tag to be used by the element's material.
-         * @param shd The string tag of the shader.
-         */
-        void set_shader_tag(const std::string& shd);
-
-        /**
-         * @brief Sets the entire material object for rendering.
-         * @param m The material object.
-         */
-        void set_material(const material& m);
-
-        /**
-         * @brief Sets the visibility of the element.
-         * @param v True to make the element visible, false otherwise.
-         */
-        void set_visible(bool v);
-        bool is_visible() const {
-            return m_visible;
-        }
-
         /**
          * @brief Returns the material of the element
          */
         material& get_material() {
             return m_material;
         };
-
-        // Size constraints
-        /**
-         * @brief Sets the minimum size constraints.
-         * @param width The minimum width in pixels.
-         * @param height The minimum height in pixels.
-         */
-        void set_min_size(int width, int height);
-
-        /**
-         * @brief Sets the maximum size constraints.
-         * @param width The maximum width in pixels.
-         * @param height The maximum height in pixels.
-         */
-        void set_max_size(int width, int height);
-        // -- /STYLE --
-
-        // Size constraints
-        /**
-         * @brief Gets the minimum size constraint.
-         * @return A vec2i containing the minimum width and height.
-         */
-        vec2i get_min_size() const { return m_min_size; }
-        
-        /**
-         * @brief Gets the maximum size constraint.
-         * @return A vec2i containing the maximum width and height.
-         */
-        vec2i get_max_size() const { return m_max_size; }
-
-        // required size
-        /**
-         * @brief Gets the raw required size values (pixels or percentage).
-         * @return A vec2 containing the required width and height.
-         */
-        vec2 required_size() const { return m_required_size; }
-        
-        /**
-         * @brief Gets the required size measurement modes.
-         * @return A vec<2,mode> containing the width and height modes.
-         */
-        vec<2,mode> get_required_mode() const { return m_required_mode; }
-
-        // Core Style Application
-        /**
-         * @brief Applies a given style object to the element, updating material properties.
-         * @param style The style object to apply.
-         */
-        virtual void apply_style(const style& style);
-
-        /**
-         * @brief Getter to enable user to edit elemnt's local style.
-         * @returns A style containing informations from it's style.
-         */
-        style& get_style() {
-            return m_style;
-        }
 
         /**
          * @brief Calculates the size based on the available space and required size.
@@ -298,18 +129,19 @@ namespace bgui {
          * @return The Y coordinate in pixels.
          */
         int processed_y()     const { return m_rect[1]; }
+
         
         /**
          * @brief Gets the final computed width of the element.
          * @return The width in pixels.
          */
-        int processed_width() const { return m_rect[2]; }
+        int processed_width() const { return m_rect.z; }
         
         /**
          * @brief Gets the final computed height of the element.
          * @return The height in pixels.
          */
-        int processed_height()const { return m_rect[3]; }
+        int processed_height()const { return m_rect.w; }
 
         /**
          * @brief Sets the final computed position and size of the element.
@@ -333,7 +165,7 @@ namespace bgui {
          * @param x The final width.
          * @param y The final height.
          */
-        void set_final_size(int x, int y) {m_rect[2] = x; m_rect[3] = y;}
+        void set_final_size(int x, int y) {m_rect.z = x; m_rect.w = y;}
 
         /**
          * @brief Gets the final computed position as a 2D vector.
@@ -345,7 +177,7 @@ namespace bgui {
          * @brief Gets the final computed size as a 2D vector.
          * @return A vec2i containing the width and height.
          */
-        vec2i processed_size()     const { return vec2i({m_rect[2], m_rect[3]}); }
+        vec2i processed_size()     const { return vec2i({m_rect.z, m_rect.w}); }
         
         /**
          * @brief Gets the final computed rectangle (X, Y, W, H).
@@ -398,7 +230,9 @@ namespace bgui {
         /**
          * @brief Callback invoked when the element is initially pressed (mouse down).
          */
-        virtual void on_pressed() {};
+        virtual void on_pressed() {
+            m_state = input_state::pressed;
+        };
 
         /**
          * @brief Callback invoked when the mouse is moved while pressed over the element.
@@ -409,23 +243,31 @@ namespace bgui {
         /**
          * @brief Callback invoked when the element is clicked (pressed and released).
          */
-        virtual void on_clicked() {};
+        virtual void on_clicked() {
+            m_state = input_state::pressed;
+        };
 
         /**
          * @brief Callback invoked when the press is released (mouse up).
          */
-        virtual void on_released() {};
+        virtual void on_released() {
+            m_state = input_state::normal;
+        };
 
         /**
          * @brief Callback invoked when the mouse cursor hovers over the element.
          */
-        virtual void on_mouse_hover() {};
+        virtual void on_mouse_hover() {
+            m_state = input_state::hover;
+        };
 
         /**
          * @brief Gets the minimum required size for the element's content.
          * @return A vec2i representing the content size. Defaults to get_min_size().
          */
-        virtual vec2i get_content_size() {return get_min_size(); }
+        virtual vec2i get_content_size() {
+            return vec2i{computed_style.layout.limit_min[0], computed_style.layout.limit_min[1]}; 
+        }
 
         /**
          * @brief Collects draw calls required to render this element.
