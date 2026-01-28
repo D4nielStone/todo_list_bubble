@@ -5,6 +5,8 @@
 bgui::input_area::input_area(const std::string& buffer, const float scale, const std::string& placeholder) :
     linear(), m_placeholder(placeholder) {
     type = "inputarea";
+    m_text = &add<text>(m_placeholder, 0.35f);
+    m_text->add_class("inputarea-text");
 }
 
 bgui::input_area::~input_area() {

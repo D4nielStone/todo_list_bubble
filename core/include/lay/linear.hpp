@@ -15,8 +15,7 @@ namespace bgui {
         ~linear() = default;
     
         void on_update() override;
-        float content_height() override;
-        float content_width() override;
+        vec2i get_content_size() override;
         
         bgui::layout* as_layout() override { return this; }
     };

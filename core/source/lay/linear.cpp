@@ -165,55 +165,52 @@ void linear::on_update() {
     }
 }
 
-float linear::content_height() {
+vec2i linear::get_content_size() {
+    const bool vertical = (m_orientation == orientation::vertical);
+
+    int content_w = 0;
+    int content_h = 0;
+
+    // Padding
+    const int pad_left   = computed_style.layout.padding.x;
+    const int pad_top    = computed_style.layout.padding.y;
+    const int pad_right  = computed_style.layout.padding.z;
+    const int pad_bottom = computed_style.layout.padding.w;
+
     if (m_elements.empty()) {
-        return computed_style.layout.padding.y + computed_style.layout.padding.w;
+        m_content_size = {
+            pad_left + pad_right,
+            pad_top + pad_bottom
+        };
+        return m_content_size;
     }
 
-    const bool vertical = (m_orientation == orientation::vertical);
-    int total = 0;
-
     for (auto& elem : m_elements) {
-        if(!elem->is_enabled()) continue;
-        int h = elem->processed_height()
-        +
-                elem->computed_style.layout.margin.y +
-                elem->computed_style.layout.margin.w;
+        if (!elem->is_enabled())
+            continue;
+
+        const auto& margin = elem->computed_style.layout.margin;
+
+        const int elem_w =
+            elem->processed_width() +
+            margin.x + margin.z;
+
+        const int elem_h =
+            elem->processed_height() +
+            margin.y + margin.w;
 
         if (vertical) {
-            total += h;
+            content_h += elem_h;
+            content_w = std::max(content_w, elem_w);
         } else {
-            total = std::max(total, h);
+            content_w += elem_w;
+            content_h = std::max(content_h, elem_h);
         }
     }
 
-    total += computed_style.layout.padding.y + computed_style.layout.padding.w;
+    content_w += pad_left + pad_right;
+    content_h += pad_top + pad_bottom;
 
-    return static_cast<float>(total);
-}
-
-float bgui::linear::content_width() {
-    if (m_elements.empty()) {
-        return  computed_style.layout.padding.x + computed_style.layout.padding.z;
-    }
-
-    const bool vertical = (m_orientation == orientation::vertical);
-    int total_width = 0;
-
-    for (auto& elem : m_elements) {
-        if(!elem->is_enabled()) continue;
-        int w = elem->processed_width(); +
-                elem->computed_style.layout.margin.x +
-                elem->computed_style.layout.margin.z;
-
-        if (!vertical) {
-            total_width += w;
-        } else {
-            total_width = std::max(total_width, w);
-        }
-    }
-
-    total_width += computed_style.layout.padding.x + computed_style.layout.padding.z;
-
-    return static_cast<float>(total_width);
+    m_content_size = { content_w, content_h };
+    return m_content_size;
 }

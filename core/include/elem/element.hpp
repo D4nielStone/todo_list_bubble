@@ -34,7 +34,7 @@ namespace bgui {
         // Flag indicating if the element should process mouse/keyboard input. Not strictly style, but related to interaction.
         bool m_recives_input{true};
         
-        vec2i m_last_drag{0, 0};
+        vec2i m_last_drag{0, 0}, m_content_size{0, 0};
 
         // FINAL COMPUTED RECT (layout writes this)
         // x, y, width, height - The final position and dimensions calculated by the layout.
@@ -219,13 +219,13 @@ namespace bgui {
          * @brief Calculates the content width (excluding padding, margin, border).
          * @return The content width as a float.
          */
-        virtual float content_width(){return 0.f;};
+        float content_width(){return get_content_size().x;};
 
         /**
          * @brief Calculates the content height (excluding padding, margin, border).
          * @return The content height as a float.
          */
-        virtual float content_height(){return 0.f;};
+        float content_height(){return get_content_size().y;};
 
         /**
          * @brief Callback invoked when the element is initially pressed (mouse down).
@@ -266,8 +266,11 @@ namespace bgui {
          * @return A vec2i representing the content size. Defaults to get_min_size().
          */
         virtual vec2i get_content_size() {
-            return vec2i{computed_style.layout.limit_min[0], computed_style.layout.limit_min[1]}; 
+            return m_content_size; 
         }
+        void set_content_size(const vec2i& content) {
+            m_content_size = content;
+        };
 
         /**
          * @brief Collects draw calls required to render this element.

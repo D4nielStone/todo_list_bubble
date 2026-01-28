@@ -41,6 +41,15 @@ bgui::theme bgui::dark_theme() {
     t.types["button"].layout.padding           = {5, 5, 5, 5};
     t.types["button"].visual.border_size      = 1.f;
     t.types["button"].layout.require_mode(mode::stretch, mode::wrap_content);
+    
+    t.types["inputarea"].visual.background.normal = {0.1f, 0.1f, 0.1f, 1.f};    // m_button_color (released)
+    t.types["inputarea"].visual.background.hover  = {0.12f, 0.12f, 0.12f, 1.f}; // m_button_hovered_color
+    t.types["inputarea"].visual.background.pressed  = {0.12f, 0.12f, 0.12f, 1.f}; // m_button_clicked_color
+    t.types["inputarea"].visual.border.normal     = {0.04f, 0.04f, 0.04f, 1.f}; // m_button_border_color
+    t.types["inputarea"].visual.border_radius     = 4.f;
+    t.types["inputarea"].layout.padding           = {5, 5, 5, 5};
+    t.types["inputarea"].visual.border_size      = 1.f;
+    t.types["inputarea"].layout.require_mode(mode::stretch, mode::wrap_content);
 
     // ---------- CHECKBOX (from old m_cb_color, m_cb_border_color) ----------
     t.types["checkbox"].visual.background.normal = {0.1f, 0.1f, 0.1f, 1.f};    // m_button_color (released)
