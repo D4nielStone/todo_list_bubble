@@ -50,17 +50,21 @@ bgui::theme bgui::dark_theme() {
     t.types["inputarea"].layout.padding           = {5, 5, 5, 5};
     t.types["inputarea"].visual.border_size      = 1.f;
     t.types["inputarea"].layout.require_mode(mode::stretch, mode::wrap_content);
+    t.classes["inputarea-txt"].layout.require_mode(mode::stretch, mode::wrap_content);
 
     // ---------- CHECKBOX (from old m_cb_color, m_cb_border_color) ----------
     t.types["checkbox"].visual.background.normal = {0.1f, 0.1f, 0.1f, 1.f};    // m_button_color (released)
     t.types["checkbox"].visual.background.hover  = {0.12f, 0.12f, 0.12f, 1.f}; // m_button_hovered_color
-    t.types["checkbox"].visual.background.pressed  = {0.12f, 0.12f, 0.12f, 1.f}; // m_button_clicked_color
+    t.classes["checkbox-box"].visual.background.pressed  = {0.5, 0.5, 0.5, 1.f}; // m_button_clicked_color
     t.types["checkbox"].visual.border.normal     = {0.04f, 0.04f, 0.04f, 1.f}; // m_button_border_color
     t.types["checkbox"].visual.border_radius     = 4.f;
     t.types["checkbox"].layout.padding           = {5, 5, 5, 5};
     t.types["checkbox"].visual.border_size      = 1.f;
+    t.types["checkbox"].layout.set_padding(5, 2);
     t.types["checkbox"].layout.require_mode(mode::stretch, mode::wrap_content);
+    t.classes["checkbox-txt"].layout.require_mode(mode::stretch, mode::wrap_content);
     t.classes["checkbox-txt"].layout.align = alignment::end;
+    t.classes["checkbox-txt"].layout.set_margin(5, 5);
     t.classes["checkbox-box"].layout.require_size(20, 20);
     t.classes["checkbox-box"].layout.require_mode(mode::pixel, mode::pixel);
     t.classes["window-label"].visual.border.normal = {0.f};
@@ -71,7 +75,7 @@ bgui::theme bgui::dark_theme() {
     t.types["text"].visual.border.normal = {0.f};
     t.types["text"].visual.text.normal = {1.f};
     t.types["text"].visual.background.normal = {0.f};
-    t.types["text"].layout.require_mode(mode::match_parent, mode::wrap_content);
+    t.types["text"].layout.require_mode(mode::wrap_content, mode::wrap_content);
     t.types["text"].layout.align = alignment::center;
 
     // ---------- CLASSES (optional accent variants) ----------

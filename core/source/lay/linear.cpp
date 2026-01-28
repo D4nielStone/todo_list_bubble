@@ -10,6 +10,9 @@ linear::linear(const orientation& ori) : m_orientation(ori), layout() {
 }
 
 void linear::on_update() {
+    element::on_update();
+    calc_content_size();
+
     if (m_elements.empty()) return;
 
     const bool vertical = (m_orientation == orientation::vertical);
@@ -165,7 +168,7 @@ void linear::on_update() {
     }
 }
 
-vec2i linear::get_content_size() {
+void linear::calc_content_size() {
     const bool vertical = (m_orientation == orientation::vertical);
 
     int content_w = 0;
@@ -182,7 +185,7 @@ vec2i linear::get_content_size() {
             pad_left + pad_right,
             pad_top + pad_bottom
         };
-        return m_content_size;
+        return;
     }
 
     for (auto& elem : m_elements) {
@@ -211,6 +214,5 @@ vec2i linear::get_content_size() {
     content_w += pad_left + pad_right;
     content_h += pad_top + pad_bottom;
 
-    m_content_size = { content_w, content_h };
-    return m_content_size;
+    set_content_size({ content_w, content_h });
 }

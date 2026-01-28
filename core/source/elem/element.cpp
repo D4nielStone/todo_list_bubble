@@ -45,6 +45,7 @@ void element::set_enable(bool b){
 }
 
 void element::on_update() {
+    m_state = input_state::normal;
     m_last_drag = {0, 0};
 }
 
@@ -106,7 +107,7 @@ void element::process_required_size(const bgui::vec2i& available) {
             case bgui::mode::match_parent:
                 return max;
             case bgui::mode::wrap_content:
-                return vertical ? content_height() : content_width();
+                return (float)get_content_size()[vertical];
             case bgui::mode::stretch:
                 return max;
         }

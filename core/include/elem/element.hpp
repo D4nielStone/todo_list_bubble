@@ -51,7 +51,7 @@ namespace bgui {
         bgui::computed_style computed_style;       // final style
 
         bool is_style_dirty() const { return m_style_dirty; }
-        void clear_style_dirty()    { m_style_dirty = false; }
+        void clear_style_dirty()    { /*m_style_dirty = false;*/ }
         /**
          * @brief Default constructor.
          */
@@ -261,11 +261,13 @@ namespace bgui {
             m_state = input_state::hover;
         };
 
+        virtual void calc_content_size() {};
+
         /**
          * @brief Gets the minimum required size for the element's content.
          * @return A vec2i representing the content size. Defaults to get_min_size().
          */
-        virtual vec2i get_content_size() {
+        vec2i get_content_size() const {
             return m_content_size; 
         }
         void set_content_size(const vec2i& content) {
